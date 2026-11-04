@@ -82,6 +82,26 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  isNewArrival: {
+    type: Boolean,
+    default: true
+  },
+  isOnSale: {
+    type: Boolean,
+    default: false
+  },
+  isTrending: {
+    type: Boolean,
+    default: false
+  },
+  featured: {
+    type: Boolean,
+    default: false
+  },
+  discountPercent: {
+    type: Number,
+    default: 0
+  },
   stock: {
     type: Number,
     default: 25
@@ -97,5 +117,14 @@ const productSchema = new mongoose.Schema({
     }
   }
 });
+
+// High-concurrency compound indexes for fast filtering & sorting
+productSchema.index({ category: 1, createdAt: -1 });
+productSchema.index({ isNewArrival: 1, category: 1 });
+productSchema.index({ isOnSale: 1, discountPercent: -1 });
+productSchema.index({ isTrending: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ title: 'text', description: 'text', fabric: 'text' });
 
 module.exports = mongoose.model('Product', productSchema);

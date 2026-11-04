@@ -50,7 +50,7 @@ export default function InstagramFeed() {
             href="https://instagram.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#641E32] text-[#FAF5EC] hover:bg-[#164B3C] text-xs font-semibold uppercase tracking-[0.2em] transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#641E32] text-[#FAF5EC] hover:bg-[#4A1624] text-xs font-semibold uppercase tracking-[0.2em] transition-all shadow-sm"
           >
             <SparklesIcon className="w-4 h-4 text-[#B89B62]" />
             <span>Follow @LailaShamsiOfficial</span>

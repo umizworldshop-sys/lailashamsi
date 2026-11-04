@@ -1,97 +1,88 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { TruckIcon, ShieldCheckIcon, SparklesIcon, RefreshCwIcon } from './Icons';
 
 export default function ValueProps() {
   const perks = [
     {
-      icon: SparklesIcon,
-      title: 'Pakistani Craftsmanship',
-      desc: 'Artisan tilla, resham & zardozi embroidery on every outfit'
-    },
-    {
       icon: TruckIcon,
-      title: 'Nationwide & Global Delivery',
-      desc: 'Express shipping across Pakistan, UK, USA, UAE & Canada'
+      title: 'Cash on Delivery (COD)',
+      subtitle: 'Pay at Doorstep',
+      desc: 'Order with complete peace of mind. Pay cash when your parcel arrives anywhere across Pakistan.'
     },
     {
       icon: ShieldCheckIcon,
-      title: 'Pure Natural Fabrics',
-      desc: 'Fine Pakistani lawn, pure raw silk, chiffon & organza'
+      title: '100% Pure Fabrics',
+      subtitle: 'Original Quality',
+      desc: 'Breathable Pakistani fine lawn, pure raw silks, chiffons, and authentic handcrafted embroidery.'
+    },
+    {
+      icon: SparklesIcon,
+      title: 'Fast 2-4 Days Delivery',
+      subtitle: 'Express Nationwide',
+      desc: 'Direct dispatch from Lahore via express couriers to Karachi, Islamabad, Rawalpindi & all cities.'
     },
     {
       icon: RefreshCwIcon,
-      title: 'Tailored Perfection',
-      desc: 'Refined Eastern cuts with effortless 14-day exchanges'
+      title: 'Easy Exchange & Support',
+      subtitle: 'Hassle-Free Policy',
+      desc: 'Simple 14-day size exchanges with dedicated WhatsApp stylist support (03174341036).'
     }
   ];
 
-  const sectionRef = useRef(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.25 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section
-      ref={sectionRef}
-      aria-label="Our promises"
-      className="relative bg-[#FAF5EC] py-12 sm:py-14 border-b border-[#E8DCCB]"
-    >
-      <span
-        className={`absolute top-0 left-1/2 -translate-x-1/2 h-px bg-gradient-to-r from-transparent via-[#B89B62]/60 to-transparent transition-all duration-[1400ms] ease-out ${
-          visible ? 'w-full' : 'w-0'
-        }`}
-      />
-      <span
-        className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-px bg-gradient-to-r from-transparent via-[#B89B62]/60 to-transparent transition-all duration-[1400ms] ease-out ${
-          visible ? 'w-full' : 'w-0'
-        }`}
-      />
-
+    <section className="bg-[#FAF5EC] py-14 sm:py-16 border-b border-[#E8DCCB] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 lg:divide-x lg:divide-[#E8DCCB]">
-          {perks.map((perk, index) => {
+        
+        {/* Section Header */}
+        <div className="text-center max-w-xl mx-auto mb-10">
+          <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.24em] text-[#B89B62] font-bold block mb-1">
+            ✦ Umi&apos;z World Shopping Guarantee
+          </span>
+          <h2 className="font-cinzel text-2xl sm:text-3xl font-bold text-[#641E32]">
+            Why Women Across Pakistan Trust Us
+          </h2>
+          <div className="w-16 h-0.5 bg-[#B89B62] mx-auto mt-2.5" />
+        </div>
+
+        {/* 4 Prominent Pakistani Trust Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          {perks.map((perk, idx) => {
             const Icon = perk.icon;
             return (
               <div
-                key={perk.title}
-                style={{ transitionDelay: `${index * 140}ms` }}
-                className={`group flex flex-col items-center text-center px-4 sm:px-6 cursor-default transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                  visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-                }`}
+                key={idx}
+                className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E8DCCB] shadow-sm hover:shadow-lg hover:border-[#B89B62] transition-all duration-300 flex flex-col justify-between group"
               >
-                <div className="relative w-14 h-14 mb-4 flex items-center justify-center">
-                  <span className="absolute inset-0 rounded-full border border-dashed border-[#B89B62]/60 transition-transform duration-[1200ms] ease-out group-hover:rotate-180 group-hover:border-[#641E32]" />
-                  <span className="absolute inset-[5px] rounded-full bg-white shadow-sm transition-all duration-500 group-hover:bg-[#641E32]" />
-                  <Icon className="relative w-5 h-5 text-[#641E32] transition-all duration-500 group-hover:text-[#FAF5EC] group-hover:scale-110" />
+                <div>
+                  {/* Icon & Subtitle Badge */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-[#641E32]/10 border border-[#B89B62]/30 flex items-center justify-center text-[#641E32] group-hover:bg-[#641E32] group-hover:text-[#FAF5EC] transition-all duration-300 shadow-xs">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-[9.5px] uppercase tracking-wider font-semibold text-[#641E32] bg-[#641E32]/10 px-2.5 py-1 rounded-full">
+                      {perk.subtitle}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-cinzel text-base font-bold text-[#641E32] mb-2 group-hover:text-[#B89B62] transition-colors">
+                    {perk.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-xs text-[#282321]/75 leading-relaxed font-normal">
+                    {perk.desc}
+                  </p>
                 </div>
 
-                <h3 className="font-cinzel text-[13px] sm:text-sm font-bold text-[#641E32]">
-                  {perk.title}
-                </h3>
-
-                <span className="block h-px w-6 bg-[#B89B62] my-2.5 transition-all duration-500 group-hover:w-14" />
-
-                <p className="text-[11.5px] sm:text-xs text-[#282321]/80 font-normal leading-relaxed max-w-[220px]">
-                  {perk.desc}
-                </p>
+                <div className="pt-4 mt-4 border-t border-[#E8DCCB]/60 flex items-center gap-1.5 text-[10.5px] text-[#B89B62] font-semibold">
+                  <span>✦ Verified Pakistani Standard</span>
+                </div>
               </div>
             );
           })}
         </div>
+
       </div>
     </section>
   );

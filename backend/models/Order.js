@@ -3,7 +3,13 @@ const mongoose = require('mongoose');
 const orderItemSchema = new mongoose.Schema({
   productId: { type: String, required: false },
   title: { type: String, required: true },
+  category: { type: String, default: '' },
+  categoryLabel: { type: String, default: 'Luxury Pret' },
+  fabric: { type: String, default: '' },
+  pieces: { type: String, default: '' },
+  description: { type: String, default: '' },
   price: { type: Number, required: true },
+  originalPrice: { type: Number, default: null },
   quantity: { type: Number, required: true, default: 1 },
   selectedSize: { type: String, default: 'M' },
   selectedColor: {
@@ -17,7 +23,8 @@ const orderSchema = new mongoose.Schema({
   orderNumber: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    index: true
   },
   customer: {
     fullName: { type: String, required: true },
@@ -30,14 +37,17 @@ const orderSchema = new mongoose.Schema({
   },
   items: [orderItemSchema],
   subtotal: { type: Number, required: true },
+  discountAmount: { type: Number, default: 0 },
+  promoCode: { type: String, default: '' },
   shippingFee: { type: Number, default: 0 },
   grandTotal: { type: Number, required: true },
-  currency: { type: String, default: 'USD' },
+  currency: { type: String, default: 'PKR' },
   paymentMethod: { type: String, default: 'cod' },
   status: {
     type: String,
     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
-    default: 'Pending'
+    default: 'Pending',
+    index: true
   }
 }, {
   timestamps: true,
@@ -50,5 +60,7 @@ const orderSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ 'customer.phone': 1 });
 
+module.exports = mongoose.model('Order', orderSchema);

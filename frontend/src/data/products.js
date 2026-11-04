@@ -1,6 +1,6 @@
 export const CURRENCY_RATES = {
+  PKR: { symbol: 'Rs. ', rate: 100 },
   USD: { symbol: '$', rate: 1 },
-  PKR: { symbol: 'Rs. ', rate: 280 },
   GBP: { symbol: '£', rate: 0.79 },
   AED: { symbol: 'AED ', rate: 3.67 }
 };
@@ -9,42 +9,35 @@ export const CATEGORIES = [
   {
     id: 'all',
     name: 'All Collections',
-    count: 14
+    count: 12
+  },
+  {
+    id: 'female',
+    name: 'Female (Women Wear)',
+    subtitle: 'Luxury pret, unstitched suits & formal wear',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
+    count: 8
+  },
+  {
+    id: 'babies',
+    name: 'Kids Collection',
+    subtitle: 'Charming festive attire for girls & babies',
+    image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=900&auto=format&fit=crop',
+    count: 4
   },
   {
     id: 'unstitched',
     name: 'Unstitched Suits',
     subtitle: 'Embroidered lawn suits, raw silks & chiffons',
     image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=900&auto=format&fit=crop',
-    count: 5
-  },
-  {
-    id: 'ready-to-wear',
-    name: 'Ready to Wear',
-    subtitle: 'Tailored shalwar kameez & daily Eastern essentials',
-    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=900&auto=format&fit=crop',
-    count: 5
+    count: 4
   },
   {
     id: 'stitched',
-    name: 'Luxury Pret',
-    subtitle: 'Handcrafted embroidered dresses & silk outfits',
-    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=900&auto=format&fit=crop',
-    count: 6
-  },
-  {
-    id: 'luxury-formals',
-    name: 'Festive & Formal Wear',
-    subtitle: 'Traditional zardozi, tilla & formal ensembles',
-    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=900&auto=format&fit=crop',
-    count: 4
-  },
-  {
-    id: 'festive-26',
-    name: 'Eid Collection',
-    subtitle: 'Timeless festive attire for cherished occasions',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=900&auto=format&fit=crop',
-    count: 4
+    name: 'Stitched (Ready to Wear)',
+    subtitle: 'Tailored shalwar kameez & luxury pret',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=900&auto=format&fit=crop',
+    count: 7
   }
 ];
 
@@ -86,7 +79,7 @@ export const PRODUCTS = [
     rating: 5.0,
     reviewsCount: 44,
     tag: 'Customer Favourite',
-    tagColor: 'bg-[#164B3C] text-[#FAF5EC]',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
     images: [
       'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=80&w=1000&auto=format&fit=crop',
@@ -217,7 +210,7 @@ export const PRODUCTS = [
     rating: 4.7,
     reviewsCount: 77,
     tag: 'Unstitched Lawn',
-    tagColor: 'bg-[#164B3C] text-[#FAF5EC]',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
     images: [
       'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1000&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop',
@@ -310,6 +303,162 @@ export const PRODUCTS = [
     ],
     sizes: ['6-12M', '1-2Y', '2-4Y', '4-6Y'],
     description: 'Charming Pakistani festive attire featuring handcrafted gota borders and delicate pearl tassels for memorable family celebrations.',
+    isNew: true
+  },
+  {
+    id: 11,
+    title: 'Dhanak Embroidered Cotton Chiffon 3PC',
+    category: 'unstitched',
+    categoryLabel: 'Unstitched Suits',
+    stitchType: 'unstitched',
+    price: 98,
+    originalPrice: 125,
+    rating: 4.8,
+    reviewsCount: 38,
+    tag: 'Unstitched Lawn',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
+    images: [
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Fine Cotton Chiffon & Pure Lawn',
+    pieces: '3 Piece Unstitched (Embroidered Shirt, Digital Chiffon Dupatta & Dyed Trouser)',
+    colors: [
+      { name: 'Warm Ivory', hex: '#FAF5EC' },
+      { name: 'Deep Maroon', hex: '#641E32' }
+    ],
+    sizes: ['Unstitched', 'S', 'M', 'L', 'XL'],
+    description: 'Sumptuous unstitched ensemble featuring heavy threadwork embroidery, hand-rendered lace borders, and a flowy printed chiffon dupatta.',
+    isNew: true
+  },
+  {
+    id: 12,
+    title: 'Sunehri Hand-Printed Silk & Lawn 3PC',
+    category: 'unstitched',
+    categoryLabel: 'Unstitched Suits',
+    stitchType: 'unstitched',
+    price: 115,
+    originalPrice: 145,
+    rating: 4.9,
+    reviewsCount: 46,
+    tag: 'Silk Edit',
+    tagColor: 'bg-[#B89B62] text-white',
+    images: [
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Medium Silk & Embroidered Lawn',
+    pieces: '3 Piece Unstitched (Digital Silk Dupatta, Embroidered Lawn Shirt & Cambric Trouser)',
+    colors: [
+      { name: 'Antique Gold', hex: '#B89B62' },
+      { name: 'Deep Maroon', hex: '#641E32' }
+    ],
+    sizes: ['Unstitched', 'S', 'M', 'L', 'XL'],
+    description: 'Elevated summer luxury with hand-embellished resham thread necklines and a pure medium silk digitally printed dupatta.',
+    isNew: false
+  },
+  {
+    id: 13,
+    title: 'Bahaar Luxury Organza Jacquard 3PC',
+    category: 'unstitched',
+    categoryLabel: 'Unstitched Suits',
+    stitchType: 'unstitched',
+    price: 130,
+    originalPrice: 160,
+    rating: 5.0,
+    reviewsCount: 29,
+    tag: 'Jacquard Edit',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
+    images: [
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Organza Jacquard & Slub Silk',
+    pieces: '3 Piece Unstitched (Jacquard Shirt, Slub Silk Trouser & Embroidered Organza Dupatta)',
+    colors: [
+      { name: 'Deep Maroon', hex: '#641E32' },
+      { name: 'Soft Beige', hex: '#E8DCCB' }
+    ],
+    sizes: ['Unstitched', 'S', 'M', 'L', 'XL'],
+    description: 'Festive unstitched three-piece made with woven gold zari jacquard motifs and intricate floral resham embroidered borders.',
+    isNew: true
+  },
+  {
+    id: 14,
+    title: 'Ayzel Little Princess Embroidered Peshwas',
+    category: 'babies',
+    categoryLabel: 'Kids Collection',
+    stitchType: 'babies',
+    price: 92,
+    originalPrice: 115,
+    rating: 5.0,
+    reviewsCount: 18,
+    tag: 'Festive Baby',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
+    images: [
+      'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Pure Net & Soft Malmal Cotton Lining',
+    pieces: '3 Piece (Embroidered Peshwas, Churidar & Net Dupatta)',
+    colors: [
+      { name: 'Warm Ivory', hex: '#FAF5EC' },
+      { name: 'Deep Maroon', hex: '#641E32' }
+    ],
+    sizes: ['0-6M', '6-12M', '1-2Y', '2-4Y', '4-6Y'],
+    description: 'Darling flared peshwas for young girls with gentle handcrafted tilla borders and extra-soft cotton lining that keeps them comfortable.',
+    isNew: true
+  },
+  {
+    id: 15,
+    title: 'Rayan Festive Kurta Shalwar & Waistcoat',
+    category: 'babies',
+    categoryLabel: 'Kids Collection',
+    stitchType: 'babies',
+    price: 88,
+    originalPrice: 110,
+    rating: 4.9,
+    reviewsCount: 24,
+    tag: 'Boys Festive',
+    tagColor: 'bg-[#B89B62] text-white',
+    images: [
+      'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Pure Cotton Silk & Jamawar Waistcoat',
+    pieces: '3 Piece (Kurta, Shalwar & Jamawar Waistcoat)',
+    colors: [
+      { name: 'Deep Maroon', hex: '#641E32' },
+      { name: 'Antique Gold', hex: '#B89B62' }
+    ],
+    sizes: ['6-12M', '1-2Y', '2-4Y', '4-6Y'],
+    description: 'Handsome traditional festive set for boys featuring a classic embroidered ban collar, comfy shalwar, and royal gold jamawar waistcoat.',
+    isNew: true
+  },
+  {
+    id: 16,
+    title: 'Mehak Traditional Mirror-Work Ghagra Choli',
+    category: 'babies',
+    categoryLabel: 'Kids Collection',
+    stitchType: 'babies',
+    price: 99,
+    originalPrice: 125,
+    rating: 5.0,
+    reviewsCount: 35,
+    tag: 'Eid Special',
+    tagColor: 'bg-[#641E32] text-[#FAF5EC]',
+    images: [
+      'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=1000&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Pure Georgette Chiffon & Silk Cotton',
+    pieces: '3 Piece (Choli, Flared Ghagra & Dupatta)',
+    colors: [
+      { name: 'Deep Maroon', hex: '#641E32' },
+      { name: 'Antique Gold', hex: '#B89B62' }
+    ],
+    sizes: ['1-2Y', '2-4Y', '4-6Y'],
+    description: 'Festive ghagra choli set decorated with delicate acrylic safe mirror work, gota kinari, and soft elastic waistband for effortless movement.',
     isNew: true
   }
 ];

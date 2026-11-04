@@ -1,132 +1,139 @@
 import React from 'react';
-import { SparklesIcon, ArrowRightIcon } from './Icons';
+import { SparklesIcon, ArrowRightIcon, MapPinIcon } from './Icons';
 
 export default function AboutPage({ onExploreCollection }) {
-  const pillars = [
+  const categories = [
     {
-      no: '01',
-      title: 'Pure Pakistani Textiles',
-      desc: 'We source fine Pakistani cotton lawn, pure raw silks, delicate chiffons, and breathable organzas crafted for lasting comfort and grace.'
+      title: 'Unstitched Fabrics',
+      desc: 'Exquisite lawn, pure raw silk, and delicate chiffon fabrics designed for you to customize your silhouette.'
     },
     {
-      no: '02',
-      title: 'Traditional Embroidery',
-      desc: 'Each formal ensemble honours centuries of Pakistani craftsmanship with intricate tilla, dabka, resham threadwork, and pearl embellishments.'
+      title: 'Stitched Luxury Pret',
+      desc: 'Ready-to-wear formal and festive ensembles featuring intricate tilla, dabka, and resham threadwork.'
     },
     {
-      no: '03',
-      title: 'Graceful Silhouettes',
-      desc: 'From classic shalwar kameez and flowy kalidars to contemporary luxury pret cuts designed for modern femininity.'
-    },
-    {
-      no: '04',
-      title: 'Artisanal Heritage',
-      desc: 'Crafted in our Lahore studios where master artisans preserve timeless Pakistani needlework techniques.'
+      title: 'Little Umi\'z (Baby Wear)',
+      desc: 'Adorable, soft, and graceful traditional outfits crafted with utmost care for the little ones.'
     }
   ];
 
   const timeline = [
-    { year: '2018', title: 'The Lahore Studio', desc: 'Founded in Lahore with a dedication to authentic Pakistani formal wear and handcrafted bridal silhouettes.' },
-    { year: '2021', title: 'Luxury Pret & Lawn', desc: 'Expanded into unstitched lawn suits, embroidered dresses, and ready-to-wear shalwar kameez across Pakistan.' },
-    { year: '2024', title: 'International Reach', desc: 'Welcomed patrons across the UK, UAE, USA, and Canada seeking timeless Pakistani Eastern Wear.' },
-    { year: '2026', title: 'Timeless Elegance', desc: 'Continuing to celebrate Pakistani fashion with seasonal Eid collections, formal wear, and daily essentials.' }
+    { year: '2018', title: 'The Inception', desc: 'Started our journey in New Samanabad, Lahore, with a passion for authentic Pakistani Eastern wear.' },
+    { year: '2021', title: 'Expanding Collections', desc: 'Introduced exclusive unstitched lawn suites and festive luxury pret lines for modern women.' },
+    { year: '2024', title: 'Little Umi\'z Launch', desc: 'Expanded our curation to include handcrafted traditional clothing ranges for children.' },
+    { year: '2026', title: 'A Trusted Name', desc: 'Continuing to dress families across Pakistan and globally with unmatched grace and heritage.' }
   ];
 
   return (
-    <div className="bg-[#FAF5EC] text-[#282321] pt-36 pb-20">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#282321] pt-36 sm:pt-40 lg:pt-44 pb-20 selection:bg-[#B89B62] selection:text-white font-sans">
       
-      {/* Editorial Hero Banner */}
-      <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        <div className="relative rounded-3xl overflow-hidden bg-[#641E32] text-[#FAF5EC] p-8 sm:p-16 lg:p-20 border border-[#B89B62]/40 shadow-xl">
-          <div className="max-w-2xl relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF5EC]/10 border border-[#B89B62] text-[#B89B62] text-[10px] uppercase tracking-widest font-semibold">
-              <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-              Discover Timeless Pakistani Elegance
+      {/* ================= HERO SECTION ================= */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-white rounded-3xl p-8 sm:p-12 lg:p-16 border border-[#E8DCCB] shadow-sm">
+          
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF5EC] border border-[#B89B62]/40 text-[#B89B62] text-[10px] uppercase tracking-[0.25em] font-bold shadow-xs">
+              <SparklesIcon className="w-3.5 h-3.5" />
+              Welcome to Umi&apos;z World
             </div>
             
-            <h1 className="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-bold tracking-wide leading-tight text-[#FAF5EC]">
-              Rooted in Tradition, Designed for Today
+            <h1 className="font-cinzel text-3xl sm:text-5xl font-bold text-[#641E32] tracking-wide leading-tight">
+              Rooted in Heritage, Crafted for Modern Elegance
             </h1>
             
-            <p className="text-xs sm:text-sm text-[#E8DCCB] font-normal leading-relaxed pt-2">
-              Discover a thoughtful selection of Pakistani Eastern Wear that brings together traditional artistry, elegant silhouettes, and contemporary style.
+            <p className="text-sm sm:text-base text-[#282321]/75 font-light leading-relaxed">
+              At <strong className="font-medium text-[#641E32]">Umi&apos;z World</strong>, we celebrate the timeless beauty of Pakistani fashion. From exquisite unstitched fabrics and statement luxury pret to charming traditional wear for your little ones, every piece tells a story of grace and artisanal devotion.
             </p>
 
-            <div className="pt-4 flex items-center gap-4">
+            <div className="pt-2">
               <button
                 onClick={onExploreCollection}
-                className="px-7 py-3.5 bg-[#164B3C] hover:bg-[#B89B62] hover:text-[#282321] text-[#FAF5EC] font-semibold text-xs uppercase tracking-[0.2em] rounded-full transition-all shadow-md flex items-center gap-2"
+                className="group px-8 py-3.5 bg-[#641E32] hover:bg-[#4a1624] text-[#FAF5EC] font-bold text-[10px] uppercase tracking-[0.2em] rounded-full transition-all shadow-md flex items-center gap-3"
               >
-                <span>Shop the Collection</span>
-                <ArrowRightIcon className="w-3.5 h-3.5" />
+                <span>Explore Our Collections</span>
+                <ArrowRightIcon className="w-3.5 h-3.5 text-[#B89B62] group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
 
-          <div className="hidden lg:block absolute right-12 bottom-12 w-72 h-80 rounded-2xl overflow-hidden border border-[#B89B62]/50 shadow-2xl">
-            <img
-              src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=800&auto=format&fit=crop"
-              alt="Pakistani Craftsmanship"
-              className="w-full h-full object-cover"
-            />
+          <div className="lg:col-span-5 relative">
+            <div className="relative mx-auto w-full max-w-sm aspect-[4/5] rounded-2xl overflow-hidden border border-[#E8DCCB] shadow-xl">
+              <img
+                src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=800&auto=format&fit=crop"
+                alt="Umi'z World Atelier"
+                className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#641E32]/40 to-transparent pointer-events-none" />
+              <div className="absolute bottom-4 left-4 right-4 text-white text-center">
+                <p className="font-cinzel text-xs tracking-widest uppercase font-semibold">Handcrafted in Lahore</p>
+              </div>
+            </div>
           </div>
+
         </div>
       </section>
 
-      {/* 4 Craftsmanship Pillars */}
+      {/* ================= WHAT WE OFFER (CATEGORIES) ================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
         <div className="text-center max-w-xl mx-auto mb-14">
-          <span className="text-[10.5px] uppercase tracking-[0.25em] text-[#B89B62] font-bold">
-            Our Philosophy
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#B89B62] font-bold block mb-2">
+            Our Curation
           </span>
-          <h2 className="font-cinzel text-3xl sm:text-4xl font-bold text-[#641E32] mt-2 mb-3">
-            Tradition Woven with Elegance
+          <h2 className="font-cinzel text-3xl sm:text-4xl font-bold text-[#641E32] mb-3">
+            Designed for Every Generation
           </h2>
-          <div className="w-16 h-0.5 bg-[#B89B62] mx-auto" />
+          <div className="w-16 h-[1px] bg-[#B89B62] mx-auto" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pillars.map((item) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {categories.map((cat, idx) => (
             <div 
-              key={item.no}
-              className="bg-white p-7 rounded-2xl border border-[#E8DCCB] shadow-sm hover:shadow-xl hover:border-[#B89B62] transition-all space-y-3 group"
+              key={idx}
+              className="bg-white p-8 rounded-2xl border border-[#E8DCCB] shadow-sm hover:shadow-md hover:border-[#641E32] transition-all duration-300 flex flex-col justify-between group"
             >
-              <span className="font-cinzel text-2xl font-bold text-[#B89B62] group-hover:text-[#641E32] transition-colors">
-                {item.no}
-              </span>
-              <h3 className="font-cinzel text-base font-bold text-[#641E32]">
-                {item.title}
-              </h3>
-              <p className="text-xs text-[#282321]/80 font-normal leading-relaxed">
-                {item.desc}
-              </p>
+              <div>
+                <span className="font-cinzel text-xl font-bold text-[#B89B62] block mb-3 group-hover:text-[#641E32] transition-colors">
+                  0{idx + 1}
+                </span>
+                <h3 className="font-cinzel text-lg font-bold text-[#641E32] mb-3">
+                  {cat.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-[#282321]/70 font-light leading-relaxed">
+                  {cat.desc}
+                </p>
+              </div>
+              <div className="mt-6 pt-4 border-t border-[#FAF5EC]">
+                <span className="text-[10px] uppercase tracking-widest text-[#641E32] font-semibold">
+                  Discover Line &rarr;
+                </span>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Brand History Timeline */}
+      {/* ================= BRAND TIMELINE / HERITAGE ================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-        <div className="bg-[#282321] text-[#FAF5EC] rounded-3xl p-8 sm:p-14 border border-[#E8DCCB]/20 shadow-xl">
+        <div className="bg-[#282321] text-[#FAF5EC] rounded-3xl p-8 sm:p-14 border border-[#B89B62]/30 shadow-xl">
           <div className="max-w-xl mb-12">
-            <span className="text-[10px] uppercase tracking-[0.28em] text-[#B89B62] font-semibold">
-              Our Heritage
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#B89B62] font-semibold block mb-2">
+              Our Journey
             </span>
-            <h2 className="font-cinzel text-2xl sm:text-4xl font-bold text-[#FAF5EC] mt-1">
-              Celebrating Pakistani Fashion
+            <h2 className="font-cinzel text-2xl sm:text-4xl font-bold text-[#FAF5EC]">
+              The Umi&apos;z World Legacy
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {timeline.map((step) => (
-              <div key={step.year} className="space-y-2 border-l-2 border-[#B89B62] pl-4">
-                <span className="font-cinzel text-xl font-bold text-[#B89B62] block">
+              <div key={step.year} className="space-y-2 border-l border-[#B89B62]/60 pl-4 py-1">
+                <span className="font-cinzel text-lg font-bold text-[#B89B62] block">
                   {step.year}
                 </span>
                 <h4 className="font-cinzel text-sm font-bold text-[#FAF5EC]">
                   {step.title}
                 </h4>
-                <p className="text-xs text-[#E8DCCB]/80 font-normal leading-relaxed">
+                <p className="text-xs text-[#E8DCCB]/70 font-light leading-relaxed">
                   {step.desc}
                 </p>
               </div>
@@ -135,35 +142,28 @@ export default function AboutPage({ onExploreCollection }) {
         </div>
       </section>
 
-      {/* Boutiques */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <span className="text-[10px] uppercase tracking-[0.28em] text-[#B89B62] font-bold">
-          Visit Us
-        </span>
-        <h2 className="font-cinzel text-3xl font-bold text-[#641E32] mt-2 mb-10">
-          Flagship Boutiques
-        </h2>
+      {/* ================= FLAGSHIP STUDIO LOCATION ================= */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="bg-white rounded-3xl p-8 sm:p-12 border border-[#E8DCCB] shadow-sm relative overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-36 h-36 bg-[#FAF5EC] rounded-full opacity-50 pointer-events-none" />
+          
+          <div className="w-12 h-12 rounded-full bg-[#FAF5EC] border border-[#B89B62]/40 flex items-center justify-center text-[#641E32] mx-auto mb-4 shadow-xs">
+            <MapPinIcon className="w-5 h-5" />
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-          <div className="p-6 bg-white rounded-2xl border border-[#E8DCCB]">
-            <h4 className="font-cinzel font-bold text-sm text-[#641E32]">Lahore Boutique</h4>
-            <p className="text-xs text-[#282321]/75 mt-1">M.M. Alam Road, Gulberg III</p>
-            <p className="text-[11px] text-[#164B3C] font-medium mt-3">Mon – Sat: 11 AM – 9 PM</p>
-          </div>
-          <div className="p-6 bg-white rounded-2xl border border-[#E8DCCB]">
-            <h4 className="font-cinzel font-bold text-sm text-[#641E32]">Karachi Studio</h4>
-            <p className="text-xs text-[#282321]/75 mt-1">Bukhari Commercial, DHA Phase VI</p>
-            <p className="text-[11px] text-[#164B3C] font-medium mt-3">Mon – Sat: 12 PM – 9 PM</p>
-          </div>
-          <div className="p-6 bg-white rounded-2xl border border-[#E8DCCB]">
-            <h4 className="font-cinzel font-bold text-sm text-[#641E32]">Islamabad Salon</h4>
-            <p className="text-xs text-[#282321]/75 mt-1">F-7 Markaz, Islamabad</p>
-            <p className="text-[11px] text-[#164B3C] font-medium mt-3">Daily: 11 AM – 9 PM</p>
-          </div>
-          <div className="p-6 bg-white rounded-2xl border border-[#E8DCCB]">
-            <h4 className="font-cinzel font-bold text-sm text-[#641E32]">London Showcase</h4>
-            <p className="text-xs text-[#282321]/75 mt-1">Sloane Street, Knightsbridge</p>
-            <p className="text-[11px] text-[#164B3C] font-medium mt-3">By Private Appointment</p>
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#B89B62] font-bold block mb-1">
+            Visit Our Atelier
+          </span>
+          <h2 className="font-cinzel text-2xl sm:text-3xl font-bold text-[#641E32] mb-4">
+            Flagship Studio in Lahore
+          </h2>
+          
+          <p className="text-sm text-[#282321]/75 font-light max-w-md mx-auto leading-relaxed mb-6">
+            Experience our fabrics, embroidery details, and luxury pret collections in person at our flagship location:
+          </p>
+
+          <div className="inline-block bg-[#FAF5EC] border border-[#E8DCCB] px-6 py-3 rounded-xl text-xs sm:text-sm font-medium text-[#282321] shadow-xs">
+            129 Mehmood Road, Near Telephone Exchange, New Samanabad, Lahore, Pakistan
           </div>
         </div>
       </section>

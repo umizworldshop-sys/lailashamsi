@@ -1,18 +1,113 @@
-import React, { useState } from 'react';
-import { SparklesIcon, CheckIcon, ArrowRightIcon } from './Icons';
+import React, { useState, useEffect } from 'react';
+import { 
+  SparklesIcon, 
+  CheckIcon, 
+  ArrowRightIcon,
+  MapPinIcon,
+  MailIcon,
+  PhoneIcon 
+} from './Icons'; // WhatsAppIcon hata diya gaya hai
 
-export default function ContactPage({ onShowToast }) {
+// Strict Pakistani Mobile Number Validation (03XXXXXXXXX - 11 digits, real network prefix)
+const isValidPakistaniPhone = (phone) => {
+  const digits = (phone || '').replace(/\D/g, '');
+  if (!/^03[0-9]{9}$/.test(digits)) return false;
+  const suffix = digits.slice(2);
+  if (/^(\d)\1+$/.test(suffix)) return false;
+  if (
+    suffix === '123456789' ||
+    suffix === '987654321' ||
+    suffix === '012345678' ||
+    suffix === '000000001'
+  ) return false;
+  return true;
+};
+
+// Strict Real Email Validation (Blocks fake, dummy, disposable addresses)
+const isValidRealEmail = (email) => {
+  if (!email || typeof email !== 'string') return false;
+  const cleaned = email.trim().toLowerCase();
+  const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!regex.test(cleaned)) return false;
+  const [localPart, domainPart] = cleaned.split('@');
+  if (!localPart || !domainPart || localPart.length < 2) return false;
+
+  const fakePrefixes = [
+    'test', 'fake', 'dummy', 'temp', 'asdf', 'qwerty', 'abc', 'xyz',
+    'none', 'noemail', 'sample', 'example', 'user', 'admin', 'client'
+  ];
+  if (fakePrefixes.includes(localPart)) return false;
+
+  const fakeDomains = [
+    'example.com', 'test.com', 'fake.com', 'dummy.com', 'sample.com',
+    'asdf.com', 'temp.com', 'mailinator.com', 'tempmail.com', 'trashmail.com'
+  ];
+  if (fakeDomains.includes(domainPart)) return false;
+
+  const parts = domainPart.split('.');
+  const tld = parts[parts.length - 1];
+  if (!tld || tld.length < 2) return false;
+
+  return true;
+};
+
+export default function ContactPage({ onShowToast, initialCategory }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    inquiryType: 'Festive & Formal Wear Consultation',
+    inquiryType: 'Track Order',
     message: ''
   });
+  const [formError, setFormError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    // Check if a specific Client Care category was passed or stored
+    let categoryToSelect = initialCategory;
+    try {
+      const stored = sessionStorage.getItem('laila_enquiry_category');
+      if (stored) {
+        categoryToSelect = stored;
+        sessionStorage.removeItem('laila_enquiry_category');
+      }
+    } catch {}
+
+    if (categoryToSelect) {
+      setFormData((prev) => ({ ...prev, inquiryType: categoryToSelect }));
+    }
+
+    // If navigated with #enquiry-form, scroll straight to the form
+    if (window.location.hash === '#enquiry-form' || window.location.hash.includes('enquiry')) {
+      const scrollTimer = setTimeout(() => {
+        const el = document.getElementById('enquiry-form');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [initialCategory]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.name.trim() || formData.name.trim().length < 3) {
+      setFormError('Please enter your full name (at least 3 characters).');
+      return;
+    }
+
+    if (!isValidPakistaniPhone(formData.phone)) {
+      setFormError('Please enter a valid 11-digit Pakistani mobile number starting with 03 (e.g. 03001234567). Dummy numbers are not accepted.');
+      return;
+    }
+
+    if (!isValidRealEmail(formData.email)) {
+      setFormError('Please enter a genuine, active email address (e.g. ayesha.khan@gmail.com). Fake emails are not accepted.');
+      return;
+    }
+
+    setFormError('');
     setSubmitted(true);
     if (onShowToast) {
       onShowToast('Consultation request received! A senior stylist will contact you.');
@@ -20,201 +115,241 @@ export default function ContactPage({ onShowToast }) {
   };
 
   return (
-    <div className="bg-[#FAF5EC] text-[#282321] pt-36 pb-20">
+    <div className="min-h-screen bg-[#FDFBF7] text-[#282321] pt-36 sm:pt-40 lg:pt-44 pb-20 selection:bg-[#B89B62] selection:text-white font-sans">
       
-      {/* Header Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#E8DCCB]/50 border border-[#B89B62]/50 text-[#164B3C] text-[10px] uppercase tracking-widest font-semibold mb-3">
-          <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-          Discover Timeless Pakistani Elegance
+      {/* ================= COMPACT HEADER SECTION ================= */}
+      <section className="max-w-2xl mx-auto px-4 sm:px-6 text-center mb-12 sm:mb-16 animate-fade-in-up">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FAF5EC] border border-[#B89B62]/30 text-[#B89B62] text-[9px] uppercase tracking-[0.25em] font-bold mb-4 shadow-sm">
+          <SparklesIcon className="w-3 h-3" />
+          Discover Timeless Elegance
         </div>
-        <h1 className="font-heading text-3xl sm:text-5xl font-bold text-[#641E32] tracking-wide">
+        <h1 className="font-cinzel text-3xl sm:text-4xl font-bold text-[#641E32] tracking-wide mb-4">
           Connect With Our Atelier
         </h1>
-        <div className="w-20 h-0.5 bg-[#B89B62] mx-auto mt-4 mb-4" />
-        <p className="text-xs sm:text-sm text-[#282321]/80 font-normal max-w-xl mx-auto leading-relaxed">
-          Whether you require guidance on unstitched fabrics, custom measurements for formal wear, or styling advice for our Eid collection, our team is delighted to assist you.
+        <div className="w-16 h-[1px] bg-[#B89B62]/60 mx-auto mb-5"></div>
+        <p className="text-sm text-[#282321]/70 font-light leading-relaxed">
+          Whether you require guidance on unstitched fabrics, custom measurements, or styling advice, our expert team is delighted to assist you.
         </p>
       </section>
 
-      {/* Main 2-Column Content: Left Form, Right Contact Cards & WhatsApp */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      {/* ================= MAIN CONTENT ================= */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
-          {/* Left Form (7 cols) */}
-          <div className="lg:col-span-7 bg-white rounded-3xl p-7 sm:p-10 border border-[#E8DCCB] shadow-md">
-            <h2 className="font-heading text-xl sm:text-2xl font-bold text-[#641E32] mb-2">
-              Request Styling Assistance
-            </h2>
-            <p className="text-xs text-[#282321]/75 mb-6">
-              Fill in your details below and an atelier stylist will coordinate your enquiry within 24 hours.
-            </p>
-
-            {submitted ? (
-              <div className="p-8 bg-[#FAF5EC] border border-[#B89B62]/60 rounded-2xl text-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-[#164B3C] text-[#FAF5EC] flex items-center justify-center mx-auto shadow-md">
-                  <CheckIcon className="w-6 h-6" />
-                </div>
-                <h3 className="font-heading text-lg font-bold text-[#641E32]">Enquiry Confirmed</h3>
-                <p className="text-xs text-[#282321]/80 max-w-sm mx-auto">
-                  Thank you, <span className="font-semibold">{formData.name}</span>. Our concierge will reach out to you via WhatsApp and email.
+          {/* ----- LEFT COLUMN: CLASSIC FORM (8 Cols) ----- */}
+          <div className="lg:col-span-8" id="enquiry-form">
+            <div className="bg-white rounded-xl p-8 sm:p-10 shadow-sm border border-[#E8DCCB] transition-shadow hover:shadow-md">
+              
+              <div className="mb-8 border-b border-[#E8DCCB]/50 pb-6">
+                <h2 className="font-cinzel text-xl sm:text-2xl font-bold text-[#641E32] mb-2">
+                  Request a Consultation
+                </h2>
+                <p className="text-xs sm:text-sm text-[#282321]/60 font-light">
+                  Please provide your details below and a senior stylist will coordinate with you.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setSubmitted(false)}
-                  className="mt-4 px-6 py-2 text-xs font-semibold uppercase tracking-wider text-[#641E32] hover:underline"
-                >
-                  Send another message
-                </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4 text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] uppercase font-semibold text-[#282321] tracking-wider block mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Ayesha Khan"
-                      className="w-full bg-[#FAF5EC] border border-[#E8DCCB] rounded-xl px-4 py-3 text-xs text-[#282321] focus:outline-none focus:border-[#641E32]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-semibold text-[#282321] tracking-wider block mb-1">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="ayesha@example.com"
-                      className="w-full bg-[#FAF5EC] border border-[#E8DCCB] rounded-xl px-4 py-3 text-xs text-[#282321] focus:outline-none focus:border-[#641E32]"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {submitted ? (
+                <div className="py-12 px-6 bg-[#FAF5EC] border border-[#B89B62]/30 rounded-lg text-center space-y-4 animate-fade-in-up">
+                  <div className="w-14 h-14 rounded-full bg-[#641E32] text-[#FAF5EC] flex items-center justify-center mx-auto shadow-md">
+                    <CheckIcon className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-cinzel text-xl font-bold text-[#641E32]">Enquiry Confirmed</h3>
+                  <p className="text-sm text-[#282321]/70 max-w-sm mx-auto leading-relaxed">
+                    Thank you, <span className="font-semibold text-[#282321]">{formData.name}</span>. We have received your request and will reach out to you shortly.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(false)}
+                    className="mt-4 px-6 py-2.5 border border-[#641E32] text-[10px] font-bold uppercase tracking-widest text-[#641E32] rounded hover:bg-[#641E32] hover:text-white transition-all duration-300"
+                  >
+                    Send Another Message
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {formError && (
+                    <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium">
+                      {formError}
+                    </div>
+                  )}
+
+                  {/* Name & Email Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="name" className="block text-[10px] uppercase tracking-widest text-[#282321] font-bold mb-2">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => {
+                          setFormData({ ...formData, name: e.target.value });
+                          setFormError('');
+                        }}
+                        className="w-full bg-[#FDFBF7] border border-[#641E32] px-4 py-3 text-sm text-[#282321] rounded-md focus:outline-none focus:border-[#641E32] focus:ring-1 focus:ring-[#641E32] transition-all"
+                        placeholder="e.g. Ayesha Khan"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="email" className="block text-[10px] uppercase tracking-widest text-[#282321] font-bold mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        id="email"
+                        value={formData.email}
+                        onChange={(e) => {
+                          setFormData({ ...formData, email: e.target.value });
+                          setFormError('');
+                        }}
+                        className="w-full bg-[#FDFBF7] border border-[#641E32] px-4 py-3 text-sm text-[#282321] rounded-md focus:outline-none focus:border-[#641E32] focus:ring-1 focus:ring-[#641E32] transition-all"
+                        placeholder="ayesha.khan@gmail.com"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone & Category Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label htmlFor="phone" className="block text-[10px] uppercase tracking-widest text-[#282321] font-bold">
+                          Phone / WhatsApp *
+                        </label>
+                        <span className="text-[9.5px] font-bold text-[#641E32]">
+                          {formData.phone.length}/11 digits
+                        </span>
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={11}
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => {
+                          const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 11);
+                          setFormData({ ...formData, phone: digitsOnly });
+                          setFormError('');
+                        }}
+                        className="w-full bg-[#FDFBF7] border border-[#641E32] px-4 py-3 text-sm text-[#282321] rounded-md focus:outline-none focus:border-[#641E32] focus:ring-1 focus:ring-[#641E32] transition-all"
+                        placeholder="03XXXXXXXXX (Numbers only)"
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <label className="block text-[10px] uppercase tracking-widest text-[#282321] font-bold mb-2">
+                        Enquiry Category
+                      </label>
+                      <select
+                        value={formData.inquiryType}
+                        onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
+                        className="w-full bg-[#FDFBF7] border border-[#641E32] px-4 py-3 text-sm text-[#282321] rounded-md focus:outline-none focus:border-[#641E32] focus:ring-1 focus:ring-[#641E32] transition-all appearance-none cursor-pointer font-medium"
+                      >
+                        <option value="Track Order">Track Order</option>
+                        <option value="Size Guide">Size Guide</option>
+                        <option value="Cash on Delivery">Cash on Delivery</option>
+                        <option value="14-Day Exchanges">14-Day Exchanges</option>
+                        <option value="Styling Assistance">Styling Assistance</option>
+                        <option value="General Enquiry">General Enquiry & Support</option>
+                      </select>
+                      {/* Dropdown arrow */}
+                      <div className="absolute right-4 top-[38px] pointer-events-none text-[#641E32]">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Message Field */}
                   <div>
-                    <label className="text-[10px] uppercase font-semibold text-[#282321] tracking-wider block mb-1">
-                      WhatsApp / Phone *
+                    <label htmlFor="message" className="block text-[10px] uppercase tracking-widest text-[#282321] font-bold mb-2">
+                      Special Notes / Measurements / Date
                     </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+92 300 1234567"
-                      className="w-full bg-[#FAF5EC] border border-[#E8DCCB] rounded-xl px-4 py-3 text-xs text-[#282321] focus:outline-none focus:border-[#641E32]"
+                    <textarea
+                      id="message"
+                      rows="4"
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      className="w-full bg-[#FDFBF7] border border-[#641E32] px-4 py-3 text-sm text-[#282321] rounded-md focus:outline-none focus:border-[#641E32] focus:ring-1 focus:ring-[#641E32] transition-all resize-none"
+                      placeholder="Tell us about your requirements..."
                     />
                   </div>
-                  <div>
-                    <label className="text-[10px] uppercase font-semibold text-[#282321] tracking-wider block mb-1">
-                      Enquiry Category
-                    </label>
-                    <select
-                      value={formData.inquiryType}
-                      onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
-                      className="w-full bg-[#FAF5EC] border border-[#E8DCCB] rounded-xl px-4 py-3 text-xs text-[#282321] focus:outline-none focus:border-[#641E32] cursor-pointer"
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      className="group w-full sm:w-auto px-8 py-3.5 bg-[#641E32] text-white font-bold text-[10px] uppercase tracking-[0.2em] rounded hover:bg-[#4a1624] transition-colors flex items-center justify-center gap-3"
                     >
-                      <option>Festive & Formal Wear Consultation</option>
-                      <option>Unstitched Suits & Fabric Enquiries</option>
-                      <option>Ready to Wear & Luxury Pret Sizing</option>
-                      <option>Eid Collection Orders</option>
-                      <option>International Order Tracking</option>
-                    </select>
+                      <span>Submit Request</span>
+                      <ArrowRightIcon className="w-3.5 h-3.5 text-[#B89B62] group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
-                </div>
-
-                <div>
-                  <label className="text-[10px] uppercase font-semibold text-[#282321] tracking-wider block mb-1">
-                    Special Notes / Measurements / Date
-                  </label>
-                  <textarea
-                    rows="4"
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="Tell us about your upcoming event, preferred shalwar kameez silhouettes, or any questions..."
-                    className="w-full bg-[#FAF5EC] border border-[#E8DCCB] rounded-xl px-4 py-3 text-xs text-[#282321] focus:outline-none focus:border-[#641E32] resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3.5 bg-[#641E32] hover:bg-[#4e1626] text-[#FAF5EC] font-semibold text-xs uppercase tracking-[0.2em] rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-                >
-                  <span>Submit Consultation Request</span>
-                  <ArrowRightIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-                </button>
-              </form>
-            )}
+                </form>
+              )}
+            </div>
           </div>
 
-          {/* Right Direct WhatsApp & Flagships (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* ----- RIGHT COLUMN: CONTACT INFO (4 Cols) ----- */}
+          <div className="lg:col-span-4">
             
-            {/* Direct WhatsApp Concierge Card */}
-            <div className="bg-[#282321] text-[#FAF5EC] p-7 sm:p-8 rounded-3xl border border-[#B89B62]/50 shadow-xl space-y-4">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#B89B62] font-semibold block">
-                Instant Response
-              </span>
-              <h3 className="font-heading text-xl font-bold text-[#FAF5EC]">
-                Atelier WhatsApp Concierge
-              </h3>
-              <p className="text-xs text-[#FAF5EC]/80 font-normal leading-relaxed">
-                Connect directly with our stylists for close-up embroidery videos, custom sizing measurements, and express delivery coordination.
-              </p>
-              
-              <a
-                href="https://wa.me/923001234567?text=Hello%20Laila%20Shamsi%20Atelier,%20I%20would%20like%20to%20enquire%20about%20your%20Eastern%20Wear%20collection."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-[#164B3C] hover:bg-[#113a2e] text-[#FAF5EC] rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-md"
-              >
-                <span>Chat with Stylist on WhatsApp</span>
-              </a>
-            </div>
-
-            {/* Direct Contact Points */}
-            <div className="bg-white p-7 rounded-3xl border border-[#E8DCCB] shadow-sm space-y-4 text-xs">
-              <h4 className="font-heading text-base font-bold tracking-wide text-[#641E32]">
-                Headquarters & Studios
+            {/* Elegant Contact Details Box */}
+            <div className="bg-[#FAF5EC] p-8 rounded-xl border border-[#E8DCCB] shadow-sm space-y-8 sticky top-24">
+              <h4 className="font-cinzel text-lg font-bold tracking-wide text-[#641E32] border-b border-[#E8DCCB] pb-4">
+                Our Details
               </h4>
               
-              <div className="space-y-3 text-[#282321]/80">
-                <div className="flex items-start gap-3">
-                  <span className="text-base">📍</span>
+              <div className="space-y-6 text-sm">
+                
+                {/* Store Address */}
+                <div className="flex items-start gap-4">
+                  <div className="w-9 h-9 rounded bg-white border border-[#E8DCCB] flex items-center justify-center text-[#B89B62] shrink-0 mt-0.5">
+                    <MapPinIcon className="w-4 h-4" />
+                  </div>
                   <div>
-                    <p className="font-bold text-[#641E32]">Flagship Lahore</p>
-                    <p>M.M. Alam Road, Gulberg III, Lahore, Pakistan</p>
+                    <p className="font-bold text-[#282321] uppercase text-[10px] tracking-widest mb-1">Flagship Store</p>
+                    <p className="text-xs font-light leading-relaxed text-[#282321]/80">
+                      129 Mehmood Road, Near Telephone Exchange, New Samanabad, Lahore, Pakistan
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-base">📧</span>
+
+                {/* Official Email */}
+                <div className="flex items-start gap-4">
+                  <div className="w-9 h-9 rounded bg-white border border-[#E8DCCB] flex items-center justify-center text-[#B89B62] shrink-0 mt-0.5">
+                    <MailIcon className="w-4 h-4" />
+                  </div>
                   <div>
-                    <p className="font-bold text-[#641E32]">Concierge Email</p>
-                    <p>concierge@lailashamsi.com</p>
+                    <p className="font-bold text-[#282321] uppercase text-[10px] tracking-widest mb-1">Official Email</p>
+                    <a href="mailto:umizworldshop@gmail.com" className="text-xs font-medium text-[#641E32] hover:underline transition-colors">
+                      umizworldshop@gmail.com
+                    </a>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <span className="text-base">📞</span>
+
+                {/* Direct Phone */}
+                <div className="flex items-start gap-4">
+                  <div className="w-9 h-9 rounded bg-white border border-[#E8DCCB] flex items-center justify-center text-[#B89B62] shrink-0 mt-0.5">
+                    <PhoneIcon className="w-4 h-4" />
+                  </div>
                   <div>
-                    <p className="font-bold text-[#641E32]">Direct Telephone</p>
-                    <p>+92 (42) 3578-9000</p>
+                    <p className="font-bold text-[#282321] uppercase text-[10px] tracking-widest mb-1">Direct Line</p>
+                    <a href="tel:03174341036" className="text-xs font-medium text-[#641E32] hover:underline transition-colors">
+                      +92 317 434 1036
+                    </a>
                   </div>
                 </div>
+
               </div>
             </div>
 
           </div>
-
         </div>
       </section>
-
     </div>
   );
 }

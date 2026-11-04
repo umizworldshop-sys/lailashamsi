@@ -8,12 +8,12 @@ export default function SearchModal({
   products,
   onSelectProduct,
   onApplySearchQuery,
-  selectedCurrency = 'USD'
+  selectedCurrency = 'PKR'
 }) {
   if (!isOpen) return null;
 
   const [query, setQuery] = useState('');
-  const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.USD;
+  const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
 
   const popularTags = ['Raw Silk', 'Velvet Rose', 'Chiffon Kalidar', 'Angrakha', 'Pastel Pret', 'Co-ord'];
 

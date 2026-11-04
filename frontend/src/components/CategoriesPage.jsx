@@ -9,7 +9,7 @@ export default function CategoriesPage({
   onAddToCart,
   wishlist,
   onToggleWishlist,
-  selectedCurrency,
+  selectedCurrency = 'PKR',
   subFilter = 'all'
 }) {
   const [selectedCategory, setSelectedCategory] = useState(subFilter || 'all');
@@ -26,15 +26,17 @@ export default function CategoriesPage({
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       if (selectedCategory === 'all') return true;
-      
-      if (selectedCategory === 'stitched') {
-        return p.stitchType === 'stitched' || p.category === 'stitched' || p.category === 'ready-to-wear' || p.category === 'luxury-formals';
+      if (selectedCategory === 'female' || selectedCategory === 'women') {
+        return p.category !== 'babies' && p.stitchType !== 'babies';
+      }
+      if (selectedCategory === 'babies' || selectedCategory === 'kids') {
+        return p.category === 'babies' || p.stitchType === 'babies';
       }
       if (selectedCategory === 'unstitched') {
-        return p.stitchType === 'unstitched' || p.category === 'unstitched' || p.category === 'festive-26';
+        return p.stitchType === 'unstitched' || p.category === 'unstitched' || p.categoryLabel?.toLowerCase().includes('unstitched');
       }
-      if (selectedCategory === 'babies') {
-        return p.category === 'babies' || p.stitchType === 'babies';
+      if (selectedCategory === 'stitched' || selectedCategory === 'ready-to-wear') {
+        return (p.stitchType === 'stitched' || p.category === 'stitched' || p.category === 'ready-to-wear' || p.category === 'luxury-formals') && p.category !== 'babies';
       }
 
       return p.category === selectedCategory || p.stitchType === selectedCategory;
@@ -47,7 +49,7 @@ export default function CategoriesPage({
   }, [products, selectedCategory, sortBy]);
 
   return (
-    <div className="bg-[#FAF5EC] text-[#282321] pt-36 pb-20">
+    <div className="bg-[#FAF5EC] text-[#282321] pt-28 sm:pt-36 pb-16 sm:pb-20">
       
       {/* Header Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center">
@@ -64,20 +66,22 @@ export default function CategoriesPage({
         </p>
       </section>
 
-      {/* Main 5 Category Cards */}
+      {/* Main 4 Category Cards - Perfectly Balanced */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {displayCategories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => setSelectedCategory(selectedCategory === cat.id ? 'all' : cat.id)}
               className={`group relative h-64 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border ${
-                selectedCategory === cat.id ? 'border-[#164B3C] ring-2 ring-[#164B3C]' : 'border-[#E8DCCB]'
+                selectedCategory === cat.id ? 'border-[#641E32] ring-2 ring-[#641E32]' : 'border-[#E8DCCB]'
               }`}
             >
               <img
                 src={cat.image}
                 alt={cat.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover object-center transform transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#282321]/90 via-[#282321]/35 to-transparent" />
@@ -110,8 +114,8 @@ export default function CategoriesPage({
                 onClick={() => setSelectedCategory(tab.id)}
                 className={`px-4 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all whitespace-nowrap ${
                   selectedCategory === tab.id
-                    ? 'bg-[#164B3C] text-[#FAF5EC] shadow-sm'
-                    : 'bg-white border border-[#E8DCCB] text-[#282321] hover:border-[#641E32]'
+                    ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
+                    : 'bg-white border border-[#E8DCCB] text-[#282321] hover:border-[#641E32] hover:text-[#641E32]'
                 }`}
               >
                 {tab.label || tab.name}
@@ -142,13 +146,13 @@ export default function CategoriesPage({
             <p className="font-cinzel text-lg text-[#641E32]">No outfits found in this category.</p>
             <button
               onClick={() => setSelectedCategory('all')}
-              className="mt-3 px-6 py-2.5 bg-[#641E32] hover:bg-[#164B3C] text-[#FAF5EC] rounded-xl text-xs uppercase tracking-wider font-semibold"
+              className="mt-3 px-6 py-2.5 bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] rounded-xl text-xs uppercase tracking-wider font-semibold"
             >
               Shop the Collection
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product._id || product.id}

@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { CATEGORIES } from '../data/products';
 import ProductCard from './ProductCard';
-import { SparklesIcon } from './Icons';
+import { SparklesIcon, ArrowRightIcon } from './Icons';
 
 export default function ProductSection({
   products,
@@ -11,17 +10,33 @@ export default function ProductSection({
   onAddToCart,
   wishlist,
   onToggleWishlist,
-  selectedCurrency,
+  selectedCurrency = 'PKR',
   searchQuery,
   onClearSearch,
-  title = "New Season, New Elegance",
-  badge = "Discover Timeless Pakistani Elegance"
+  title = "New Arrivals",
+  badge = "Discover Timeless Pakistani Elegance",
+  onExploreAll,
+  maxProducts = 5
 }) {
   const [sortBy, setSortBy] = useState('featured');
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      const matchesCategory = activeCategory === 'all' || p.category === activeCategory || p.stitchType === activeCategory;
+      let matchesCategory = false;
+      if (activeCategory === 'all') {
+        matchesCategory = true;
+      } else if (activeCategory === 'female' || activeCategory === 'women') {
+        matchesCategory = p.category !== 'babies' && p.stitchType !== 'babies';
+      } else if (activeCategory === 'babies' || activeCategory === 'kids') {
+        matchesCategory = p.category === 'babies' || p.stitchType === 'babies';
+      } else if (activeCategory === 'unstitched') {
+        matchesCategory = p.stitchType === 'unstitched' || p.category === 'unstitched' || p.categoryLabel?.toLowerCase().includes('unstitched');
+      } else if (activeCategory === 'stitched' || activeCategory === 'ready-to-wear') {
+        matchesCategory = (p.stitchType === 'stitched' || p.category === 'stitched' || p.category === 'ready-to-wear' || p.category === 'luxury-formals') && p.category !== 'babies';
+      } else {
+        matchesCategory = p.category === activeCategory || p.stitchType === activeCategory;
+      }
+
       const matchesSearch = !searchQuery ||
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.fabric.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,59 +52,21 @@ export default function ProductSection({
   }, [products, activeCategory, searchQuery, sortBy]);
 
   return (
-    <section id="collection" className="py-20 bg-[#FAF5EC] border-b border-[#E8DCCB]">
+    <section id="collection" className="py-14 sm:py-20 bg-[#FAF5EC] border-b border-[#E8DCCB]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-[#E8DCCB]">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[#B89B62] text-xs font-semibold uppercase tracking-[0.22em] mb-2">
-              <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-              <span>{badge}</span>
-            </div>
-            <h2 className="font-cinzel text-2xl sm:text-4xl font-bold text-[#641E32] tracking-wide">
-              {title}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#282321]/80 mt-2 max-w-2xl">
-              Find your perfect look with our collection of Pakistani suits, embroidered outfits, and timeless Eastern essentials.
-            </p>
+        <div className="mb-8 sm:mb-10 pb-5 sm:pb-6 border-b border-[#E8DCCB]">
+          <div className="inline-flex items-center gap-2 text-[#B89B62] text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] mb-1.5 sm:mb-2">
+            <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
+            <span>{badge}</span>
           </div>
-
-          {/* Sort Dropdown */}
-          <div className="mt-4 md:mt-0 flex items-center gap-3">
-            <span className="text-xs uppercase tracking-[0.15em] text-[#282321]/75 font-medium">Sort By:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-white border border-[#E8DCCB] text-xs rounded-full px-4 py-2 text-[#282321] focus:outline-none focus:border-[#641E32] font-medium shadow-sm transition-colors cursor-pointer"
-            >
-              <option value="featured">Featured Collection</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Customer Favourites</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Minimalist Filter Navigation Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-10 scrollbar-none">
-          {CATEGORIES.map((cat) => {
-            const isSelected = activeCategory === cat.id;
-
-            return (
-              <button
-                key={cat.id}
-                onClick={() => onSelectCategory(cat.id)}
-                className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-semibold tracking-[0.12em] uppercase transition-all duration-300 ${
-                  isSelected
-                    ? 'bg-[#164B3C] text-[#FAF5EC] shadow-md'
-                    : 'bg-white text-[#282321] border border-[#E8DCCB] hover:border-[#641E32] hover:text-[#641E32]'
-                }`}
-              >
-                {cat.name}
-              </button>
-            );
-          })}
+          <h2 className="font-cinzel text-2xl sm:text-4xl font-bold text-[#641E32] tracking-wide">
+            {title}
+          </h2>
+          <p className="text-xs sm:text-sm text-[#282321]/80 mt-1.5 max-w-2xl leading-relaxed">
+            Find your perfect look with our collection of Pakistani suits, embroidered outfits, and timeless Eastern essentials.
+          </p>
         </div>
 
         {/* Search Feedback */}
@@ -107,37 +84,50 @@ export default function ProductSection({
           </div>
         )}
 
-        {/* Product Grid */}
+        {/* Product Grid - Exactly 5 cards on desktop row */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 sm:gap-x-5 gap-y-10 max-w-7xl mx-auto">
-            {filteredProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onQuickView={onQuickView}
-                onAddToCart={onAddToCart}
-                isWishlisted={wishlist.includes(product.id)}
-                onToggleWishlist={onToggleWishlist}
-                selectedCurrency={selectedCurrency}
-                staggerClass={`stagger-${(index % 6) + 1}`}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-3 sm:gap-x-5 gap-y-6 sm:gap-y-10 max-w-7xl mx-auto">
+              {filteredProducts.slice(0, maxProducts).map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onQuickView={onQuickView}
+                  onAddToCart={onAddToCart}
+                  isWishlisted={wishlist.includes(product.id)}
+                  onToggleWishlist={onToggleWishlist}
+                  selectedCurrency={selectedCurrency}
+                  staggerClass={`stagger-${(index % 5) + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Explore All New Arrivals Button */}
+            {onExploreAll && (
+              <div className="mt-10 sm:mt-14 text-center">
+                <button
+                  type="button"
+                  onClick={onExploreAll}
+                  className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-3.5 bg-[#641E32] hover:bg-[#4a1624] text-[#FAF5EC] text-[11px] sm:text-xs uppercase tracking-[0.18em] sm:tracking-[0.2em] font-semibold rounded-full shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 group"
+                >
+                  <span>Explore All New Arrivals</span>
+                  <ArrowRightIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </button>
+              </div>
+            )}
+          </>
         ) : (
-          <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-[#E8DCCB] max-w-lg mx-auto p-8 shadow-sm">
-            <SparklesIcon className="w-8 h-8 text-[#B89B62] mx-auto mb-3 animate-pulse" />
-            <h3 className="font-cinzel text-lg font-bold text-[#641E32]">No Outfits Found</h3>
-            <p className="text-xs text-[#282321]/75 mt-1 mb-4">
-              We could not find any designs matching your selection.
-            </p>
+          <div className="text-center py-16 bg-white rounded-2xl border border-[#E8DCCB] max-w-md mx-auto p-6">
+            <p className="font-cinzel text-base font-semibold text-[#641E32] mb-1">No Outfits Found</p>
+            <p className="text-xs text-[#282321]/70 mb-4">Try selecting another collection or clearing your search filters.</p>
             <button
               onClick={() => {
                 onSelectCategory('all');
-                onClearSearch();
+                if (onClearSearch) onClearSearch();
               }}
-              className="px-6 py-2.5 bg-[#641E32] text-[#FAF5EC] rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-[#164B3C] transition-colors"
+              className="px-5 py-2 bg-[#641E32] text-[#FAF5EC] rounded-full text-xs uppercase tracking-wider font-semibold hover:bg-[#4a1624] transition-colors"
             >
-              Shop the Collection
+              Show All Collections
             </button>
           </div>
         )}

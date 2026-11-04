@@ -114,7 +114,7 @@ export default function LookbookBanner({ onShopLook }) {
                 “Celebrating Pakistani Fashion, One Beautiful Detail at a Time.”
               </p>
               <p className="mt-3 text-[10px] uppercase tracking-[0.28em] text-[#B89B62]">
-                Laila Shamsi · Pakistani Eastern Wear
+                Umi&apos;z World · Pakistani Eastern Wear
               </p>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function LookbookBanner({ onShopLook }) {
           <div {...reveal(1100)}>
             <button
               onClick={onShopLook}
-              className="group mt-9 inline-flex items-center gap-4 px-8 py-4 bg-[#641E32] hover:bg-[#164B3C] text-[#FAF5EC] rounded-full text-xs uppercase tracking-[0.22em] font-semibold transition-all shadow-md"
+              className="group mt-9 inline-flex items-center gap-4 px-8 py-4 bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] rounded-full text-xs uppercase tracking-[0.22em] font-semibold transition-all shadow-md"
             >
               <span>Shop the Collection</span>
               <ArrowRightIcon className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" />

@@ -1,234 +1,311 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowRightIcon } from './Icons';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon, SparklesIcon } from './Icons';
 
-/**
- * Editorial luxury hero:
- * - Left-aligned magazine layout with masked line-by-line text reveal
- * - Ken Burns crossfade between slides
- * - Timed progress bars + 01/03 counter + next-slide preview
- */
-const SLIDE_MS = 7000;
-
-const slides = [
+const DEFAULT_HERO_SLIDES = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2200&auto=format&fit=crop',
-    tag: 'Discover Timeless Pakistani Elegance',
-    line1: 'Tradition Woven',
-    line2: 'with Elegance',
-    subtitle: 'Celebrate your heritage with beautiful Eastern Wear inspired by Pakistani craftsmanship, timeless designs, and modern femininity.'
+    tag: 'Velvet Formals 2026',
+    title: 'Grace in Every Thread',
+    subtitle: 'Handcrafted Velvet & Zari Peshwas with Intricate Dabka Work',
+    image: 'https://jazmin.pk/cdn/shop/files/2C5A5663.png?v=1793342503&width=2000',
+    fallbackImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=85&w=2000&auto=format&fit=crop',
+    ctaText: 'Shop Velvet Collection',
+    targetRoute: '/categories'
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2200&auto=format&fit=crop',
-    tag: 'Discover Timeless Pakistani Elegance',
-    line1: 'Tradition Woven',
-    line2: 'with Elegance',
-    subtitle: 'Celebrate your heritage with beautiful Eastern Wear inspired by Pakistani craftsmanship, timeless designs, and modern femininity.'
+    tag: 'Festive Pret & Couture',
+    title: 'Festive Pret & Couture',
+    subtitle: 'Pure Chiffon, Fine Lawn & Hand-Embroidered Luxury Silks',
+    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop',
+    fallbackImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop',
+    ctaText: 'Shop New Arrivals',
+    targetRoute: '/new-arrivals'
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=85&w=2200&auto=format&fit=crop',
-    tag: 'Discover Timeless Pakistani Elegance',
-    line1: 'Tradition Woven',
-    line2: 'with Elegance',
-    subtitle: 'Celebrate your heritage with beautiful Eastern Wear inspired by Pakistani craftsmanship, timeless designs, and modern femininity.'
+    tag: 'Royal Heritage Formals',
+    title: 'Timeless Eastern Elegance',
+    subtitle: 'Flared Kalidar Silhouettes & Gilded Gotta Kinari Craft',
+    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop',
+    fallbackImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop',
+    ctaText: 'Explore Collection',
+    targetRoute: '/categories'
   }
 ];
 
-export default function Hero({ onExploreClick, onLookbookClick }) {
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
+export default function Hero({ onExploreClick, onLookbookClick, customSlides = [] }) {
+  const slidesList = Array.isArray(customSlides) && customSlides.filter(s => s && s.image).length > 0
+    ? customSlides.filter(s => s && s.image)
+    : DEFAULT_HERO_SLIDES;
+  const totalSlides = slidesList.length;
 
-  const go = useCallback((i) => setCurrent((i + slides.length) % slides.length), []);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
+  const safeSlideIdx = totalSlides > 0 ? currentSlide % totalSlides : 0;
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % totalSlides);
+  }, [totalSlides]);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  }, [totalSlides]);
+
+  // Autoplay - precisely 3 seconds interval
   useEffect(() => {
-    if (paused) return;
-    const t = setTimeout(() => go(current + 1), SLIDE_MS);
-    return () => clearTimeout(t);
-  }, [current, paused, go]);
+    if (isPaused || totalSlides <= 1) return;
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [nextSlide, isPaused, totalSlides]);
 
-  const s = slides[current];
-  const next = slides[(current + 1) % slides.length];
+  // Mobile Swipe Gesture Handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const diff = touchStartX.current - touchEndX.current;
+    if (diff > 45) {
+      nextSlide();
+    } else if (diff < -45) {
+      prevSlide();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
+  const active = slidesList[safeSlideIdx] || slidesList[0];
+  
+  // Extended array so sliding multiple images continuously is smooth
+  const displaySlides = [...slidesList, ...slidesList, ...slidesList]; 
 
   return (
-    <section
-      className="relative w-full h-screen min-h-[620px] max-h-[960px] overflow-hidden bg-[#0E0E0E]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+    <section 
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      className="relative w-full overflow-hidden select-none bg-[#110e10] text-[#FAF5EC] pt-[125px] sm:pt-[135px] lg:pt-[140px] xl:pt-[148px] pb-12 sm:pb-16 lg:pb-20"
     >
+      {/* Inline styles for responsive carousel math */}
       <style>{`
-        @keyframes heroMask { from { transform: translateY(110%); } to { transform: translateY(0); } }
-        @keyframes heroFade { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-        @keyframes heroLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        @keyframes heroProgress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-        @keyframes heroKen { from { transform: scale(1.15) translateX(1.5%); } to { transform: scale(1.02) translateX(0); } }
-        @keyframes heroScroll { 0% { transform: translateY(-100%); } 100% { transform: translateY(200%); } }
-        .h-mask { animation: heroMask 1.1s cubic-bezier(.22,1,.36,1) both; }
-        .h-fade { animation: heroFade 1s cubic-bezier(.22,1,.36,1) both; }
-        .h-line { animation: heroLine 1s cubic-bezier(.22,1,.36,1) both; transform-origin: left; }
-        .h-ken  { animation: heroKen ${SLIDE_MS + 1500}ms ease-out both; }
+        .hero-slider-track {
+          --slide-w: 82vw;
+          --slide-g: 16px;
+        }
+        @media (min-width: 640px) {
+          .hero-slider-track { --slide-w: 360px; --slide-g: 20px; }
+        }
+        @media (min-width: 1024px) {
+          .hero-slider-track { --slide-w: 380px; --slide-g: 24px; }
+        }
+        @media (min-width: 1280px) {
+          .hero-slider-track { --slide-w: 420px; --slide-g: 28px; }
+        }
+        @media (min-width: 1536px) {
+          .hero-slider-track { --slide-w: 460px; --slide-g: 32px; }
+        }
       `}</style>
 
-      {/* ============ BACKGROUND SLIDES ============ */}
-      {slides.map((slide, i) => (
-        <div
-          key={slide.id}
-          className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${
-            i === current ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          }`}
-        >
-          <img
-            key={i === current ? `active-${current}` : slide.id}
-            src={slide.image}
-            alt=""
-            className={`w-full h-full object-cover object-[center_25%] ${i === current ? 'h-ken' : ''}`}
-          />
-        </div>
-      ))}
+      {/* Background Ambient Glow */}
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#641E32]/15 rounded-full blur-[150px] pointer-events-none" />
 
-      {/* Overlays: left-weighted for legibility */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-r from-black/80 via-black/45 to-black/10" />
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-
-      {/* ============ CONTENT ============ */}
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex flex-col justify-center">
-        <div key={s.id} className="max-w-2xl">
-          {/* Tag */}
-          <div className="flex items-center gap-4 mb-7">
-            <span className="h-px w-12 bg-[#B89B62] h-line" style={{ animationDelay: '0.2s' }} />
-            <span
-              className="h-fade text-[11px] sm:text-xs uppercase tracking-[0.3em] text-[#B89B62] font-medium"
-              style={{ animationDelay: '0.35s' }}
+      {/* Main Full-Width Layout Container */}
+      <div className="flex flex-col lg:flex-row items-center w-full max-w-[2000px] mx-auto">
+        
+        {/* ======================================================== */}
+        {/* LEFT PART (TEXT & CTAs) - 42% Width                     */}
+        {/* ======================================================== */}
+        <div className="w-full lg:w-[42%] flex-shrink-0 px-5 sm:px-10 lg:pl-14 xl:pl-20 z-10 mb-8 lg:mb-0">
+          
+          <div key={`text-${safeSlideIdx}`} className="animate-fade-in-up">
+            <span 
+              style={{ fontFamily: 'var(--font-heading)' }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 border border-[#D4AF37]/35 bg-black/40 text-[#D4AF37] text-[10px] sm:text-xs font-semibold tracking-[0.22em] uppercase rounded-full mb-5 backdrop-blur-sm shadow-sm"
             >
-              {s.tag}
+              <SparklesIcon className="w-3 h-3 text-[#D4AF37]" />
+              {active.tag || 'Luxury Collection'}
             </span>
+
+            <h1 
+              style={{ fontFamily: 'var(--font-heading)' }}
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white tracking-wide leading-[1.15] drop-shadow-md mb-4"
+            >
+              {active.title || 'Grace in Every Thread'}
+            </h1>
+
+            <p 
+              style={{ fontFamily: 'var(--font-body)' }}
+              className="text-sm sm:text-base lg:text-lg text-[#FAF5EC]/75 font-normal leading-relaxed max-w-md mb-7"
+            >
+              {active.subtitle || 'Handcrafted Pakistani Eastern Wear with Intricate Artisan Details'}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={onExploreClick}
+                style={{ fontFamily: 'var(--font-heading)' }}
+                className="group flex items-center gap-3 px-6 sm:px-7 py-3 sm:py-3.5 bg-[#641E32] hover:bg-[#852541] active:scale-95 text-white text-xs sm:text-sm uppercase tracking-[0.18em] font-semibold transition-all duration-300 shadow-[0_4px_20px_rgba(100,30,50,0.4)] cursor-pointer"
+              >
+                <span>{active.ctaText || 'Shop Collection'}</span>
+                <ArrowRightIcon className="w-4 h-4 text-[#D4AF37] group-hover:translate-x-1.5 transition-transform" />
+              </button>
+
+              <button
+                type="button"
+                onClick={onLookbookClick}
+                style={{ fontFamily: 'var(--font-heading)' }}
+                className="px-6 sm:px-7 py-3 sm:py-3.5 bg-transparent hover:bg-white/10 active:scale-95 text-white border border-white/30 hover:border-white text-xs sm:text-sm uppercase tracking-[0.18em] font-semibold transition-all duration-300 cursor-pointer"
+              >
+                New Arrivals
+              </button>
+            </div>
           </div>
 
-          {/* Headline with masked reveal */}
-          <h1 className="text-[#FAF5EC]">
-            <span className="block overflow-hidden pb-1">
-              <span
-                className="h-mask block font-cinzel text-[38px] sm:text-6xl lg:text-[74px] font-semibold leading-[1.06] tracking-[0.02em]"
-                style={{ animationDelay: '0.45s' }}
+          {/* Navigation Controls & Indicators */}
+          <div className="flex items-center gap-4 mt-8 lg:mt-14">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={prevSlide}
+                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-full bg-black/30 hover:bg-white hover:text-black text-white transition-all duration-300 cursor-pointer"
+                aria-label="Previous Slide"
               >
-                {s.line1}
-              </span>
-            </span>
-            <span className="block overflow-hidden pb-3">
-              <span
-                className="h-mask block font-serif-luxury italic font-normal text-[36px] sm:text-6xl lg:text-[72px] leading-[1.08] text-[#B89B62]"
-                style={{ animationDelay: '0.62s' }}
+                <ChevronLeftIcon className="w-4 h-4" />
+              </button>
+
+              <span 
+                style={{ fontFamily: 'var(--font-heading)' }}
+                className="text-xs sm:text-sm font-semibold tracking-[0.2em] text-[#FAF5EC]/80 px-1"
               >
-                {s.line2}
+                <span className="text-[#D4AF37]">{String(safeSlideIdx + 1).padStart(2, '0')}</span>
+                <span className="text-white/40 mx-1.5">/</span>
+                <span>{String(totalSlides).padStart(2, '0')}</span>
               </span>
-            </span>
-          </h1>
 
-          <p
-            className="h-fade mt-5 max-w-xl text-[15px] sm:text-base leading-relaxed text-[#FAF5EC]/90 font-normal"
-            style={{ animationDelay: '0.9s' }}
-          >
-            {s.subtitle}
-          </p>
-
-          {/* CTAs */}
-          <div
-            className="h-fade mt-10 flex flex-wrap items-center gap-x-8 gap-y-5"
-            style={{ animationDelay: '1.1s' }}
-          >
-            <button
-              onClick={onExploreClick}
-              className="group relative overflow-hidden inline-flex items-center gap-3 bg-[#641E32] text-[#FAF5EC] px-8 py-4 text-[11px] font-semibold uppercase tracking-[0.22em]"
-            >
-              <span className="absolute inset-0 bg-[#164B3C] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)]" />
-              <span className="relative transition-colors duration-500">Shop the Collection</span>
-              <ArrowRightIcon className="relative w-4 h-4 transition-all duration-500 group-hover:translate-x-1" />
-            </button>
-
-            <button
-              onClick={onLookbookClick}
-              className="group relative text-[11px] font-semibold uppercase tracking-[0.22em] text-[#FAF5EC] py-2"
-            >
-              Explore New Arrivals
-              <span className="absolute left-0 bottom-0 h-px w-full bg-[#FAF5EC]/50" />
-              <span className="absolute left-0 bottom-0 h-px w-full bg-[#B89B62] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* ============ BOTTOM BAR: progress + counter + next preview ============ */}
-      <div className="absolute bottom-0 inset-x-0 z-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 pb-8 flex items-end justify-between gap-6">
-          {/* Counter + progress */}
-          <div className="flex items-center gap-5">
-            <span className="font-cinzel text-[#FAF5EC] text-lg tabular-nums">
-              {String(current + 1).padStart(2, '0')}
-            </span>
-            <div className="flex gap-2">
-              {slides.map((_, i) => (
+              <button
+                onClick={nextSlide}
+                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-full bg-black/30 hover:bg-white hover:text-black text-white transition-all duration-300 cursor-pointer"
+                aria-label="Next Slide"
+              >
+                <ChevronRightIcon className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {/* Custom Bar Indicator */}
+            <div className="hidden sm:flex items-center ml-2 gap-2">
+              {slidesList.map((_, idx) => (
                 <button
-                  key={i}
-                  onClick={() => go(i)}
-                  aria-label={`Go to slide ${i + 1}`}
-                  className="relative h-[2px] w-10 sm:w-16 bg-white/25 overflow-hidden py-0"
-                >
-                  <span
-                    key={`${current}-${i}`}
-                    className="absolute inset-0 bg-[#B89B62] origin-left"
-                    style={
-                      i < current
-                        ? { transform: 'scaleX(1)' }
-                        : i === current
-                        ? {
-                            animation: `heroProgress ${SLIDE_MS}ms linear both`,
-                            animationPlayState: paused ? 'paused' : 'running'
-                          }
-                        : { transform: 'scaleX(0)' }
-                    }
-                  />
-                </button>
+                  key={idx}
+                  type="button"
+                  onClick={() => setCurrentSlide(idx)}
+                  className={`h-[3px] rounded-full transition-all duration-500 cursor-pointer ${
+                    safeSlideIdx === idx ? 'w-8 bg-[#D4AF37]' : 'w-3 bg-white/25 hover:bg-white/50'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
               ))}
             </div>
-            <span className="font-cinzel text-white/50 text-sm tabular-nums">
-              {String(slides.length).padStart(2, '0')}
-            </span>
           </div>
 
-          {/* Next slide preview */}
-          <button
-            onClick={() => go(current + 1)}
-            className="hidden md:flex group items-center gap-4 text-left"
-            aria-label="Next slide"
-          >
-            <div className="text-right">
-              <span className="block text-[10px] uppercase tracking-[0.3em] text-white/50">Next</span>
-              <span className="block font-serif-luxury italic text-white text-lg">{next.line2}</span>
-            </div>
-            <div className="relative w-20 h-24 overflow-hidden">
-              <img
-                src={next.image}
-                alt=""
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-            </div>
-          </button>
         </div>
-      </div>
 
-      {/* Vertical scroll cue */}
-      <div className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 z-20 flex-col items-center gap-4">
-        <span className="text-[10px] uppercase tracking-[0.35em] text-white/60 [writing-mode:vertical-rl]">
-          Scroll
-        </span>
-        <span className="relative w-px h-16 bg-white/20 overflow-hidden">
-          <span
-            className="absolute inset-x-0 h-1/2 bg-[#E6B8BF]"
-            style={{ animation: 'heroScroll 2s ease-in-out infinite' }}
-          />
-        </span>
+        {/* ======================================================== */}
+        {/* RIGHT PART (SLIDER / 3 IMAGES CAROUSEL) - 58% Width     */}
+        {/* ======================================================== */}
+        <div 
+          className="w-full lg:w-[58%] relative overflow-hidden pl-4 sm:pl-8 lg:pl-4 pr-5 sm:pr-8 lg:pr-12 xl:pr-16"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div
+            className="hero-slider-track flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+            style={{ 
+              gap: 'var(--slide-g)',
+              transform: `translateX(calc(-${safeSlideIdx} * (var(--slide-w) + var(--slide-g))))` 
+            }}
+          >
+            {displaySlides.map((slide, idx) => {
+              const isActive = idx === safeSlideIdx;
+              
+              return (
+                <div
+                  key={`${slide.id}-${idx}`}
+                  style={{ width: 'var(--slide-w)' }}
+                  className={`flex-shrink-0 relative rounded-2xl overflow-hidden transition-all duration-700 ease-out cursor-grab active:cursor-grabbing
+                    ${isActive 
+                      ? 'opacity-100 scale-100 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10 border border-white/15 ring-1 ring-white/10' 
+                      : 'opacity-50 scale-[0.95] blur-[1px] hover:opacity-80 hover:blur-none z-0 border border-transparent'
+                    }
+                  `}
+                >
+                  {/* Clean height to stay clear of navbar and bottom */}
+                  <div className="w-full h-[450px] sm:h-[500px] lg:h-[540px] xl:h-[580px] relative bg-[#1F181D]">
+                    
+                    {/* Floating Luxury Tag on Active Card */}
+                    {isActive && (
+                      <span 
+                        style={{ fontFamily: 'var(--font-heading)' }}
+                        className="absolute top-4 left-4 z-20 inline-flex items-center gap-1.5 px-3 py-1 bg-black/60 backdrop-blur-md border border-[#D4AF37]/50 text-[#D4AF37] text-[10px] sm:text-xs font-semibold tracking-[0.18em] uppercase rounded-full shadow-lg"
+                      >
+                        ✦ {slide.tag || 'HIGH FASHION PRET'}
+                      </span>
+                    )}
+
+                    {/* Direct Prev / Next arrows over active slide for effortless desktop navigation */}
+                    {isActive && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); prevSlide(); }}
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all opacity-75 hover:opacity-100 cursor-pointer"
+                          aria-label="Previous slide"
+                        >
+                          <ChevronLeftIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); nextSlide(); }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-black/40 hover:bg-black/75 text-white flex items-center justify-center backdrop-blur-sm border border-white/20 transition-all opacity-75 hover:opacity-100 cursor-pointer"
+                          aria-label="Next slide"
+                        >
+                          <ChevronRightIcon className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
+
+                    <img
+                      src={slide.image}
+                      alt={slide.title || 'Umi\'z World Collection'}
+                      loading={idx < 3 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        if (slide.fallbackImage && e.target.src !== slide.fallbackImage) {
+                          e.target.onerror = null;
+                          e.target.src = slide.fallbackImage;
+                        }
+                      }}
+                      className="w-full h-full object-cover object-top transition-transform duration-1000 ease-out hover:scale-105"
+                    />
+                    
+                    {/* Subtle bottom vignette gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#110e10]/80 via-transparent to-transparent pointer-events-none" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </div>
     </section>
   );

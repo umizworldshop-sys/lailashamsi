@@ -1,209 +1,268 @@
-import React, { useState } from 'react';
-import { SparklesIcon, CheckIcon, ArrowRightIcon, LockIcon } from './Icons';
+import React from 'react';
+import { 
+  LockIcon,
+  MapPinIcon,
+  MailIcon,
+  PhoneIcon,
+  WhatsAppIcon,
+  InstagramIcon,
+  FacebookIcon,
+  TikTokIcon
+} from './Icons';
 
 export default function Footer({ onSelectCategory, onOpenAdmin, onNavigate }) {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail('');
-    }
-  };
-
   const handleNav = (route) => {
     if (onNavigate) onNavigate(route);
   };
 
+  const handleClientCareClick = (categoryName) => (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const targetCat = typeof categoryName === 'string' ? categoryName : 'Track Order';
+    try {
+      sessionStorage.setItem('laila_enquiry_category', targetCat);
+    } catch {}
+    if (onNavigate) {
+      onNavigate('/contact', targetCat);
+    }
+    try {
+      window.history.pushState({}, '', '/contact#enquiry-form');
+    } catch {
+      // ignore
+    }
+    setTimeout(() => {
+      const el = document.getElementById('enquiry-form');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+  };
+
   return (
-    <footer className="bg-[#282321] text-[#FAF5EC] border-t border-[#E8DCCB]/20 pt-20 pb-12">
+    <footer className="bg-[#282321] text-[#FAF5EC] border-t border-[#E8DCCB]/20 pt-12 sm:pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Top Newsletter Subscription Box */}
-        <div className="bg-[#FAF5EC] text-[#282321] rounded-3xl p-8 sm:p-14 mb-20 border border-[#E8DCCB] shadow-xl relative overflow-hidden">
-          <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#B89B62]/15 rounded-full blur-3xl pointer-events-none" />
+        {/* Main Footer Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 pb-14 border-b border-[#E8DCCB]/15">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <div className="lg:col-span-7 space-y-3">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#B89B62] font-bold flex items-center gap-2">
-                <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-                Discover Timeless Pakistani Elegance
-              </span>
-              <h3 className="font-cinzel text-2xl sm:text-4xl text-[#641E32] font-bold">
-                Be the First to Discover What's New
-              </h3>
-              <p className="text-xs sm:text-sm text-[#282321]/80 font-normal max-w-lg leading-relaxed">
-                Subscribe for new arrivals, seasonal collections, and exclusive offers.
-              </p>
-            </div>
-
-            <div className="lg:col-span-5">
-              {subscribed ? (
-                <div className="p-4 bg-white border border-[#164B3C] rounded-2xl flex items-center gap-3 text-xs text-[#282321]">
-                  <div className="w-8 h-8 rounded-full bg-[#164B3C] flex items-center justify-center flex-shrink-0">
-                    <CheckIcon className="w-4 h-4 text-[#FAF5EC]" />
-                  </div>
-                  <div>
-                    <p className="font-bold text-[#164B3C]">Thank You for Subscribing!</p>
-                    <p className="text-[#282321]/80">Use code <span className="text-[#641E32] font-bold">LAILA10</span> at checkout.</p>
-                  </div>
-                </div>
-              ) : (
-                <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2.5">
-                  <input 
-                    type="email" 
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    className="flex-1 bg-white border border-[#E8DCCB] rounded-full px-5 py-3.5 text-xs text-[#282321] placeholder:text-[#282321]/50 focus:outline-none focus:border-[#641E32] transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    className="px-7 py-3.5 bg-[#641E32] text-[#FAF5EC] rounded-full text-xs uppercase tracking-[0.16em] font-semibold hover:bg-[#164B3C] transition-all whitespace-nowrap flex items-center justify-center gap-2 shadow-sm"
-                  >
-                    <span>Join Our Newsletter</span>
-                    <ArrowRightIcon className="w-3.5 h-3.5" />
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 4 Clean Columns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-[#E8DCCB]/15">
-          
-          {/* Brand Info */}
-          <div className="lg:col-span-2 space-y-4">
+          {/* Brand Info (4 cols) */}
+          <div className="lg:col-span-4 space-y-4">
             <div 
               onClick={() => handleNav('/')}
               className="flex items-center gap-3 cursor-pointer group"
-              title="Laila Shamsi - Back to Start"
+              title="Umi'z World - Home"
             >
               <img 
-                src="/Logo.jpeg" 
-                alt="Laila Shamsi" 
-                className="h-12 w-12 rounded-xl object-contain border border-[#B89B62]/60 shadow-md group-hover:scale-105 transition-transform"
+                src="/logo.png" 
+                alt="Umi'z World" 
+                onError={(e) => {
+                  if (e.target.src.indexOf('Logo.jpeg') === -1) {
+                    e.target.src = '/Logo.jpeg';
+                  }
+                }}
+                className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl object-contain border border-[#B89B62]/60 shadow-md group-hover:scale-105 transition-transform"
               />
               <div>
-                <span className="font-cinzel tracking-[0.18em] text-xl font-bold text-[#FAF5EC] uppercase block leading-tight group-hover:text-[#B89B62] transition-colors">
-                  LAILA SHAMSI
+                <span className="font-cinzel tracking-[0.16em] text-lg sm:text-xl font-bold text-[#FAF5EC] uppercase block leading-tight group-hover:text-[#B89B62] transition-colors">
+                  UMI&apos;Z WORLD
                 </span>
                 <p className="text-[8.5px] uppercase tracking-[0.28em] text-[#B89B62] font-semibold mt-0.5">
-                  Pakistani Eastern Wear
+                  Umiz World Collection
                 </p>
               </div>
             </div>
+            
             <p className="text-xs text-[#E8DCCB]/85 font-normal leading-relaxed max-w-sm">
-              Celebrating Pakistani Fashion, One Beautiful Detail at a Time.
+              Celebrating Pakistani Fashion, One Beautiful Detail at a Time. Handcrafted luxury pret, embroidered unstitched fabrics, and festive heirloom wear.
             </p>
+
             <button
               onClick={() => handleNav('/about')}
-              className="text-[11px] text-[#B89B62] hover:underline font-semibold uppercase tracking-wider block"
+              className="text-[11px] text-[#B89B62] hover:text-[#FAF5EC] font-semibold uppercase tracking-wider block transition-colors"
             >
               Rooted in Tradition, Designed for Today →
             </button>
             
             {/* Social Media Links */}
-            <div className="flex items-center gap-4 pt-2">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/20 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:border-[#B89B62] transition-colors text-xs font-semibold">
-                IG
+            <div className="flex items-center gap-2.5 pt-2">
+              <a 
+                href="https://www.instagram.com/umizworld?dlrf=MTllNno1OWozcnh0aw==" 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="Instagram"
+                title="Follow Umiz World on Instagram"
+                className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/25 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:bg-[#641E32] hover:border-[#641E32] transition-all duration-300 shadow-sm"
+              >
+                <InstagramIcon className="w-4 h-4" />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/20 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:border-[#B89B62] transition-colors text-xs font-semibold">
-                FB
+              <a 
+                href="https://www.tiktok.com/@umizworld?_r=1&_t=ZS-9B7gEmyDdyP" 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="TikTok"
+                title="Follow Umiz World on TikTok"
+                className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/25 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:bg-[#641E32] hover:border-[#641E32] transition-all duration-300 shadow-sm"
+              >
+                <TikTokIcon className="w-4 h-4" />
               </a>
-              <a href="https://pinterest.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/20 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:border-[#B89B62] transition-colors text-xs font-semibold">
-                PIN
+              <a 
+                href="https://www.facebook.com/share/1C9iyEgsgE/?mibextid=wwXIfr" 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="Facebook"
+                title="Follow Umiz World on Facebook"
+                className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/25 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:bg-[#641E32] hover:border-[#641E32] transition-all duration-300 shadow-sm"
+              >
+                <FacebookIcon className="w-4 h-4" />
               </a>
-              <a href="https://tiktok.com" target="_blank" rel="noreferrer" className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/20 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:border-[#B89B62] transition-colors text-xs font-semibold">
-                TT
+              <a 
+                href="https://wa.me/923174341036" 
+                target="_blank" 
+                rel="noreferrer" 
+                aria-label="WhatsApp"
+                title="Chat on WhatsApp"
+                className="w-9 h-9 rounded-full bg-white/5 border border-[#E8DCCB]/25 flex items-center justify-center text-[#E8DCCB] hover:text-[#FAF5EC] hover:bg-[#641E32] hover:border-[#641E32] transition-all duration-300 shadow-sm"
+              >
+                <WhatsAppIcon className="w-4 h-4" />
               </a>
             </div>
           </div>
 
-          {/* Collections */}
-          <div className="space-y-3">
-            <h4 className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wide">
-              Discover Our Collections
+          {/* Collections (3 cols) */}
+          <div className="lg:col-span-3 space-y-3">
+            <h4 className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wider uppercase">
+              Collections
             </h4>
             <ul className="space-y-2.5 text-xs text-[#E8DCCB]/80">
               <li>
-                <button onClick={() => { onSelectCategory('unstitched'); handleNav('/categories'); }} className="hover:text-[#B89B62] transition-colors">
+                <button onClick={() => { onSelectCategory('female'); handleNav('/categories', 'female'); }} className="hover:text-[#FAF5EC] transition-colors">
+                  Female (Women Wear)
+                </button>
+              </li>
+              <li>
+                <button onClick={() => { onSelectCategory('stitched'); handleNav('/stitched'); }} className="hover:text-[#FAF5EC] transition-colors">
+                  Stitched (Ready to Wear)
+                </button>
+              </li>
+              <li>
+                <button onClick={() => { onSelectCategory('unstitched'); handleNav('/unstitched'); }} className="hover:text-[#FAF5EC] transition-colors">
                   Unstitched Suits
                 </button>
               </li>
               <li>
-                <button onClick={() => { onSelectCategory('ready-to-wear'); handleNav('/categories'); }} className="hover:text-[#B89B62] transition-colors">
-                  Ready to Wear
+                <button onClick={() => { onSelectCategory('babies'); handleNav('/baby-clothes'); }} className="hover:text-[#FAF5EC] transition-colors">
+                  Kids Collection (Baby Clothes)
                 </button>
               </li>
               <li>
-                <button onClick={() => { onSelectCategory('stitched'); handleNav('/categories'); }} className="hover:text-[#B89B62] transition-colors">
-                  Luxury Pret
-                </button>
-              </li>
-              <li>
-                <button onClick={() => { onSelectCategory('luxury-formals'); handleNav('/categories'); }} className="hover:text-[#B89B62] transition-colors">
-                  Festive & Formal Wear
-                </button>
-              </li>
-              <li>
-                <button onClick={() => { onSelectCategory('festive-26'); handleNav('/categories'); }} className="hover:text-[#B89B62] transition-colors">
-                  Eid Collection
+                <button onClick={() => handleNav('/sales')} className="hover:text-[#FAF5EC] transition-colors">
+                  Customer Favourites & Sale
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Client Care */}
-          <div className="space-y-3">
-            <h4 className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wide">
+          {/* Quick Help (2 cols) */}
+          <div className="lg:col-span-2 space-y-3">
+            <h4 
+              onClick={handleClientCareClick('Track Order')}
+              className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wider uppercase cursor-pointer hover:underline inline-block"
+              title="Click to visit Consultation & Inquiry"
+            >
               Client Care
             </h4>
             <ul className="space-y-2.5 text-xs text-[#E8DCCB]/80">
-              <li><button onClick={() => handleNav('/contact')} className="hover:text-[#B89B62] transition-colors text-left">Size & Fitting Guide</button></li>
-              <li><button onClick={() => handleNav('/contact')} className="hover:text-[#B89B62] transition-colors text-left">Shipping & Delivery</button></li>
-              <li><button onClick={() => handleNav('/contact')} className="hover:text-[#B89B62] transition-colors text-left">14-Day Exchange Policy</button></li>
-              <li><button onClick={() => handleNav('/contact')} className="hover:text-[#B89B62] transition-colors text-left">Track Your Order</button></li>
-              <li><button onClick={() => handleNav('/contact')} className="hover:text-[#B89B62] transition-colors text-left">Styling Consultation</button></li>
+              <li><button onClick={handleClientCareClick('Track Order')} className="hover:text-[#FAF5EC] transition-colors text-left cursor-pointer">Track Order</button></li>
+              <li><button onClick={handleClientCareClick('Size Guide')} className="hover:text-[#FAF5EC] transition-colors text-left cursor-pointer">Size Guide</button></li>
+              <li><button onClick={handleClientCareClick('Cash on Delivery')} className="hover:text-[#FAF5EC] transition-colors text-left cursor-pointer">Cash on Delivery</button></li>
+              <li><button onClick={handleClientCareClick('14-Day Exchanges')} className="hover:text-[#FAF5EC] transition-colors text-left cursor-pointer">14-Day Exchanges</button></li>
+              <li><button onClick={handleClientCareClick('Styling Assistance')} className="hover:text-[#FAF5EC] transition-colors text-left cursor-pointer">Styling Assistance</button></li>
             </ul>
           </div>
 
-          {/* Flagships */}
-          <div className="space-y-3">
-            <h4 className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wide">
-              Boutiques
-            </h4>
-            <ul className="space-y-2 text-xs text-[#E8DCCB]/80">
-              <li><span className="text-[#FAF5EC] font-medium">Lahore:</span> M.M. Alam Road, Gulberg</li>
-              <li><span className="text-[#FAF5EC] font-medium">Karachi:</span> Bukhari Commercial, DHA</li>
-              <li><span className="text-[#FAF5EC] font-medium">Islamabad:</span> F-7 Markaz</li>
-              <li><span className="text-[#FAF5EC] font-medium">London:</span> Knightsbridge</li>
-            </ul>
+          {/* Official Store Location & Contact (3 cols) */}
+          <div className="lg:col-span-3 space-y-4">
+            <div>
+              <h4 className="font-cinzel text-sm font-bold text-[#B89B62] tracking-wider uppercase">
+                Flagship Atelier
+              </h4>
+              <div className="w-10 h-0.5 bg-[#B89B62]/60 mt-1.5" />
+            </div>
+            
+            <div className="space-y-3.5 text-xs">
+              {/* Store Address */}
+              <div className="flex items-start gap-3 group">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF5EC]/10 border border-[#B89B62]/40 flex items-center justify-center text-[#B89B62] shrink-0 group-hover:bg-[#641E32] group-hover:text-[#FAF5EC] group-hover:border-[#641E32] transition-all shadow-sm mt-0.5">
+                  <MapPinIcon className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider text-[#B89B62] font-semibold block mb-0.5">
+                    Store Address
+                  </span>
+                  <p className="text-xs text-[#FAF5EC]/90 leading-relaxed font-normal">
+                    129 Mehmood Road, Near Telephone Exchange, New Samanabad, Lahore, Pakistan
+                  </p>
+                </div>
+              </div>
+
+              {/* Email Us */}
+              <a 
+                href="mailto:umizworldshop@gmail.com" 
+                className="flex items-start gap-3 group transition-colors block"
+              >
+                <div className="w-8 h-8 rounded-lg bg-[#FAF5EC]/10 border border-[#B89B62]/40 flex items-center justify-center text-[#B89B62] shrink-0 group-hover:bg-[#641E32] group-hover:text-[#FAF5EC] group-hover:border-[#641E32] transition-all shadow-sm mt-0.5">
+                  <MailIcon className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider text-[#B89B62] font-semibold block mb-0.5">
+                    Email Us
+                  </span>
+                  <p className="text-xs text-[#FAF5EC]/90 group-hover:text-[#B89B62] underline underline-offset-2 transition-colors truncate">
+                    umizworldshop@gmail.com
+                  </p>
+                </div>
+              </a>
+
+              {/* Phone / WhatsApp */}
+              <div className="flex items-start gap-3 group">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF5EC]/10 border border-[#B89B62]/40 flex items-center justify-center text-[#B89B62] shrink-0 group-hover:bg-[#641E32] group-hover:text-[#FAF5EC] group-hover:border-[#641E32] transition-all shadow-sm mt-0.5">
+                  <PhoneIcon className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider text-[#B89B62] font-semibold block mb-0.5">
+                    Phone & WhatsApp
+                  </span>
+                  <a 
+                    href="tel:03174341036" 
+                    className="text-xs font-mono font-semibold text-[#FAF5EC] hover:text-[#B89B62] transition-colors block mt-0.5"
+                  >
+                    03174341036
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        {/* Bottom Legal */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#E8DCCB]/60 gap-4">
-          <p>© {new Date().getFullYear()} LAILA SHAMSI. Celebrating Pakistani Fashion, One Beautiful Detail at a Time.</p>
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">Privacy Policy</span>
-            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">Terms of Service</span>
-            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">Authenticity Certified</span>
-            
-            {/* Admin Login Lock Icon */}
+        {/* Bottom Legal Bar */}
+        <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#E8DCCB]/60 gap-4 text-center sm:text-left">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+            <p>© {new Date().getFullYear()} UMI&apos;Z WORLD. Celebrating Pakistani Fashion, One Beautiful Detail at a Time.</p>
+            <span className="hidden sm:inline text-[#E8DCCB]/30">•</span>
+            {/* Admin Lock Icon (Name removed as requested) */}
             <button 
               onClick={onOpenAdmin} 
-              className="p-1.5 rounded-full text-[#E8DCCB]/60 hover:text-[#B89B62] border border-transparent hover:border-[#B89B62]/40 hover:bg-[#B89B62]/10 transition-all group"
+              className="w-7 h-7 rounded-full bg-white/5 hover:bg-[#B89B62]/20 border border-[#E8DCCB]/25 hover:border-[#B89B62]/60 flex items-center justify-center text-[#B89B62] hover:text-[#FAF5EC] transition-all cursor-pointer shadow-sm group"
               title="Admin Login"
               aria-label="Admin Login"
             >
-              <LockIcon className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
+              <LockIcon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
             </button>
+          </div>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:pr-24">
+            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">Privacy Policy</span>
+            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">Terms of Service</span>
+            <span className="hover:text-[#FAF5EC] cursor-pointer transition-colors">100% Authentic Fabric</span>
           </div>
         </div>
 
