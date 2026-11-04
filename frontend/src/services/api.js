@@ -1,5 +1,11 @@
-const rawApiBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').trim().replace(/\/+$/, '');
-const API_BASE_URL = rawApiBase.endsWith('/api') ? rawApiBase : `${rawApiBase}/api`;
+const rawApiBase = (
+  import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api')
+).trim().replace(/\/+$/, '');
+
+const API_BASE_URL = rawApiBase === '' || rawApiBase === '/api' 
+  ? '/api' 
+  : (rawApiBase.endsWith('/api') ? rawApiBase : `${rawApiBase}/api`);
 
 // ----------------------------------------------------------------------
 // HIGH-CONCURRENCY CLIENT CACHE & IN-FLIGHT REQUEST DEDUPLICATION
