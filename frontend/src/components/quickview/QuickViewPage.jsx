@@ -48,13 +48,13 @@ export default function QuickViewPage({
       setQuantity(1);
       setShowSizeGuide(false);
     }, 0);
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     return () => clearTimeout(timer);
   }, [product]);
 
   if (!product) {
     return (
-      <section className="pt-36 pb-24 px-4 sm:px-8 max-w-5xl mx-auto text-center">
+      <section className="pt-24 sm:pt-36 pb-24 px-4 sm:px-8 max-w-5xl mx-auto text-center">
         <div className="bg-white rounded-3xl border border-[#E8DCCB] p-10 sm:p-16 shadow-sm space-y-4">
           <p className="text-xs uppercase tracking-[0.25em] text-[#B89B62] font-semibold">
             UMI&apos;Z WORLD ATELIER
@@ -116,7 +116,7 @@ export default function QuickViewPage({
       : products.filter((p) => String(p.id) !== String(product.id)).slice(0, 4);
 
   return (
-    <section className="pt-36 sm:pt-40 lg:pt-44 pb-20 bg-[#FAF5EC] min-h-screen">
+    <section className="pt-24 sm:pt-32 lg:pt-36 pb-16 bg-[#FAF5EC] min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Top Breadcrumb & Back Navigation Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 mb-4 border-b border-[#E8DCCB]">
@@ -235,7 +235,7 @@ export default function QuickViewPage({
 
             {/* Thumbnail Strip */}
             {totalImages > 1 && (
-              <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none justify-center">
+              <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center px-1">
                 {imagesList.map((img, idx) => (
                   <button
                     key={idx}

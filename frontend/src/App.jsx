@@ -110,12 +110,8 @@ export default function App() {
     });
     window.history.pushState({}, '', route);
 
-    // Starting fresh from top on home click or smooth scroll on other pages
-    if (route === '/') {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    } else {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }
+    // Always start fresh from top instantly on route change to prevent jarring bottom-to-top scroll
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
     if (route === '/new-arrivals') {
       document.title = "New Arrivals | UMI'Z WORLD Haute Couture";
@@ -334,7 +330,7 @@ export default function App() {
       setCurrentRoute('/quick-view');
     });
     window.history.pushState({}, '', pid ? `/quick-view/${pid}` : '/quick-view');
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.title = `${product.title} | LAILA SHAMSI Haute Couture`;
   };
 

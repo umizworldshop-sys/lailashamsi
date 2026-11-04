@@ -529,7 +529,7 @@ Please confirm my order. Thank you!`;
       }
     });
 
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
     // Fire non-blocking background persistence to MongoDB backend
     createOrder(orderPayload).catch(() => {
