@@ -370,7 +370,7 @@ export default function AdminPanel({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-[#070607] text-[#EDE8E3] flex font-body">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[#070607] text-[#EDE8E3] flex flex-col font-body">
       {/* Toast Feedback */}
       {panelToast && (
         <div className="fixed top-5 right-5 z-[70] bg-[#1A181C] text-white px-5 py-3 rounded-2xl border border-[#D4AF37]/80 shadow-[0_10px_40px_rgba(0,0,0,0.8)] flex items-center gap-2.5 text-xs font-semibold animate-reveal-up">

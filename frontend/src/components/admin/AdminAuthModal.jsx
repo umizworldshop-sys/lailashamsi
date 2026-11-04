@@ -131,24 +131,26 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
   };
 
   return (
-    <div className="w-full h-full flex items-center justify-center p-4 bg-radial from-[#1A1115] via-[#0E0B0D] to-[#050405] relative overflow-y-auto">
+    <div className="w-full min-h-screen flex items-center justify-center p-3 sm:p-6 py-8 sm:py-12 bg-radial from-[#1A1115] via-[#0E0B0D] to-[#050405] relative overflow-y-auto">
       {/* Subtle Ambient Glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#B76E79]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-[#B76E79]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-[#D4AF37]/10 rounded-full blur-3xl pointer-events-none" />
 
+      {/* Responsive Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-6 right-6 p-3 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors cursor-pointer"
+        className="fixed top-3 right-3 sm:top-6 sm:right-6 z-30 p-2.5 sm:p-3 text-gray-400 hover:text-white bg-black/60 hover:bg-black/90 rounded-full border border-white/10 backdrop-blur-md transition-colors cursor-pointer shadow-lg"
         title="Return to Storefront"
+        aria-label="Close"
       >
-        <CloseIcon className="w-5 h-5" />
+        <CloseIcon className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
 
       {/* VIEW: LOADING */}
       {view === 'loading' && (
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs uppercase font-mono tracking-[0.25em] text-gray-400">
+        <div className="text-center space-y-4 my-auto">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-[10px] sm:text-xs uppercase font-mono tracking-[0.25em] text-gray-400">
             Connecting Database...
           </p>
         </div>
@@ -156,34 +158,39 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
 
       {/* VIEW: ONE-TIME MASTER ADMIN REGISTRATION */}
       {view === 'register' && (
-        <div className="relative w-full max-w-lg bg-[#141216]/95 border border-[#D4AF37]/40 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl">
-          <div className="text-center space-y-2 mb-7">
+        <div className="relative w-full max-w-lg my-auto bg-[#141216]/95 border border-[#D4AF37]/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl">
+          <div className="text-center space-y-1.5 sm:space-y-2 mb-5 sm:mb-7">
             <img 
-              src="/Logo.jpeg" 
-              alt="Laila Shamsi" 
-              className="w-14 h-14 rounded-2xl object-contain border border-[#D4AF37]/50 shadow-xl mx-auto"
+              src="/logo.png" 
+              alt="Umi'z World" 
+              onError={(e) => {
+                if (e.target.src.indexOf('Logo.jpeg') === -1) {
+                  e.target.src = '/Logo.jpeg';
+                }
+              }}
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-contain border border-[#D4AF37]/50 shadow-xl mx-auto"
             />
-            <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#D4AF37] block">
+            <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[#D4AF37] block">
               Online Database Setup
             </span>
-            <h2 className="font-cinzel text-2xl font-bold text-white tracking-wide">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-wide" style={{ fontFamily: 'var(--font-heading)' }}>
               Master Admin Registration
             </h2>
-            <p className="text-xs text-gray-400 leading-relaxed max-w-sm mx-auto">
-              Register the administrator for Laila Shamsi. Your account will be safely stored in the online MongoDB database. Once registered, registration closes permanently.
+            <p className="text-[11px] sm:text-xs text-gray-400 leading-relaxed max-w-sm mx-auto px-1">
+              Register the administrator for Umi&apos;z World. Account is stored in MongoDB Atlas. Once registered, registration locks permanently.
             </p>
           </div>
 
           {authError && (
-            <div className="mb-6 p-3.5 bg-rose-950/60 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
+            <div className="mb-4 sm:mb-6 p-3 bg-rose-950/70 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
               <span className="shrink-0 mt-0.5">⚠️</span>
-              <div className="flex-1">{authError}</div>
+              <div className="flex-1 text-[11px] sm:text-xs">{authError}</div>
             </div>
           )}
 
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleRegister} className="space-y-3 sm:space-y-4">
             <div>
-              <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+              <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                 Administrator Name *
               </label>
               <input
@@ -192,12 +199,12 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                 value={registerForm.name}
                 onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
                 placeholder="Enter full name"
-                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-4 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+              <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                 Admin Email *
               </label>
               <input
@@ -205,14 +212,14 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                 required
                 value={registerForm.email}
                 onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-                placeholder="e.g. admin@lailashamsi.com"
-                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-4 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                placeholder="e.g. admin@umizworld.com"
+                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                   Password *
                 </label>
                 <div className="relative">
@@ -222,12 +229,12 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                     placeholder="Min 6 characters"
-                    className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-4 pr-11 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-3.5 sm:pl-4 pr-10 sm:pr-11 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1 transition-colors cursor-pointer"
+                    className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1.5 transition-colors cursor-pointer"
                     title={showRegisterPassword ? 'Hide password' : 'View password'}
                     aria-label={showRegisterPassword ? 'Hide password' : 'View password'}
                   >
@@ -241,7 +248,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
               </div>
 
               <div>
-                <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+                <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                   Confirm Password *
                 </label>
                 <div className="relative">
@@ -251,12 +258,12 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                     value={registerForm.confirmPassword}
                     onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
                     placeholder="Repeat password"
-                    className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-4 pr-11 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                    className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-3.5 sm:pl-4 pr-10 sm:pr-11 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowRegisterConfirmPassword(!showRegisterConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1 transition-colors cursor-pointer"
+                    className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1.5 transition-colors cursor-pointer"
                     title={showRegisterConfirmPassword ? 'Hide password' : 'View password'}
                     aria-label={showRegisterConfirmPassword ? 'Hide password' : 'View password'}
                   >
@@ -273,7 +280,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
             <button
               type="submit"
               disabled={authLoading}
-              className="w-full mt-2 py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white font-semibold text-xs uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className="w-full mt-2 py-3 sm:py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white font-semibold text-xs uppercase tracking-[0.18em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               {authLoading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -282,7 +289,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
               )}
             </button>
 
-            <div className="pt-3 text-center">
+            <div className="pt-2 text-center">
               <p className="text-xs text-gray-400">
                 Already registered?{' '}
                 <button
@@ -300,34 +307,39 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
 
       {/* VIEW: MASTER ADMIN LOGIN */}
       {view === 'login' && (
-        <div className="relative w-full max-w-md bg-[#141216]/95 border border-[#D4AF37]/40 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl">
-          <div className="text-center space-y-2 mb-8">
+        <div className="relative w-full max-w-md my-auto bg-[#141216]/95 border border-[#D4AF37]/40 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xl">
+          <div className="text-center space-y-1.5 sm:space-y-2 mb-6 sm:mb-8">
             <img 
-              src="/Logo.jpeg" 
-              alt="Laila Shamsi" 
-              className="w-14 h-14 rounded-2xl object-contain border border-[#D4AF37]/50 shadow-xl mx-auto"
+              src="/logo.png" 
+              alt="Umi'z World" 
+              onError={(e) => {
+                if (e.target.src.indexOf('Logo.jpeg') === -1) {
+                  e.target.src = '/Logo.jpeg';
+                }
+              }}
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-contain border border-[#D4AF37]/50 shadow-xl mx-auto"
             />
-            <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-[#D4AF37] block">
+            <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[#D4AF37] block">
               Admin Access
             </span>
-            <h2 className="font-cinzel text-2xl font-bold text-white tracking-wide">
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-wide" style={{ fontFamily: 'var(--font-heading)' }}>
               Admin Login
             </h2>
-            <p className="text-xs text-gray-400">
+            <p className="text-[11px] sm:text-xs text-gray-400 max-w-xs mx-auto">
               Enter your admin credentials to access catalog management and customer orders.
             </p>
           </div>
 
           {authError && (
-            <div className="mb-6 p-3.5 bg-rose-950/60 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
+            <div className="mb-4 sm:mb-6 p-3 bg-rose-950/70 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
               <span className="shrink-0 mt-0.5">⚠️</span>
-              <div className="flex-1">{authError}</div>
+              <div className="flex-1 text-[11px] sm:text-xs">{authError}</div>
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-3.5 sm:space-y-4">
             <div>
-              <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+              <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                 Admin Email *
               </label>
               <input
@@ -335,13 +347,13 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                 required
                 value={loginForm.email}
                 onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                placeholder="e.g. admin@lailashamsi.com"
-                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-4 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                placeholder="e.g. admin@umizworld.com"
+                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label className="text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
+              <label className="text-[10px] sm:text-[11px] font-medium uppercase tracking-wider text-gray-300 block mb-1">
                 Password *
               </label>
               <div className="relative">
@@ -351,12 +363,12 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                   value={loginForm.password}
                   onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                   placeholder="Enter admin password"
-                  className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-4 pr-11 py-3 text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                  className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-3.5 sm:pl-4 pr-10 sm:pr-11 py-2.5 sm:py-3 text-sm sm:text-xs text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowLoginPassword(!showLoginPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1 transition-colors cursor-pointer"
+                  className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1.5 transition-colors cursor-pointer"
                   title={showLoginPassword ? 'Hide password' : 'View password'}
                   aria-label={showLoginPassword ? 'Hide password' : 'View password'}
                 >
@@ -372,7 +384,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
             <button
               type="submit"
               disabled={authLoading}
-              className="w-full mt-4 py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white font-semibold text-xs uppercase tracking-[0.2em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              className="w-full mt-3 sm:mt-4 py-3 sm:py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white font-semibold text-xs uppercase tracking-[0.18em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               {authLoading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -381,7 +393,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
               )}
             </button>
 
-            <div className="pt-3 text-center border-t border-[#332E38]/50 mt-4">
+            <div className="pt-3 text-center border-t border-[#332E38]/50 mt-3 sm:mt-4">
               {!hasAdminExists ? (
                 <p className="text-xs text-gray-400">
                   Need initial setup?{' '}
@@ -394,8 +406,8 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                   </button>
                 </p>
               ) : (
-                <p className="text-[11px] text-[#D4AF37]/80 flex items-center justify-center gap-1.5 font-medium">
-                  <LockIcon className="w-3.5 h-3.5 text-[#D4AF37]" /> Registration locked (Admin account configured in online database)
+                <p className="text-[10px] sm:text-[11px] text-[#D4AF37]/80 flex items-center justify-center gap-1.5 font-medium">
+                  <LockIcon className="w-3.5 h-3.5 text-[#D4AF37]" /> Registration locked (Admin configured)
                 </p>
               )}
             </div>
@@ -405,4 +417,3 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
     </div>
   );
 }
-
