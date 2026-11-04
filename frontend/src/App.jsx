@@ -289,6 +289,8 @@ export default function App() {
 
   const handleCloseAdmin = useCallback(() => {
     setIsAdminOpen(false);
+    sessionStorage.removeItem('ls_admin_token');
+    localStorage.removeItem('ls_admin_token');
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
 

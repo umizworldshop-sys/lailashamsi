@@ -43,8 +43,8 @@ export default function AdminPanel({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [catalogViewMode, setCatalogViewMode] = useState('grid');
 
-  // Auth credentials
-  const [token, setToken] = useState(() => localStorage.getItem('ls_admin_token') || '');
+  // Auth credentials (starts fresh without permanent persistence)
+  const [token, setToken] = useState(() => sessionStorage.getItem('ls_admin_token') || '');
   const [adminUser, setAdminUser] = useState(null);
 
   // Data states
@@ -116,7 +116,7 @@ export default function AdminPanel({
 
     let isMounted = true;
     const checkSession = async () => {
-      const savedToken = localStorage.getItem('ls_admin_token');
+      const savedToken = sessionStorage.getItem('ls_admin_token');
       if (savedToken) {
         try {
           const profile = await getAdminProfile(savedToken);
@@ -130,6 +130,7 @@ export default function AdminPanel({
           }
         } catch {
           if (!isMounted) return;
+          sessionStorage.removeItem('ls_admin_token');
           localStorage.removeItem('ls_admin_token');
           setToken('');
           setView('auth');
@@ -149,6 +150,13 @@ export default function AdminPanel({
 
     return () => {
       isMounted = false;
+      // Auto-logout when admin closes or leaves the dashboard
+      sessionStorage.removeItem('ls_admin_token');
+      localStorage.removeItem('ls_admin_token');
+      setToken('');
+      setAdminUser(null);
+      setView('auth');
+
       document.documentElement.classList.remove('admin-modal-open');
       document.body.classList.remove('admin-modal-open');
       document.body.style.overflow = '';
@@ -158,7 +166,8 @@ export default function AdminPanel({
 
   // Auth Success Callback
   const handleAuthSuccess = ({ token: newToken, admin: newAdmin }) => {
-    localStorage.setItem('ls_admin_token', newToken);
+    sessionStorage.setItem('ls_admin_token', newToken);
+    localStorage.removeItem('ls_admin_token');
     setToken(newToken);
     setAdminUser(newAdmin);
     setView('dashboard');
@@ -168,6 +177,7 @@ export default function AdminPanel({
 
   // Explicit Logout
   const handleLogout = () => {
+    sessionStorage.removeItem('ls_admin_token');
     localStorage.removeItem('ls_admin_token');
     setToken('');
     setAdminUser(null);
@@ -175,8 +185,9 @@ export default function AdminPanel({
     showToast('Logged out successfully.');
   };
 
-  // Exit & Scroll to top
+  // Exit & Scroll to top (automatically logs out as requested)
   const handleClose = () => {
+    handleLogout();
     onClose();
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   };
