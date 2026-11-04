@@ -56,11 +56,14 @@ app.disable('x-powered-by');
 
 // Production CORS Configuration
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.CORS_ORIGIN,
+  'https://www.lailashamsi.com',
+  'https://lailashamsi.com',
+  'https://lailashamsi-frn21.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
-  'http://localhost:5000'
+  'http://localhost:5000',
+  process.env.FRONTEND_URL,
+  process.env.CORS_ORIGIN
 ].filter(Boolean).map(url => url.replace(/\/+$/, ''));
 
 app.use(cors({
@@ -68,25 +71,25 @@ app.use(cors({
     // Allow non-browser requests (e.g. mobile apps, curl, server-to-server health checks)
     if (!origin) return callback(null, true);
 
-    // Development or explicit wildcard
-    if (process.env.NODE_ENV !== 'production' || allowedOrigins.includes('*')) {
-      return callback(null, true);
-    }
-
     const cleanOrigin = origin.replace(/\/+$/, '');
-    const isExplicitlyAllowed = allowedOrigins.includes(cleanOrigin);
-    const isVercelDomain = cleanOrigin.endsWith('.vercel.app');
 
-    if (isExplicitlyAllowed || isVercelDomain) {
+    // Allow development, wildcard, explicit whitelist, or any Vercel domain / production domain
+    if (
+      process.env.NODE_ENV !== 'production' ||
+      allowedOrigins.includes('*') ||
+      allowedOrigins.includes(cleanOrigin) ||
+      cleanOrigin.endsWith('.vercel.app') ||
+      cleanOrigin.includes('lailashamsi.com')
+    ) {
       return callback(null, true);
     }
 
     console.warn(`⚠️ CORS blocked request from unauthorized origin: ${origin}`);
-    return callback(new Error(`Origin ${origin} not permitted by CORS policy`));
+    return callback(null, false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
 app.use(express.json({ limit: '10mb' }));
