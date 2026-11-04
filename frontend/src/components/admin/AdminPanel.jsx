@@ -43,8 +43,8 @@ export default function AdminPanel({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [catalogViewMode, setCatalogViewMode] = useState('grid');
 
-  // Auth credentials (starts fresh without permanent persistence)
-  const [token, setToken] = useState(() => sessionStorage.getItem('ls_admin_token') || '');
+  // Auth credentials (always starts fresh for login)
+  const [token, setToken] = useState('');
   const [adminUser, setAdminUser] = useState(null);
 
   // Data states
@@ -110,61 +110,33 @@ export default function AdminPanel({
     }
   }, [token]);
 
-  // Auth Initialization on Modal Open
+  // Handle open/close state transitions & background scroll lock
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      // When admin panel is closed, auto-logout and reset state for next time
+      setToken('');
+      setAdminUser(null);
+      setView('auth');
+      sessionStorage.removeItem('ls_admin_token');
+      localStorage.removeItem('ls_admin_token');
+      return;
+    }
 
-    let isMounted = true;
-    const checkSession = async () => {
-      const savedToken = sessionStorage.getItem('ls_admin_token');
-      if (savedToken) {
-        try {
-          const profile = await getAdminProfile(savedToken);
-          if (!isMounted) return;
-          if (profile && profile.success && profile.admin) {
-            setToken(savedToken);
-            setAdminUser(profile.admin);
-            setView('dashboard');
-            loadDashboardData(savedToken);
-            return;
-          }
-        } catch {
-          if (!isMounted) return;
-          sessionStorage.removeItem('ls_admin_token');
-          localStorage.removeItem('ls_admin_token');
-          setToken('');
-          setView('auth');
-        }
-      } else {
-        setView('auth');
-      }
-    };
-
-    checkSession();
-
-    // Prevent background scrolling
+    // Prevent background scrolling while admin modal is active
     document.documentElement.classList.add('admin-modal-open');
     document.body.classList.add('admin-modal-open');
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
 
     return () => {
-      isMounted = false;
-      // Auto-logout when admin closes or leaves the dashboard
-      sessionStorage.removeItem('ls_admin_token');
-      localStorage.removeItem('ls_admin_token');
-      setToken('');
-      setAdminUser(null);
-      setView('auth');
-
       document.documentElement.classList.remove('admin-modal-open');
       document.body.classList.remove('admin-modal-open');
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     };
-  }, [isOpen, loadDashboardData]);
+  }, [isOpen]);
 
-  // Auth Success Callback
+  // Auth Success Callback (invoked on successful login or register)
   const handleAuthSuccess = ({ token: newToken, admin: newAdmin }) => {
     sessionStorage.setItem('ls_admin_token', newToken);
     localStorage.removeItem('ls_admin_token');
