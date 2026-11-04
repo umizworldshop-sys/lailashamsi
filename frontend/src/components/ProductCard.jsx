@@ -25,18 +25,24 @@ export default function ProductCard({
   const totalImages = imagesList.length;
   const safeImgIdx = totalImages > 0 ? currentImgIdx % totalImages : 0;
 
-  // Automatic carousel slide when hovering over the card
+  // Automatic carousel slide when hovering over the card (Desktop pointer devices only)
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia && !window.matchMedia('(hover: hover)').matches) {
+      return;
+    }
     if (!isHovered || totalImages <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentImgIdx((prev) => (prev + 1) % totalImages);
-    }, 1300);
+    }, 1400);
 
     return () => clearInterval(interval);
   }, [isHovered, totalImages]);
 
   const handleCardMouseEnter = () => {
+    if (typeof window !== 'undefined' && window.matchMedia && !window.matchMedia('(hover: hover)').matches) {
+      return;
+    }
     setIsHovered(true);
     if (totalImages > 1) {
       setCurrentImgIdx(1);
@@ -136,30 +142,30 @@ export default function ProductCard({
           );
         })}
 
-        {/* Carousel Left / Right Controls & Dots (when multiple images exist) */}
+        {/* Carousel Left / Right Controls & Dots (Desktop only when multiple images exist) */}
         {totalImages > 1 && (
           <>
             <button
               type="button"
               onClick={handlePrevImage}
               aria-label="Previous product image"
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/85 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md backdrop-blur-sm flex items-center justify-center opacity-90 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
+              className="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/85 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md backdrop-blur-sm items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
             >
-              <ChevronLeftIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <ChevronLeftIcon className="w-4 h-4" />
             </button>
             <button
               type="button"
               onClick={handleNextImage}
               aria-label="Next product image"
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/85 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md backdrop-blur-sm flex items-center justify-center opacity-90 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
+              className="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white/85 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md backdrop-blur-sm items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
             >
-              <ChevronRightIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <ChevronRightIcon className="w-4 h-4" />
             </button>
 
-            {/* Carousel Dots Indicator */}
+            {/* Carousel Dots Indicator (Desktop only on hover) */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-2.5 sm:group-hover:bottom-12 inset-x-0 z-10 flex items-center justify-center gap-1.5 transition-all duration-300 pointer-events-auto"
+              className="hidden sm:flex absolute bottom-2.5 group-hover:bottom-12 inset-x-0 z-10 items-center justify-center gap-1.5 transition-all duration-300 pointer-events-auto opacity-0 group-hover:opacity-100"
             >
               {imagesList.map((_, idx) => (
                 <button

@@ -38,6 +38,10 @@ export default function QuickViewPage({
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
 
+  // Touch swipe support for mobile gallery
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
+
   // Reset state whenever the selected product changes
   useEffect(() => {
     if (!product) return;
@@ -55,8 +59,8 @@ export default function QuickViewPage({
   if (!product) {
     return (
       <section className="pt-24 sm:pt-36 pb-24 px-4 sm:px-8 max-w-5xl mx-auto text-center">
-        <div className="bg-white rounded-3xl border border-[#E8DCCB] p-10 sm:p-16 shadow-sm space-y-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-[#B89B62] font-semibold">
+        <div className="bg-white rounded-3xl border border-[#E8DCCB] p-8 sm:p-16 shadow-sm space-y-4">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#B89B62] font-semibold">
             UMI&apos;Z WORLD ATELIER
           </p>
           <h1 className="font-cinzel text-2xl sm:text-3xl font-bold text-[#641E32]">
@@ -84,6 +88,29 @@ export default function QuickViewPage({
       : [product.image || '/Logo.jpeg'];
   const totalImages = imagesList.length;
   const safeActiveIdx = totalImages > 0 ? activeImage % totalImages : 0;
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    const minSwipeDistance = 45;
+    if (distance > minSwipeDistance && totalImages > 1) {
+      // Swiped Left -> Next Image
+      setActiveImage((prev) => (prev + 1) % totalImages);
+    } else if (distance < -minSwipeDistance && totalImages > 1) {
+      // Swiped Right -> Previous Image
+      setActiveImage((prev) => (prev - 1 + totalImages) % totalImages);
+    }
+  };
 
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
   const convertedPrice = Math.round((Number(product.price) || 0) * curr.rate);
@@ -116,11 +143,23 @@ export default function QuickViewPage({
       : products.filter((p) => String(p.id) !== String(product.id)).slice(0, 4);
 
   return (
-    <section className="pt-24 sm:pt-32 lg:pt-36 pb-16 bg-[#FAF5EC] min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        {/* Top Breadcrumb & Back Navigation Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 mb-4 border-b border-[#E8DCCB]">
-          <div className="flex items-center gap-2 text-xs text-[#282321]/70">
+    <section className="pt-20 sm:pt-28 lg:pt-32 pb-28 sm:pb-20 bg-[#FAF5EC] min-h-screen">
+      <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
+        
+        {/* ================= TOP NAVIGATION / BREADCRUMB BAR ================= */}
+        <div className="flex items-center justify-between pb-3 mb-3 sm:mb-4 border-b border-[#E8DCCB]">
+          {/* Back Button */}
+          <button
+            type="button"
+            onClick={() => (onBack ? onBack() : onNavigate && onNavigate('/'))}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#641E32] text-[#282321] hover:text-[#FAF5EC] border border-[#E8DCCB] text-[11px] sm:text-xs font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer"
+          >
+            <ChevronLeftIcon className="w-3.5 h-3.5" />
+            <span>Back</span>
+          </button>
+
+          {/* Desktop Breadcrumbs (Hidden on small mobile to avoid cluttered wrapping) */}
+          <div className="hidden sm:flex items-center gap-2 text-xs text-[#282321]/70">
             <button
               type="button"
               onClick={() => (onNavigate ? onNavigate('/') : onBack && onBack())}
@@ -143,27 +182,39 @@ export default function QuickViewPage({
               {product.categoryLabel || product.category || 'Collection'}
             </button>
             <span>/</span>
-            <span className="text-[#641E32] font-bold truncate max-w-[180px] sm:max-w-xs">
+            <span className="text-[#641E32] font-bold truncate max-w-xs">
               {product.title}
             </span>
           </div>
 
+          {/* Top Right Wishlist Toggle */}
           <button
             type="button"
-            onClick={() => (onBack ? onBack() : onNavigate && onNavigate('/'))}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#641E32] text-[#282321] hover:text-[#FAF5EC] border border-[#E8DCCB] text-[11px] font-semibold tracking-wider uppercase transition-all shadow-sm cursor-pointer"
+            onClick={() => onToggleWishlist(product.id)}
+            className={`p-2 rounded-full border transition-all cursor-pointer ${
+              isWishlisted
+                ? 'bg-[#641E32] text-[#FAF5EC] border-[#641E32] shadow-sm'
+                : 'bg-white text-[#282321] border-[#E8DCCB] hover:border-[#641E32]'
+            }`}
+            title={isWishlisted ? 'Saved to Wishlist' : 'Add to Wishlist'}
+            aria-label="Wishlist"
           >
-            <ChevronLeftIcon className="w-3.5 h-3.5" />
-            <span>Back</span>
+            <HeartIcon className="w-4 h-4" filled={isWishlisted} />
           </button>
         </div>
 
-        {/* Main Product QuickView Showcase Grid - Professional Compact Size */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 bg-white rounded-2xl p-4 sm:p-6 lg:p-7 border border-[#E8DCCB] shadow-sm">
-          {/* Left Column: Interactive Multi-Photo Gallery (5 cols on md/lg) */}
-          <div className="md:col-span-5 space-y-3">
-            <div className="relative aspect-[3/4] max-h-[460px] mx-auto rounded-xl overflow-hidden bg-[#F7F3EB] border border-[#E8DCCB] shadow-sm group">
-              {/* Base Cover Image so frame never flashes blank */}
+        {/* ================= MAIN PRODUCT QUICKVIEW SHOWCASE ================= */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 lg:p-7 border border-[#E8DCCB] shadow-sm">
+          
+          {/* ================= LEFT: TOUCH-SWIPEABLE GALLERY ================= */}
+          <div className="md:col-span-5 space-y-2.5 sm:space-y-3">
+            <div
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="relative aspect-[3/4] max-h-[400px] sm:max-h-[460px] mx-auto rounded-xl sm:rounded-2xl overflow-hidden bg-[#F7F3EB] border border-[#E8DCCB] shadow-sm group select-none"
+            >
+              {/* Base Cover Image */}
               <img
                 src={imagesList[0]}
                 alt={product.title}
@@ -193,14 +244,35 @@ export default function QuickViewPage({
                 );
               })}
 
-              {/* Left / Right Carousel Arrows */}
+              {/* Top Left Badges */}
+              <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap gap-1.5 pointer-events-none">
+                {discountPercent > 0 && (
+                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2 py-0.5 rounded-full shadow-sm bg-[#641E32] text-[#FAF5EC]">
+                    -{discountPercent}% OFF
+                  </span>
+                )}
+                {product.tag && (
+                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2 py-0.5 rounded-full shadow-sm bg-[#282321] text-[#FAF5EC] border border-[#B89B62]/40">
+                    {product.tag}
+                  </span>
+                )}
+              </div>
+
+              {/* Photo Indicator Pill */}
+              {totalImages > 1 && (
+                <div className="absolute bottom-2.5 right-2.5 z-10 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-white text-[10px] font-mono tracking-wider font-semibold pointer-events-none">
+                  {safeActiveIdx + 1} / {totalImages}
+                </div>
+              )}
+
+              {/* Desktop-only Hover Prev / Next Buttons (Hidden on mobile to keep tap/swipe clean) */}
               {totalImages > 1 && (
                 <>
                   <button
                     type="button"
                     onClick={() => setActiveImage((safeActiveIdx - 1 + totalImages) % totalImages)}
                     aria-label="Previous photo"
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md flex items-center justify-center transition-all cursor-pointer"
+                    className="hidden sm:flex absolute left-2.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md items-center justify-center transition-all cursor-pointer opacity-80 hover:opacity-100"
                   >
                     <ChevronLeftIcon className="w-4 h-4" />
                   </button>
@@ -208,43 +280,26 @@ export default function QuickViewPage({
                     type="button"
                     onClick={() => setActiveImage((safeActiveIdx + 1) % totalImages)}
                     aria-label="Next photo"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md flex items-center justify-center transition-all cursor-pointer"
+                    className="hidden sm:flex absolute right-2.5 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/90 hover:bg-[#641E32] text-[#282321] hover:text-white shadow-md items-center justify-center transition-all cursor-pointer opacity-80 hover:opacity-100"
                   >
                     <ChevronRightIcon className="w-4 h-4" />
                   </button>
-                  <span className="absolute bottom-2.5 right-2.5 z-10 px-2.5 py-0.5 rounded-full bg-black/65 text-white text-[10px] font-semibold backdrop-blur-sm">
-                    {safeActiveIdx + 1} / {totalImages}
-                  </span>
                 </>
               )}
-
-              {/* Top Left Badges */}
-              <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap gap-1.5">
-                {discountPercent > 0 && (
-                  <span className="text-[9px] font-bold tracking-[0.18em] uppercase px-2.5 py-0.5 rounded-full shadow-sm bg-[#641E32] text-[#FAF5EC]">
-                    -{discountPercent}% OFF
-                  </span>
-                )}
-                {product.tag && (
-                  <span className="text-[9px] font-bold tracking-[0.18em] uppercase px-2.5 py-0.5 rounded-full shadow-sm bg-[#282321] text-[#FAF5EC] border border-[#B89B62]/40">
-                    {product.tag}
-                  </span>
-                )}
-              </div>
             </div>
 
-            {/* Thumbnail Strip */}
+            {/* Thumbnail Strip (Touch scrollable) */}
             {totalImages > 1 && (
-              <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center px-1">
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none justify-start sm:justify-center px-0.5">
                 {imagesList.map((img, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setActiveImage(idx)}
-                    className={`relative w-14 h-18 sm:w-16 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${
+                    className={`relative w-13 h-16 sm:w-16 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all cursor-pointer ${
                       safeActiveIdx === idx
-                        ? 'border-[#641E32] scale-105 shadow-md ring-2 ring-[#641E32]/20'
-                        : 'border-transparent opacity-70 hover:opacity-100'
+                        ? 'border-[#641E32] scale-105 shadow-md ring-2 ring-[#641E32]/30'
+                        : 'border-[#E8DCCB] opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
@@ -254,12 +309,13 @@ export default function QuickViewPage({
             )}
           </div>
 
-          {/* Right Column: Product Specifications & Ordering Controls (7 cols on md/lg) */}
+          {/* ================= RIGHT: SPECIFICATIONS & ACTIONS ================= */}
           <div className="md:col-span-7 flex flex-col justify-between space-y-4">
-            <div className="space-y-4">
-              {/* Category & Rating */}
+            <div className="space-y-3.5 sm:space-y-4">
+              
+              {/* Category Kicker & Reviews */}
               <div className="flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-[0.2em] font-bold text-[#B89B62]">
+                <span className="text-[10px] sm:text-[11px] uppercase tracking-[0.22em] font-bold text-[#B89B62]">
                   {product.categoryLabel || 'Luxury Eastern Wear'}
                 </span>
                 <div className="flex items-center gap-1.5 bg-[#FAF5EC] px-2.5 py-0.5 rounded-full border border-[#E8DCCB]">
@@ -272,7 +328,7 @@ export default function QuickViewPage({
               </div>
 
               {/* Product Title */}
-              <h1 className="font-cinzel text-xl sm:text-2xl font-bold text-[#641E32] uppercase leading-snug">
+              <h1 className="font-cinzel text-lg sm:text-2xl font-bold text-[#641E32] uppercase leading-snug">
                 {product.title}
               </h1>
 
@@ -288,14 +344,14 @@ export default function QuickViewPage({
                     {convertedOriginalPrice.toLocaleString()}
                   </span>
                 )}
-                <span className="text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2.5 py-0.5 rounded-full font-semibold">
-                  ✓ In Stock & Ready to Dispatch
+                <span className="text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full font-semibold">
+                  ✓ In Stock
                 </span>
               </div>
 
               {/* Description */}
               {product.description && (
-                <p className="text-xs text-[#282321]/80 leading-relaxed line-clamp-2">
+                <p className="text-xs text-[#282321]/80 leading-relaxed">
                   {product.description}
                 </p>
               )}
@@ -336,7 +392,7 @@ export default function QuickViewPage({
                         type="button"
                         onClick={() => setSelectedColor(color)}
                         style={{ backgroundColor: color.hex }}
-                        className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 transition-all cursor-pointer ${
+                        className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
                           selectedColor?.name === color.name
                             ? 'border-[#641E32] scale-110 shadow-md ring-2 ring-[#641E32]/40'
                             : 'border-white hover:scale-105 shadow-sm'
@@ -349,7 +405,7 @@ export default function QuickViewPage({
                 </div>
               )}
 
-              {/* Size Selection */}
+              {/* Size Selection & Size Chart */}
               {Array.isArray(product.sizes) && product.sizes.length > 0 && (
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
@@ -366,7 +422,7 @@ export default function QuickViewPage({
                   </div>
 
                   {showSizeGuide && (
-                    <div className="p-3 mb-2.5 bg-[#FAF5EC] rounded-xl border border-[#B89B62]/50 text-xs animate-reveal-up overflow-x-auto shadow-sm">
+                    <div className="p-2.5 sm:p-3 mb-2.5 bg-[#FAF5EC] rounded-xl border border-[#B89B62]/50 text-xs animate-reveal-up overflow-x-auto shadow-sm">
                       <table className="w-full text-center">
                         <thead>
                           <tr className="border-b border-[#E8DCCB] text-[#282321]/70">
@@ -394,7 +450,7 @@ export default function QuickViewPage({
                         key={sz}
                         type="button"
                         onClick={() => setSelectedSize(sz)}
-                        className={`min-w-[42px] h-8 px-2.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                        className={`min-w-[44px] h-9 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           selectedSize === sz
                             ? 'bg-[#641E32] text-[#FAF5EC] shadow-sm scale-105'
                             : 'bg-[#FAF5EC] border border-[#E8DCCB] text-[#282321] hover:border-[#641E32]'
@@ -407,7 +463,7 @@ export default function QuickViewPage({
                 </div>
               )}
 
-              {/* Quantity & Add to Bag Row */}
+              {/* Quantity Stepper & Add to Bag (Desktop & in-page view) */}
               <div className="flex items-center gap-2.5 pt-1">
                 {/* Quantity Stepper */}
                 <div className="flex items-center border border-[#E8DCCB] rounded-xl bg-[#FAF5EC] p-1 shadow-sm">
@@ -434,7 +490,7 @@ export default function QuickViewPage({
                 <button
                   type="button"
                   onClick={handleAddToCartClick}
-                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                 >
                   {addedSuccess ? (
                     <>
@@ -451,23 +507,9 @@ export default function QuickViewPage({
                     </>
                   )}
                 </button>
-
-                {/* Wishlist Button */}
-                <button
-                  type="button"
-                  onClick={() => onToggleWishlist(product.id)}
-                  className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                    isWishlisted
-                      ? 'bg-[#641E32] text-[#FAF5EC] border-[#641E32]'
-                      : 'bg-[#FAF5EC] text-[#282321] border-[#E8DCCB] hover:border-[#641E32]'
-                  }`}
-                  title="Save to Wishlist"
-                >
-                  <HeartIcon className="w-4 h-4" filled={isWishlisted} />
-                </button>
               </div>
 
-              {/* Instant Proceed to Checkout Button */}
+              {/* Instant Buy It Now Button */}
               {onProceedToCheckout && (
                 <button
                   type="button"
@@ -482,7 +524,7 @@ export default function QuickViewPage({
                     onAddToCart(newItem);
                     onProceedToCheckout({ items: [newItem] });
                   }}
-                  className="w-full py-3 px-5 rounded-xl bg-[#282321] hover:bg-[#641E32] text-[#FAF5EC] text-xs uppercase tracking-[0.18em] font-bold transition-all shadow-md flex items-center justify-center gap-2 group cursor-pointer"
+                  className="w-full py-3 px-5 rounded-xl bg-[#282321] hover:bg-[#641E32] text-[#FAF5EC] text-xs uppercase tracking-[0.18em] font-bold transition-all shadow-md flex items-center justify-center gap-2 group cursor-pointer active:scale-95"
                 >
                   <span>Buy It Now • Express Checkout</span>
                   <ArrowRightIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -508,21 +550,21 @@ export default function QuickViewPage({
           </div>
         </div>
 
-        {/* Related / You May Also Like Section */}
+        {/* ================= RELATED / YOU MAY ALSO LIKE ================= */}
         {fallbackRelated.length > 0 && (
-          <div className="mt-12 pt-8 border-t border-[#E8DCCB]">
-            <div className="flex items-center justify-between mb-6">
+          <div className="mt-10 sm:mt-12 pt-6 sm:pt-8 border-t border-[#E8DCCB]">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.25em] text-[#B89B62] font-semibold mb-0.5">
                   CURATED FOR YOU
                 </p>
-                <h2 className="font-cinzel text-lg sm:text-xl font-bold text-[#282321] uppercase">
+                <h2 className="font-cinzel text-base sm:text-xl font-bold text-[#282321] uppercase">
                   You May Also Like
                 </h2>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
               {fallbackRelated.map((relProduct, idx) => (
                 <ProductCard
                   key={relProduct.id || idx}
@@ -538,7 +580,36 @@ export default function QuickViewPage({
           </div>
         )}
       </div>
+
+      {/* ================= STICKY MOBILE ACTION BAR ================= */}
+      <div className="sm:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-t border-[#E8DCCB] px-4 py-2.5 shadow-[0_-4px_25px_rgba(40,35,33,0.12)] flex items-center justify-between gap-3">
+        <div className="flex flex-col">
+          <span className="text-[10px] uppercase tracking-wider text-[#B89B62] font-bold">
+            {selectedSize} {selectedColor?.name ? `• ${selectedColor.name}` : ''}
+          </span>
+          <span className="font-cinzel text-base font-bold text-[#641E32] leading-tight">
+            {curr.symbol}{(convertedPrice * quantity).toLocaleString()}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAddToCartClick}
+          className="flex-1 py-2.5 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-bold shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
+        >
+          {addedSuccess ? (
+            <>
+              <CheckIcon className="w-4 h-4" />
+              <span>Added!</span>
+            </>
+          ) : (
+            <>
+              <ShoppingBagIcon className="w-4 h-4" />
+              <span>Add to Bag</span>
+            </>
+          )}
+        </button>
+      </div>
     </section>
   );
 }
-
