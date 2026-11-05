@@ -28,140 +28,140 @@
       "source": "/contact(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/contact/index.html"
       }
     },
     {
       "source": "/about(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/about/index.html"
       }
     },
     {
       "source": "/sales(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/sales/index.html"
       }
     },
     {
       "source": "/sale(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/sale/index.html"
       }
     },
     {
       "source": "/new-arrivals(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/new-arrivals/index.html"
       }
     },
     {
       "source": "/newarrivals(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/newarrivals/index.html"
       }
     },
     {
       "source": "/categories(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/categories/index.html"
       }
     },
     {
       "source": "/stitched(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/stitched/index.html"
       }
     },
     {
       "source": "/stitch(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/stitch/index.html"
       }
     },
     {
       "source": "/unstitched(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/unstitched/index.html"
       }
     },
     {
       "source": "/baby-clothes(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/baby-clothes/index.html"
       }
     },
     {
       "source": "/babies(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/babies/index.html"
       }
     },
     {
       "source": "/kids(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/kids/index.html"
       }
     },
     {
       "source": "/baby(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/baby/index.html"
       }
     },
     {
       "source": "/quick-view/(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/quick-view/index.html"
       }
     },
     {
       "source": "/quickview/(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/quickview/index.html"
       }
     },
     {
       "source": "/product/(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/product/index.html"
       }
     },
     {
       "source": "/cart(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/cart/index.html"
       }
     },
     {
       "source": "/wishlist(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/wishlist/index.html"
       }
     },
     {
       "source": "/checkout(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/index.html"
+        "path": "/checkout/index.html"
       }
     },
     {
