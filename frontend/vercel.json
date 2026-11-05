@@ -1,12 +1,27 @@
 {
   "rewrites": [
-    {
-      "source": "/((?!api|assets|.*\\.[\\w]+$).*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/contact(.*)", "destination": "/index.html" },
+    { "source": "/about(.*)", "destination": "/index.html" },
+    { "source": "/sales(.*)", "destination": "/index.html" },
+    { "source": "/sale(.*)", "destination": "/index.html" },
+    { "source": "/new-arrivals(.*)", "destination": "/index.html" },
+    { "source": "/newarrivals(.*)", "destination": "/index.html" },
+    { "source": "/categories(.*)", "destination": "/index.html" },
+    { "source": "/stitched(.*)", "destination": "/index.html" },
+    { "source": "/stitch(.*)", "destination": "/index.html" },
+    { "source": "/unstitched(.*)", "destination": "/index.html" },
+    { "source": "/baby-clothes(.*)", "destination": "/index.html" },
+    { "source": "/babies(.*)", "destination": "/index.html" },
+    { "source": "/kids(.*)", "destination": "/index.html" },
+    { "source": "/baby(.*)", "destination": "/index.html" },
+    { "source": "/quick-view/(.*)", "destination": "/index.html" },
+    { "source": "/quickview/(.*)", "destination": "/index.html" },
+    { "source": "/product/(.*)", "destination": "/index.html" },
+    { "source": "/cart(.*)", "destination": "/index.html" },
+    { "source": "/wishlist(.*)", "destination": "/index.html" },
+    { "source": "/checkout(.*)", "destination": "/index.html" },
+    { "source": "/assets/(.*)", "destination": "/assets/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

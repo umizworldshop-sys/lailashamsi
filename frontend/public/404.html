@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UMI'Z WORLD | Haute Couture</title>
+    <script>
+      (function() {
+        var current = window.location.pathname + window.location.search + window.location.hash;
+        if (current && current !== '/' && current !== '/index.html' && current !== '/404.html') {
+          try {
+            sessionStorage.setItem('laila_spa_redirect', current);
+          } catch(e) {}
+        }
+        window.location.replace('/');
+      })();
+    </script>
+    <style>
+      body {
+        margin: 0;
+        background-color: #FAF5EC;
+        color: #641E32;
+        font-family: -apple-system, BlinkMacSystemFont, "Cinzel", Georgia, serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+      }
+      .loader {
+        width: 32px;
+        height: 32px;
+        border: 2px solid #E8DCCB;
+        border-top-color: #641E32;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto 12px;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="loader"></div>
+      <p style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;">Loading UMI'Z WORLD...</p>
+    </div>
+  </body>
+</html>
+

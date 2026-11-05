@@ -62,6 +62,26 @@ export default function App() {
   // URL ROUTING & NAVIGATION (Supports /, /new-arrivals, /categories, /stitched, /unstitched, /baby-clothes, /sales, /about, /contact, /cart, /wishlist, /checkout)
   // -----------------------------------------------------------
   const [currentRoute, setCurrentRoute] = useState(() => {
+    try {
+      const redirected = sessionStorage.getItem('laila_spa_redirect');
+      if (redirected) {
+        sessionStorage.removeItem('laila_spa_redirect');
+        window.history.replaceState({}, '', redirected);
+        const redirectPath = redirected.toLowerCase();
+        if (redirectPath.startsWith('/quick-view') || redirectPath.startsWith('/quickview') || redirectPath.startsWith('/product/')) return '/quick-view';
+        if (redirectPath.startsWith('/new-arrivals') || redirectPath.startsWith('/newarrivals')) return '/new-arrivals';
+        if (redirectPath.startsWith('/categories')) return '/categories';
+        if (redirectPath.startsWith('/stitched') || redirectPath.startsWith('/stitch')) return '/stitched';
+        if (redirectPath.startsWith('/unstitched')) return '/unstitched';
+        if (redirectPath.startsWith('/baby-clothes') || redirectPath.startsWith('/babies') || redirectPath.startsWith('/kids') || redirectPath.startsWith('/baby')) return '/baby-clothes';
+        if (redirectPath.startsWith('/sales') || redirectPath.startsWith('/sale')) return '/sales';
+        if (redirectPath.startsWith('/about')) return '/about';
+        if (redirectPath.startsWith('/contact')) return '/contact';
+        if (redirectPath.startsWith('/cart')) return '/cart';
+        if (redirectPath.startsWith('/wishlist')) return '/wishlist';
+        if (redirectPath.startsWith('/checkout')) return '/checkout';
+      }
+    } catch {}
     const path = window.location.pathname.toLowerCase();
     if (path.startsWith('/quick-view') || path.startsWith('/quickview') || path.startsWith('/product/')) return '/quick-view';
     if (path === '/new-arrivals' || path === '/newarrivals') return '/new-arrivals';
@@ -145,17 +165,7 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname.toLowerCase();
-      if (path.startsWith('/quick-view') || path.startsWith('/quickview') || path.startsWith('/product/')) {
-        setCurrentRoute('/quick-view');
-        const match = window.location.pathname.match(/^\/(?:quick-view|quickview|product)\/([^/]+)/i);
-        if (match && match[1]) {
-          const pid = decodeURIComponent(match[1]);
-          const found = (products.length > 0 ? products : PRODUCTS).find(
-            (p) => String(p.id) === String(pid) || String(p._id) === String(pid)
-          );
-          if (found) setQuickViewProduct(found);
-        }
-      }
+      if (path.startsWith('/quick-view') || path.startsWith('/quickview') || path.startsWith('/product/')) setCurrentRoute('/quick-view');
       else if (path === '/new-arrivals' || path === '/newarrivals') setCurrentRoute('/new-arrivals');
       else if (path === '/categories') setCurrentRoute('/categories');
       else if (path === '/stitched' || path === '/stitch') setCurrentRoute('/stitched');
@@ -171,7 +181,7 @@ export default function App() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [products]);
+  }, []);
 
   // Real functional Cart state (starts empty [] with NO dummy data, persists real additions)
   const [cartItems, setCartItems] = useState(() => {
