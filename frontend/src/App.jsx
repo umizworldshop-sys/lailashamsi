@@ -145,7 +145,17 @@ export default function App() {
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname.toLowerCase();
-      if (path.startsWith('/quick-view') || path.startsWith('/quickview') || path.startsWith('/product/')) setCurrentRoute('/quick-view');
+      if (path.startsWith('/quick-view') || path.startsWith('/quickview') || path.startsWith('/product/')) {
+        setCurrentRoute('/quick-view');
+        const match = window.location.pathname.match(/^\/(?:quick-view|quickview|product)\/([^/]+)/i);
+        if (match && match[1]) {
+          const pid = decodeURIComponent(match[1]);
+          const found = (products.length > 0 ? products : PRODUCTS).find(
+            (p) => String(p.id) === String(pid) || String(p._id) === String(pid)
+          );
+          if (found) setQuickViewProduct(found);
+        }
+      }
       else if (path === '/new-arrivals' || path === '/newarrivals') setCurrentRoute('/new-arrivals');
       else if (path === '/categories') setCurrentRoute('/categories');
       else if (path === '/stitched' || path === '/stitch') setCurrentRoute('/stitched');
@@ -161,7 +171,7 @@ export default function App() {
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [products]);
 
   // Real functional Cart state (starts empty [] with NO dummy data, persists real additions)
   const [cartItems, setCartItems] = useState(() => {
