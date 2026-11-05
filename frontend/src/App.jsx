@@ -41,6 +41,8 @@ const AdminPanel = lazy(() => import('./components/AdminPanel'));
 
 export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loaderRendered, setLoaderRendered] = useState(true);
   const [siteSettings, setSiteSettings] = useState({
     saleDiscountPercent: 30,
     marqueeItems: [
@@ -281,26 +283,62 @@ export default function App() {
     }
   }, []);
 
+  // Smooth fade-out and unmount luxury preloader once initial page data is ready
+  useEffect(() => {
+    if (!isInitialLoading) {
+      const timer = setTimeout(() => {
+        setLoaderRendered(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isInitialLoading]);
+
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
 
-    if (window.location.hash) {
+    if (window.location.hash && !window.location.hash.includes('enquiry')) {
       window.history.replaceState(null, '', window.location.pathname);
     }
 
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
-    // Concurrent zero-wait catalog & settings initialization
-    loadProducts();
-    fetchSiteSettings()
-      .then((res) => {
-        if (res && res.settings) {
+    let isMounted = true;
+    const startTime = Date.now();
+    const minDisplayMs = 700; // Gives smooth visual stability without flashing
+    const safetyTimeoutMs = 1800; // Never keeps the customer waiting if network is slow
+
+    const finishLoading = () => {
+      if (!isMounted) return;
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, minDisplayMs - elapsed);
+      setTimeout(() => {
+        if (isMounted) {
+          setIsInitialLoading(false);
+        }
+      }, remaining);
+    };
+
+    const safetyTimer = setTimeout(finishLoading, safetyTimeoutMs);
+
+    // Concurrent catalog & settings initialization behind the preloader
+    Promise.allSettled([
+      loadProducts(),
+      fetchSiteSettings().then((res) => {
+        if (res && res.settings && isMounted) {
           setSiteSettings(res.settings);
         }
       })
-      .catch(() => {});
+    ]).finally(() => {
+      clearTimeout(safetyTimer);
+      finishLoading();
+    });
+
+    return () => {
+      isMounted = false;
+      clearTimeout(safetyTimer);
+    };
   }, [loadProducts]);
 
   const handleCloseAdmin = useCallback(() => {
@@ -510,6 +548,51 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF5EC] text-[#282321] font-body selection:bg-[#641E32] selection:text-[#FAF5EC]">
+      {/* Luxury Atelier Full-Page Preloader on Initial Load & Page Refresh */}
+      {loaderRendered && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-label="Loading UMI'Z WORLD Haute Couture"
+          className={`fixed inset-0 z-[999999] bg-[#FAF5EC] flex flex-col items-center justify-center transition-opacity duration-500 ease-out select-none ${
+            isInitialLoading ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="relative flex items-center justify-center mb-5">
+            {/* Soft Ambient Glow */}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#B89B62]/15 blur-xl absolute" />
+            
+            {/* Spinning Haute Couture Ring */}
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-[#E8DCCB] border-t-[#641E32] border-r-[#B89B62] animate-spin" />
+            
+            {/* Circular Atelier Emblem */}
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden absolute shadow-md border-2 border-[#FAF5EC]">
+              <img
+                src="/Logo.jpeg"
+                alt="UMI'Z WORLD"
+                className="w-full h-full object-cover"
+                width="64"
+                height="64"
+              />
+            </div>
+          </div>
+
+          <div className="text-center px-4">
+            <h2 className="font-serif tracking-[0.25em] text-base sm:text-lg font-bold text-[#641E32] uppercase">
+              UMI'Z WORLD
+            </h2>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#B89B62] font-semibold mt-1">
+              Haute Couture Atelier
+            </p>
+          </div>
+
+          {/* Micro Progress Bar */}
+          <div className="w-32 h-[2px] bg-[#E8DCCB] rounded-full mt-6 overflow-hidden relative">
+            <div className="h-full bg-gradient-to-r from-[#641E32] via-[#B89B62] to-[#641E32] w-1/2 rounded-full animate-atelier-progress" />
+          </div>
+        </div>
+      )}
+
       {/* High-Visibility Toast Notification (Always clearly visible & never hidden by navbar) */}
       {toast && (
         <div className="fixed top-28 sm:top-32 right-4 sm:right-8 z-[99999] max-w-[calc(100vw-32px)] sm:max-w-md flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-[#282321] text-[#FAF5EC] shadow-[0_12px_40px_rgba(0,0,0,0.45)] border-2 border-[#B89B62] animate-reveal-up text-xs sm:text-[13px] font-semibold tracking-wide backdrop-blur-md">
@@ -540,7 +623,7 @@ export default function App() {
         marqueeItems={siteSettings?.marqueeItems}
       />
 
-      <main className="flex-1">
+      <main className="flex-1 min-h-[75vh]">
         {/* VIEW 1: HOME STOREFRONT */}
         {currentRoute === '/' && (
           <>
@@ -611,8 +694,17 @@ export default function App() {
         {/* Suspense wrapper for lazy-loaded routes */}
         <Suspense
           fallback={
-            <div className="pt-40 pb-24 text-center text-xs uppercase tracking-[0.2em] text-[#641E32] font-semibold">
-              Loading Atelier Collection...
+            <div className="min-h-[60vh] flex flex-col items-center justify-center py-20 select-none">
+              <div className="relative flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-full border-2 border-[#E8DCCB] border-t-[#641E32] border-r-[#B89B62] animate-spin" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[#641E32] absolute" />
+              </div>
+              <span className="font-serif text-xs font-bold tracking-[0.22em] text-[#641E32] uppercase">
+                Loading Atelier Collection...
+              </span>
+              <span className="text-[10px] tracking-[0.25em] text-[#B89B62] uppercase mt-1 font-semibold">
+                UMI'Z WORLD
+              </span>
             </div>
           }
         >

@@ -186,6 +186,19 @@
     }
 }
 
+@keyframes atelierProgress {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(140%);
+    }
+}
+
+.animate-atelier-progress {
+    animation: atelierProgress 1.2s ease-in-out infinite alternate;
+}
+
 .animate-cinematic-zoom {
     animation: slowCinematicZoom 16s ease-in-out infinite;
 }

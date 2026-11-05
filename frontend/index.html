@@ -20,7 +20,26 @@
     </script>
   </head>
   <body class="bg-[#FAF5EC] text-[#282321] antialiased selection:bg-[#641E32] selection:text-[#FAF5EC]">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Instant Native Preloader (renders in 0ms before JS loads, replaced when React mounts) -->
+      <div id="initial-page-preloader" style="position: fixed; inset: 0; z-index: 999999; background-color: #FAF5EC; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+          <div style="width: 76px; height: 76px; border-radius: 50%; border: 2px solid #E8DCCB; border-top-color: #641E32; border-right-color: #B89B62; animation: atelierSpin 0.9s linear infinite;"></div>
+          <img src="/Logo.jpeg" alt="UMI'Z WORLD" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; position: absolute; box-shadow: 0 4px 14px rgba(0,0,0,0.08);" />
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.22em; color: #641E32; text-transform: uppercase;">UMI'Z WORLD</div>
+          <div style="font-size: 10px; font-weight: 600; letter-spacing: 0.28em; color: #B89B62; text-transform: uppercase; margin-top: 4px;">Haute Couture Atelier</div>
+        </div>
+        <div style="width: 120px; height: 2px; background: #E8DCCB; border-radius: 999px; margin-top: 22px; overflow: hidden; position: relative;">
+          <div style="position: absolute; height: 100%; width: 45%; background: linear-gradient(90deg, #641E32, #B89B62); border-radius: 999px; animation: atelierProgress 1.1s ease-in-out infinite alternate;"></div>
+        </div>
+      </div>
+      <style>
+        @keyframes atelierSpin { to { transform: rotate(360deg); } }
+        @keyframes atelierProgress { 0% { transform: translateX(-100%); } 100% { transform: translateX(160%); } }
+      </style>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
