@@ -57,6 +57,23 @@ export default function QuickViewPage({
   }, [product]);
 
   if (!product) {
+    if (products.length === 0) {
+      return (
+        <section className="pt-24 sm:pt-36 pb-24 px-4 max-w-5xl mx-auto flex flex-col items-center justify-center min-h-[60vh] select-none">
+          <div className="relative flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-full border-2 border-[#E8DCCB] border-t-[#641E32] border-r-[#B89B62] animate-spin" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#641E32] absolute" />
+          </div>
+          <span className="font-cinzel text-xs sm:text-sm font-bold tracking-[0.2em] text-[#641E32] uppercase">
+            Loading Atelier Garment...
+          </span>
+          <span className="text-[10px] tracking-[0.25em] text-[#B89B62] uppercase font-semibold mt-1">
+            UMI&apos;Z WORLD
+          </span>
+        </section>
+      );
+    }
+
     return (
       <section className="pt-24 sm:pt-36 pb-24 px-4 sm:px-8 max-w-5xl mx-auto text-center">
         <div className="bg-white rounded-3xl border border-[#E8DCCB] p-8 sm:p-16 shadow-sm space-y-4">
@@ -143,7 +160,7 @@ export default function QuickViewPage({
       : products.filter((p) => String(p.id) !== String(product.id)).slice(0, 4);
 
   return (
-    <section className="pt-20 sm:pt-28 lg:pt-32 pb-28 sm:pb-20 bg-[#FAF5EC] min-h-screen">
+    <section className="pt-28 sm:pt-32 lg:pt-36 pb-32 sm:pb-24 bg-[#FAF5EC] min-h-screen">
       <div className="max-w-5xl mx-auto px-3.5 sm:px-6">
         
         {/* ================= TOP NAVIGATION / BREADCRUMB BAR ================= */}

@@ -43,6 +43,8 @@ export default function App() {
   const [products, setProducts] = useState(PRODUCTS);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loaderRendered, setLoaderRendered] = useState(true);
+  const [isQuickViewLoading, setIsQuickViewLoading] = useState(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [siteSettings, setSiteSettings] = useState({
     saleDiscountPercent: 30,
     marqueeItems: [
@@ -371,9 +373,10 @@ export default function App() {
     }
   }, [wishlist]);
 
-  // Open Quick View on its own dedicated page route (/quick-view/:id) instead of a modal popup
+  // Open Quick View on its own dedicated page route (/quick-view/:id) with luxury transition preloader
   const handleOpenQuickView = (product) => {
     if (!product) return;
+    setIsQuickViewLoading(true);
     setQuickViewProduct(product);
     try {
       sessionStorage.setItem('laila_quickview_product', JSON.stringify(product));
@@ -389,7 +392,12 @@ export default function App() {
     });
     window.history.pushState({}, '', pid ? `/quick-view/${pid}` : '/quick-view');
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.title = `${product.title} | LAILA SHAMSI Haute Couture`;
+    document.title = `${product.title} | UMI'Z WORLD Haute Couture`;
+
+    // Smooth transition loader so data, gallery & variant details buffer seamlessly behind it
+    setTimeout(() => {
+      setIsQuickViewLoading(false);
+    }, 550);
   };
 
   // Toast feedback
@@ -529,14 +537,23 @@ export default function App() {
     [showToast]
   );
 
-  // Navigate to dedicated /checkout route (No Popup)
+  // Navigate to dedicated /checkout route with luxury preloader
   const handleProceedToCheckout = useCallback(
     (data = null) => {
       setIsCartOpen(false);
+      setIsCheckoutLoading(true);
       if (data) {
         setCheckoutData(data);
       }
-      navigateTo('/checkout');
+      startTransition(() => {
+        navigateTo('/checkout');
+      });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
+      // Smooth checkout transition
+      setTimeout(() => {
+        setIsCheckoutLoading(false);
+      }, 550);
     },
     [navigateTo]
   );
@@ -588,6 +605,70 @@ export default function App() {
 
           {/* Micro Progress Bar */}
           <div className="w-32 h-[2px] bg-[#E8DCCB] rounded-full mt-6 overflow-hidden relative">
+            <div className="h-full bg-gradient-to-r from-[#641E32] via-[#B89B62] to-[#641E32] w-1/2 rounded-full animate-atelier-progress" />
+          </div>
+        </div>
+      )}
+
+      {/* Luxury Quick View Transition Preloader */}
+      {isQuickViewLoading && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-label="Loading Garment Details"
+          className="fixed inset-0 z-[999999] bg-[#FAF5EC] flex flex-col items-center justify-center animate-reveal-up select-none transition-all duration-300"
+        >
+          <div className="relative flex items-center justify-center mb-5">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-[#E8DCCB] border-t-[#641E32] border-r-[#B89B62] animate-spin" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden absolute shadow-md border-2 border-[#FAF5EC]">
+              <img
+                src="/Logo.jpeg"
+                alt="UMI'Z WORLD"
+                className="w-full h-full object-cover"
+                width="56"
+                height="56"
+              />
+            </div>
+          </div>
+          <h2 className="font-serif tracking-[0.22em] text-sm sm:text-base font-bold text-[#641E32] uppercase">
+            Loading Outfit Details...
+          </h2>
+          <p className="text-[10px] sm:text-[11px] tracking-[0.25em] text-[#B89B62] uppercase font-semibold mt-1">
+            {quickViewProduct?.title || "UMI'Z WORLD ATELIER"}
+          </p>
+          <div className="w-28 h-[2px] bg-[#E8DCCB] rounded-full mt-5 overflow-hidden relative">
+            <div className="h-full bg-gradient-to-r from-[#641E32] via-[#B89B62] to-[#641E32] w-1/2 rounded-full animate-atelier-progress" />
+          </div>
+        </div>
+      )}
+
+      {/* Luxury Checkout Transition Preloader */}
+      {isCheckoutLoading && (
+        <div
+          role="status"
+          aria-live="polite"
+          aria-label="Opening Checkout"
+          className="fixed inset-0 z-[999999] bg-[#FAF5EC] flex flex-col items-center justify-center animate-reveal-up select-none transition-all duration-300"
+        >
+          <div className="relative flex items-center justify-center mb-5">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-[#E8DCCB] border-t-[#641E32] border-r-[#B89B62] animate-spin" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden absolute shadow-md border-2 border-[#FAF5EC]">
+              <img
+                src="/Logo.jpeg"
+                alt="UMI'Z WORLD"
+                className="w-full h-full object-cover"
+                width="56"
+                height="56"
+              />
+            </div>
+          </div>
+          <h2 className="font-serif tracking-[0.22em] text-sm sm:text-base font-bold text-[#641E32] uppercase">
+            Opening Express Checkout...
+          </h2>
+          <p className="text-[10px] sm:text-[11px] tracking-[0.25em] text-[#B89B62] uppercase font-semibold mt-1">
+            Haute Couture Atelier • COD Pakistan
+          </p>
+          <div className="w-28 h-[2px] bg-[#E8DCCB] rounded-full mt-5 overflow-hidden relative">
             <div className="h-full bg-gradient-to-r from-[#641E32] via-[#B89B62] to-[#641E32] w-1/2 rounded-full animate-atelier-progress" />
           </div>
         </div>
@@ -909,9 +990,12 @@ export default function App() {
         </Suspense>
       )}
 
-      {/* Floating WhatsApp Quick Connect Button (Only visible on customer storefront, hidden in Admin) */}
-      {!isAdminOpen && (
-        <aside aria-label="WhatsApp Support" className="fixed bottom-6 right-6 z-50 flex items-center group">
+      {/* Floating WhatsApp Quick Connect Button (Only visible on customer storefront, hidden in Admin and Checkout) */}
+      {!isAdminOpen && currentRoute !== '/checkout' && (
+        <aside
+          aria-label="WhatsApp Support"
+          className={`fixed ${currentRoute === '/quick-view' ? 'bottom-20 sm:bottom-6' : 'bottom-6'} right-6 z-50 flex items-center group`}
+        >
           <span 
             role="tooltip"
             className="absolute right-full mr-3 px-3.5 py-1.5 rounded-xl bg-[#282321] text-[#FAF5EC] text-xs font-medium tracking-wide border border-[#B89B62]/40 shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 whitespace-nowrap translate-x-2 group-hover:translate-x-0"

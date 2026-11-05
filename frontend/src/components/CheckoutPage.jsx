@@ -361,6 +361,7 @@ export default function CheckoutPage({
 
   // Confirmed Order Receipt State (Displayed on the same /checkout page with 0ms wait)
   const [confirmedOrder, setConfirmedOrder] = useState(null);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   // Totals Calculation (Memoized)
   const { subtotal, discountAmount, shippingFee, grandTotal } = useMemo(() => {
@@ -445,6 +446,14 @@ export default function CheckoutPage({
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       setFormError(Object.values(errors)[0]);
+
+      // Smoothly scroll to the first invalid field so user immediately sees what needs to be filled
+      const firstKey = Object.keys(errors)[0];
+      const targetInput = document.querySelector(`[name="${firstKey}"]`) || document.getElementById(firstKey);
+      if (targetInput) {
+        targetInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetInput.focus();
+      }
       return;
     }
 
@@ -515,8 +524,17 @@ Please confirm my order. Thank you!`;
 
     const whatsappUrl = `https://wa.me/923174341036?text=${encodeURIComponent(whatsappMessage)}`;
 
-    // Open WhatsApp directly with the pre-filled order details
-    window.open(whatsappUrl, '_blank');
+    setIsSubmittingOrder(true);
+
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobileDevice) {
+      window.location.href = whatsappUrl;
+    } else {
+      const opened = window.open(whatsappUrl, '_blank');
+      if (!opened) {
+        window.location.href = whatsappUrl;
+      }
+    }
 
     // Immediately show confirmed receipt on the same page (0ms wait time!)
     startTransition(() => {
@@ -524,6 +542,7 @@ Please confirm my order. Thank you!`;
         ...orderPayload,
         createdAt: new Date().toLocaleString()
       });
+      setIsSubmittingOrder(false);
       if (onOrderSuccess) {
         onOrderSuccess();
       }
@@ -1006,14 +1025,32 @@ Please confirm my order. Thank you!`;
                   </div>
                 </div>
 
-                {/* Instant WhatsApp Order Submit Button */}
+                {/* High-Visibility Validation Error Alert inside Order Summary Card */}
+                {formError && (
+                  <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold flex items-start gap-2 animate-reveal-up shadow-xs">
+                    <span className="text-red-600 font-bold text-sm shrink-0 leading-none">⚠️</span>
+                    <span className="flex-1 leading-snug">{formError}</span>
+                  </div>
+                )}
+
+                {/* Clean Website-Theme Luxury Order Submit Button */}
                 <button
                   type="submit"
-                  className="w-full py-4 bg-[#25D366] hover:bg-[#1ebd5b] text-[#FAF5EC] rounded-full text-xs uppercase tracking-[0.18em] font-bold transition-all flex items-center justify-center gap-2.5 shadow-xl group"
+                  disabled={isSubmittingOrder}
+                  className="w-full py-4 px-5 bg-[#641E32] hover:bg-[#4A1624] active:scale-[0.98] text-[#FAF5EC] rounded-xl text-xs sm:text-sm uppercase tracking-[0.16em] font-bold transition-all flex items-center justify-center gap-2.5 shadow-lg border border-[#B89B62]/40 cursor-pointer select-none"
                 >
-                  <WhatsAppIcon className="w-4 h-4 text-white" />
-                  <span>Complete Order on WhatsApp • {curr.symbol}{grandTotal.toLocaleString()}</span>
-                  <ArrowRightIcon className="w-4 h-4 text-white group-hover:translate-x-1 transition-transform" />
+                  {isSubmittingOrder ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full border-2 border-[#FAF5EC] border-t-transparent animate-spin" />
+                      <span>Connecting to WhatsApp...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <WhatsAppIcon className="w-4 h-4 text-[#FAF5EC]" />
+                      <span>Complete Order • {curr.symbol}{grandTotal.toLocaleString()}</span>
+                      <ArrowRightIcon className="w-4 h-4 text-[#FAF5EC]" />
+                    </>
+                  )}
                 </button>
 
                 {/* Atelier Contact & Trust Footer */}

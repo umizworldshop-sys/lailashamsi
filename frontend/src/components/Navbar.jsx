@@ -330,28 +330,28 @@ export default function Navbar({
           </div>
 
           {/* ======================================================== */}
-          {/* RIGHT: INLINE SEARCH + WISHLIST + SHOPPING CART         */}
+          {/* RIGHT: SEARCH + WISHLIST + SHOPPING CART               */}
           {/* ======================================================== */}
           <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
             
-            {/* 1. INLINE EXPANDABLE SEARCH */}
-            <div ref={searchContainerRef} className="relative flex items-center">
+            {/* 1. DESKTOP INLINE SEARCH (Desktop Only: lg:flex) */}
+            <div ref={searchContainerRef} className="hidden lg:flex relative items-center">
               {isSearchExpanded ? (
-                <div className="flex items-center bg-[#FAF5EC] border border-[#B89B62] rounded-full pl-3 pr-1.5 py-1 sm:py-1.5 shadow-lg animate-reveal-up w-36 xs:w-44 sm:w-52 md:w-56 lg:w-60 transition-all shrink-0">
+                <div className="flex items-center bg-[#FAF5EC] border border-[#B89B62] rounded-full pl-3 pr-1.5 py-1 sm:py-1.5 shadow-lg animate-reveal-up w-52 md:w-60 transition-all shrink-0">
                   <SearchIcon className="w-3.5 h-3.5 text-[#641E32] flex-shrink-0 mr-1.5 sm:mr-2" />
                   <input
                     type="text"
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search lawn, pret..."
+                    placeholder="Search lawn, pret, silk..."
                     className="w-full bg-transparent text-[11px] sm:text-xs text-[#282321] placeholder-[#282321]/50 focus:outline-none"
                   />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="text-[#282321]/60 hover:text-[#641E32] text-xs px-1"
+                      className="text-[#282321]/60 hover:text-[#641E32] text-xs px-1 cursor-pointer"
                     >
                       ✕
                     </button>
@@ -362,7 +362,7 @@ export default function Navbar({
                       setIsSearchExpanded(false);
                       setSearchQuery('');
                     }}
-                    className="p-1 rounded-full text-[#282321]/60 hover:text-[#641E32] hover:bg-[#E8DCCB]/40 transition-colors ml-0.5 sm:ml-1"
+                    className="p-1 rounded-full text-[#282321]/60 hover:text-[#641E32] hover:bg-[#E8DCCB]/40 transition-colors ml-0.5 cursor-pointer"
                   >
                     <CloseIcon className="w-3.5 h-3.5" />
                   </button>
@@ -370,7 +370,7 @@ export default function Navbar({
               ) : (
                 <button 
                   onClick={() => setIsSearchExpanded(true)}
-                  className={`p-2 transition-all duration-200 rounded-full ${
+                  className={`p-2 transition-all duration-200 rounded-full cursor-pointer ${
                     isScrolled 
                       ? 'text-[#282321] hover:bg-[#641E32] hover:text-[#FAF5EC]' 
                       : 'text-[#FAF5EC] hover:bg-[#641E32] hover:text-[#FAF5EC]'
@@ -381,9 +381,9 @@ export default function Navbar({
                 </button>
               )}
 
-              {/* Floating Instant Search Results Dropdown */}
+              {/* Desktop Instant Search Results Dropdown */}
               {isSearchExpanded && searchQuery.trim().length > 0 && (
-                <div className="absolute top-full right-0 mt-2 w-[calc(100vw-24px)] xs:w-72 sm:w-88 max-w-sm bg-[#FAF5EC] border border-[#E8DCCB] rounded-2xl shadow-2xl p-3 z-50 animate-reveal-up text-[#282321]">
+                <div className="absolute top-full right-0 mt-2 w-80 max-w-sm bg-[#FAF5EC] border border-[#E8DCCB] rounded-2xl shadow-2xl p-3 z-50 animate-reveal-up text-[#282321]">
                   <div className="flex items-center justify-between pb-2 border-b border-[#E8DCCB] mb-2 text-[10px] uppercase tracking-[0.15em] font-semibold text-[#282321]/70">
                     <span>Search Results</span>
                     <span className="text-[#641E32] font-bold">{searchResults.length} matches</span>
@@ -420,6 +420,21 @@ export default function Navbar({
                 </div>
               )}
             </div>
+
+            {/* 1B. MOBILE SEARCH TRIGGER BUTTON (Mobile Only: lg:hidden) */}
+            <button
+              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+              className={`lg:hidden p-2 transition-all duration-200 rounded-full cursor-pointer ${
+                isSearchExpanded
+                  ? 'bg-[#641E32] text-[#FAF5EC]'
+                  : (isScrolled 
+                      ? 'text-[#282321] hover:bg-[#641E32] hover:text-[#FAF5EC]' 
+                      : 'text-[#FAF5EC] hover:bg-[#641E32] hover:text-[#FAF5EC]')
+              }`}
+              aria-label="Search Collection"
+            >
+              <SearchIcon className="w-4 h-4" />
+            </button>
 
             {/* 2. WISHLIST ICON WITH REAL DYNAMIC BADGE (NO DUMMY 1) */}
             <button 
@@ -469,6 +484,92 @@ export default function Navbar({
       </nav>
 
       {/* ======================================================== */}
+      {/* DEDICATED FULL-WIDTH MOBILE SEARCH BAR OVERLAY           */}
+      {/* ======================================================== */}
+      {isSearchExpanded && (
+        <div 
+          ref={searchContainerRef}
+          className="lg:hidden w-full bg-[#FAF5EC] border-b border-[#E8DCCB] shadow-2xl px-4 py-3 animate-reveal-up text-[#282321]"
+        >
+          <div className="flex items-center gap-2 bg-white border-2 border-[#B89B62]/80 rounded-full px-3.5 py-2 shadow-sm">
+            <SearchIcon className="w-4 h-4 text-[#641E32] shrink-0" />
+            <input
+              type="text"
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search lawn, pret, silk, unstitched..."
+              className="w-full bg-transparent text-xs text-[#282321] placeholder-[#282321]/50 focus:outline-none"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="text-[#282321]/60 hover:text-[#641E32] text-xs p-1 cursor-pointer"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setIsSearchExpanded(false);
+                setSearchQuery('');
+              }}
+              className="text-xs font-bold text-[#641E32] px-2 py-0.5 rounded-full hover:bg-[#641E32]/10 transition-colors shrink-0 cursor-pointer"
+            >
+              Cancel
+            </button>
+          </div>
+
+          {/* Live Mobile Search Results */}
+          {searchQuery.trim().length > 0 && (
+            <div className="mt-3 max-h-[60vh] overflow-y-auto space-y-2 pt-1 border-t border-[#E8DCCB]/60">
+              <div className="flex items-center justify-between pb-1 text-[10px] uppercase tracking-[0.16em] font-bold text-[#641E32]">
+                <span>Matching Garments</span>
+                <span className="text-[#B89B62]">{searchResults.length} Results</span>
+              </div>
+
+              {searchResults.length === 0 ? (
+                <div className="py-6 text-center text-xs text-[#282321]/60">
+                  No couture items found matching &quot;{searchQuery}&quot;
+                </div>
+              ) : (
+                searchResults.map((item) => (
+                  <div
+                    key={item._id || item.id}
+                    onClick={() => {
+                      if (onSelectProduct) onSelectProduct(item);
+                      setIsSearchExpanded(false);
+                      setSearchQuery('');
+                    }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-[#E8DCCB] active:bg-[#E8DCCB]/40 transition-colors cursor-pointer shadow-xs"
+                  >
+                    <img
+                      src={item.images?.[0] || item.image || '/Logo.jpeg'}
+                      alt={item.title}
+                      className="w-11 h-14 rounded-lg object-cover border border-[#E8DCCB] shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-cinzel text-xs font-bold text-[#641E32] truncate">{item.title}</p>
+                      <p className="text-[11px] font-semibold text-[#282321]/80 mt-0.5">
+                        Rs. {(Number(item.price) * 100).toLocaleString()}
+                      </p>
+                      <span className="inline-block text-[9px] uppercase tracking-wider text-[#B89B62] font-semibold mt-0.5">
+                        {item.categoryLabel || item.category}
+                      </span>
+                    </div>
+                    <span className="text-[#B89B62] font-bold text-sm shrink-0">→</span>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
       {/* MOBILE SLIDE-OVER MENU                                  */}
       {/* ======================================================== */}
       {mobileMenuOpen && (
@@ -509,8 +610,61 @@ export default function Navbar({
                 </button>
               </div>
 
+              {/* In-Drawer Quick Search Bar */}
+              <div className="mt-4 mb-2">
+                <div className="flex items-center gap-2 bg-white border border-[#B89B62]/60 rounded-xl px-3 py-2 shadow-xs">
+                  <SearchIcon className="w-3.5 h-3.5 text-[#641E32] shrink-0" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search collection..."
+                    className="w-full bg-transparent text-xs text-[#282321] placeholder-[#282321]/50 focus:outline-none"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="text-[#282321]/60 text-xs px-1"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {searchQuery.trim().length > 0 && (
+                  <div className="mt-2 max-h-48 overflow-y-auto space-y-1.5 p-1 bg-white rounded-xl border border-[#E8DCCB] shadow-sm">
+                    {searchResults.length === 0 ? (
+                      <p className="text-[11px] text-[#282321]/60 text-center py-2">No matching items</p>
+                    ) : (
+                      searchResults.map((item) => (
+                        <div
+                          key={item._id || item.id}
+                          onClick={() => {
+                            if (onSelectProduct) onSelectProduct(item);
+                            setMobileMenuOpen(false);
+                            setSearchQuery('');
+                          }}
+                          className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[#FAF5EC] cursor-pointer"
+                        >
+                          <img
+                            src={item.images?.[0] || item.image || '/Logo.jpeg'}
+                            alt=""
+                            className="w-8 h-10 rounded object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[11px] font-semibold text-[#641E32] truncate">{item.title}</p>
+                            <p className="text-[10px] text-[#282321]/70">Rs. {(Number(item.price) * 100).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
               {/* Mobile Navigation Links */}
-              <div className="space-y-1.5 mt-5">
+              <div className="space-y-1.5 mt-3">
                 
                 {/* Home */}
                 <button
