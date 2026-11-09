@@ -460,6 +460,90 @@ export const PRODUCTS = [
     sizes: ['1-2Y', '2-4Y', '4-6Y'],
     description: 'Festive ghagra choli set decorated with delicate acrylic safe mirror work, gota kinari, and soft elastic waistband for effortless movement.',
     isNew: true
+  },
+  {
+    id: '6aea4779c9473e55a2c0ef0d',
+    _id: '6aea4779c9473e55a2c0ef0d',
+    title: 'Siyah Embroidered 3-Piece Suit',
+    category: 'stitched',
+    categoryLabel: 'Stitched (Ready to Wear)',
+    price: 125,
+    originalPrice: null,
+    rating: 5.0,
+    reviewsCount: 0,
+    tag: 'New Arrival',
+    tagColor: 'bg-[#4A0E17] text-[#FAF7F2]',
+    images: [
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=1000&auto=format&fit=crop'
+    ],
+    fabric: 'Pure Silk & Handcrafted Chiffon',
+    pieces: '3 Piece',
+    colors: [
+      { name: 'Standard', hex: '#641E32' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description: 'Exquisite deep black luxury embroidered ensemble featuring fine handwork on pure silk fabric with a matching organza dupatta.',
+    isNew: true,
+    isNewArrival: true,
+    isOnSale: false,
+    stock: 25
+  },
+  {
+    id: '6aea4e1235af0193ec56e487',
+    _id: '6aea4e1235af0193ec56e487',
+    title: 'Noor-e-Haya Luxury Suit',
+    category: 'stitched',
+    categoryLabel: 'Stitched (Ready to Wear)',
+    price: 120,
+    originalPrice: 110,
+    rating: 5.0,
+    reviewsCount: 0,
+    tag: 'Seasonal Sale',
+    tagColor: 'bg-[#4A0E17] text-[#FAF7F2]',
+    images: [
+      'https://res.cloudinary.com/jpea5mb0/image/upload/v1793740272/lailashamsi_products/varnq4zuzvt1v4fqfxtz.jpg',
+      'https://res.cloudinary.com/jpea5mb0/image/upload/v1793740281/lailashamsi_products/pkncnb1ka9uv2egndgmm.jpg',
+      'https://res.cloudinary.com/jpea5mb0/image/upload/v1793740292/lailashamsi_products/y1ubsv5jpdekxxwa5kji.jpg'
+    ],
+    fabric: 'Pure Silk & Handcrafted Chiffon',
+    pieces: '3 Piece',
+    colors: [
+      { name: 'Standard', hex: '#641E32' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description: 'Discover timeless elegance with our Noor-e-Haya Embroidered 3-Piece Suit. Designed with delicate embroidery and a sophisticated traditional touch, this outfit brings grace and beauty to your wardrobe. Perfect for festive celebrations, family gatherings, and special occasions.\n\nStyle it with your favorite accessories for a stunning and graceful look.',
+    isNew: true,
+    isNewArrival: false,
+    isOnSale: true,
+    stock: 21
+  },
+  {
+    id: '6aeb0837dd5db719c3fd523f',
+    _id: '6aeb0837dd5db719c3fd523f',
+    title: 'qwertyuiop[',
+    category: 'female',
+    categoryLabel: 'Female (Women Wear)',
+    price: 120,
+    originalPrice: 230,
+    rating: 5.0,
+    reviewsCount: 0,
+    tag: 'New Arrival',
+    tagColor: 'bg-[#4A0E17] text-[#FAF7F2]',
+    images: [
+      'https://res.cloudinary.com/jpea5mb0/image/upload/v1793787941/lailashamsi_products/io3h9mcjwjmsb3hy6tgb.jpg',
+      'https://res.cloudinary.com/jpea5mb0/image/upload/v1793787957/lailashamsi_products/kh4efc9a4yowxmn3i4yh.jpg'
+    ],
+    fabric: 'Pure Silk & Handcrafted Chiffon',
+    pieces: '3 Piece',
+    colors: [
+      { name: 'Standard', hex: '#641E32' }
+    ],
+    sizes: ['XS', 'S', 'M', 'L', 'XL'],
+    description: 'Modern luxury pret outfit crafted with hand-detailed embroidery on pure fabric.',
+    isNew: true,
+    isNewArrival: false,
+    isOnSale: true,
+    stock: 25
   }
 ];
 

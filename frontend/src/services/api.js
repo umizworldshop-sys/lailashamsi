@@ -15,7 +15,7 @@ const clientCache = new Map();
 const inFlightMap = new Map();
 const CACHE_TTL = 45 * 1000; // 45s instant memory cache
 
-function fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
+function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
@@ -101,8 +101,19 @@ export async function fetchProducts({ category = '', search = '', sort = '', for
   }
 
   const url = `${API_BASE_URL}/products${params.toString() ? `?${params.toString()}` : ''}`;
-  const reqPromise = fetchWithTimeout(url, {}, 4000)
-    .then(handleResponse)
+  const executeFetch = async () => {
+    try {
+      const res = await fetchWithTimeout(url, {}, 12000);
+      return await handleResponse(res);
+    } catch (err) {
+      // Automatic single retry with 800ms backoff if serverless lambda had a cold start
+      await new Promise((r) => setTimeout(r, 800));
+      const retryRes = await fetchWithTimeout(url, {}, 12000);
+      return await handleResponse(retryRes);
+    }
+  };
+
+  const reqPromise = executeFetch()
     .then((data) => {
       clientCache.set(key, { ts: Date.now(), data });
       return data;
@@ -121,7 +132,7 @@ export async function fetchProductById(id) {
     const cached = clientCache.get(key);
     if (Date.now() - cached.ts < CACHE_TTL) return cached.data;
   }
-  const res = await fetchWithTimeout(`${API_BASE_URL}/products/${id}`, {}, 3500);
+  const res = await fetchWithTimeout(`${API_BASE_URL}/products/${id}`, {}, 10000);
   const data = await handleResponse(res);
   clientCache.set(key, { ts: Date.now(), data });
   return data;

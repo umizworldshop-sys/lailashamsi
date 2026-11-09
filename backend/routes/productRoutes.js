@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const connectDB = require('../config/db');
 const Product = require('../models/Product');
 const { verifyAdmin } = require('../middleware/auth');
 const initialProducts = require('../data/initialProducts');
@@ -79,13 +80,19 @@ router.get('/', async (req, res) => {
     }
 
     const fetchPromise = (async () => {
-      // Fallback if DB is not connected
+      // Ensure database is fully connected before checking or querying
+      if (mongoose.connection.readyState !== 1) {
+        await connectDB();
+      }
+
+      // If DB connection is genuinely unavailable after retry, return fallback without caching it in RAM
       if (mongoose.connection.readyState !== 1) {
         const fallbackList = initialProducts.map((p, i) => formatLeanProduct(p, i));
         return {
           success: true,
           count: fallbackList.length,
-          products: fallbackList
+          products: fallbackList,
+          _isFallback: true
         };
       }
 
@@ -164,10 +171,12 @@ router.get('/', async (req, res) => {
         products
       };
 
-      productCache.set(cacheKey, {
-        timestamp: Date.now(),
-        payload: responsePayload
-      });
+      if (!responsePayload._isFallback && mongoose.connection.readyState === 1) {
+        productCache.set(cacheKey, {
+          timestamp: Date.now(),
+          payload: responsePayload
+        });
+      }
 
       return responsePayload;
     })();
@@ -206,6 +215,9 @@ router.get('/:id', async (req, res) => {
     }
 
     let product = null;
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
     if (mongoose.connection.readyState === 1 && mongoose.Types.ObjectId.isValid(id)) {
       const raw = await Product.findById(id).lean();
       if (raw) product = formatLeanProduct(raw);

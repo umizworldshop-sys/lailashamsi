@@ -40,7 +40,20 @@ const QuickViewPage = lazy(() => import('./components/quickview/QuickViewPage'))
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
 
 export default function App() {
-  const [products, setProducts] = useState(PRODUCTS);
+  const [products, setProducts] = useState(() => {
+    try {
+      const cached = localStorage.getItem('laila_cached_products');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // Fallback to static catalog if localStorage unavailable
+    }
+    return PRODUCTS;
+  });
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [loaderRendered, setLoaderRendered] = useState(true);
   const [isQuickViewLoading, setIsQuickViewLoading] = useState(false);
@@ -211,9 +224,9 @@ export default function App() {
   }, [cartItems]);
 
   // Load dynamic catalog from MongoDB backend & sync cart items with backend product details
-  const loadProducts = useCallback(async () => {
+  const loadProducts = useCallback(async (forceRefresh = false) => {
     try {
-      const res = await fetchProducts();
+      const res = await fetchProducts({ forceRefresh });
       if (res && res.products && res.products.length > 0) {
         const backendList = res.products.map((p, idx) => {
           const rawPrice = Number(p.price) || 0;
@@ -236,6 +249,11 @@ export default function App() {
           };
         });
         setProducts(backendList);
+        try {
+          localStorage.setItem('laila_cached_products', JSON.stringify(backendList));
+        } catch {
+          // ignore localStorage quota errors
+        }
 
         // Sync active QuickView product if user landed directly on /quick-view/:id
         const pathMatch = window.location.pathname.match(/^\/(?:quick-view|quickview|product)\/([^/]+)/i);
@@ -983,7 +1001,7 @@ export default function App() {
           <AdminPanel
             isOpen={isAdminOpen}
             onClose={handleCloseAdmin}
-            onProductsUpdated={loadProducts}
+            onProductsUpdated={() => loadProducts(true)}
             siteSettings={siteSettings}
             onSettingsUpdated={(updated) => setSiteSettings(updated)}
           />
