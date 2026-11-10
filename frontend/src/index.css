@@ -303,23 +303,51 @@ body.admin-modal-open {
 }
 
 /* ========================================================
-   SEAMLESS MARQUEE (LEFT TO RIGHT)
+   SEAMLESS MARQUEE (LEFT TO RIGHT & RIGHT TO LEFT)
    ======================================================== */
 @keyframes marqueeLeftToRight {
     0% {
-        transform: translateX(-50%);
+        transform: translate3d(-50%, 0, 0);
     }
     100% {
-        transform: translateX(0%);
+        transform: translate3d(0%, 0, 0);
+    }
+}
+
+@keyframes marqueeRightToLeft {
+    0% {
+        transform: translate3d(0%, 0, 0);
+    }
+    100% {
+        transform: translate3d(-50%, 0, 0);
     }
 }
 
 .animate-marquee-ltr {
     display: flex;
     width: max-content;
-    animation: marqueeLeftToRight 32s linear infinite;
+    animation: marqueeLeftToRight 36s linear infinite;
+    will-change: transform;
 }
 
-.animate-marquee-ltr:hover {
+.animate-marquee-rtl {
+    display: flex;
+    width: max-content;
+    animation: marqueeRightToLeft 42s linear infinite;
+    will-change: transform;
+}
+
+.animate-marquee-ltr:hover,
+.animate-marquee-ltr:active,
+.animate-marquee-rtl:hover,
+.animate-marquee-rtl:active {
     animation-play-state: paused;
 }
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-marquee-ltr,
+    .animate-marquee-rtl {
+        animation: none !important;
+    }
+}
+
