@@ -1,3 +1,13 @@
+import { 
+  ReceiptIcon, 
+  ClockIcon, 
+  RefreshCwIcon, 
+  TruckIcon, 
+  CheckIcon, 
+  CloseIcon, 
+  EyeIcon 
+} from '../Icons';
+
 export default function AdminOrders({
   orders = [],
   statusFilter,
@@ -5,7 +15,14 @@ export default function AdminOrders({
   onStatusChange,
   onSelectOrder
 }) {
-  const statuses = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  const statuses = [
+    { label: 'All', icon: ReceiptIcon },
+    { label: 'Pending', icon: ClockIcon },
+    { label: 'Processing', icon: RefreshCwIcon },
+    { label: 'Shipped', icon: TruckIcon },
+    { label: 'Delivered', icon: CheckIcon },
+    { label: 'Cancelled', icon: CloseIcon }
+  ];
 
   const filteredOrders = orders.filter(o => {
     if (statusFilter === 'All') return true;
@@ -18,19 +35,21 @@ export default function AdminOrders({
       <div className="flex flex-wrap items-center justify-between gap-3 bg-[#141117] p-4 rounded-2xl border border-[#27212E]">
         <div className="flex flex-wrap items-center gap-1.5">
           {statuses.map(st => {
-            const count = st === 'All' ? orders.length : orders.filter(o => o.status === st).length;
-            const isActive = statusFilter === st;
+            const count = st.label === 'All' ? orders.length : orders.filter(o => o.status === st.label).length;
+            const isActive = statusFilter === st.label;
+            const Icon = st.icon;
             return (
               <button
-                key={st}
-                onClick={() => setStatusFilter(st)}
+                key={st.label}
+                onClick={() => setStatusFilter(st.label)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-[#B76E79] text-white font-semibold shadow-sm'
                     : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
                 }`}
               >
-                <span>{st}</span>
+                <Icon className="w-3.5 h-3.5" />
+                <span>{st.label}</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono ${
                   isActive ? 'bg-black/40 text-white' : 'bg-white/10 text-gray-400'
                 }`}>
@@ -107,9 +126,10 @@ export default function AdminOrders({
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => onSelectOrder(order)}
-                          className="px-2.5 py-1 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer"
                         >
-                          View
+                          <EyeIcon className="w-3 h-3" />
+                          <span>View</span>
                         </button>
                       </td>
                     </tr>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CloseIcon, CheckIcon, SparklesIcon } from './Icons';
 import { CURRENCY_RATES } from '../data/products';
 import { createOrder } from '../services/api';
@@ -10,8 +10,6 @@ export default function CheckoutModal({
   onOrderSuccess,
   selectedCurrency = 'PKR'
 }) {
-  if (!isOpen || !checkoutData) return null;
-
   const [step, setStep] = useState('shipping'); // 'shipping' | 'confirmed'
   const [formData, setFormData] = useState({
     fullName: '',
@@ -24,9 +22,25 @@ export default function CheckoutModal({
     deliveryNotes: ''
   });
   const [orderNumber, setOrderNumber] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Prevent background body scroll when checkout modal is open
+  useEffect(() => {
+    if (!isOpen || !checkoutData) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
+    };
+  }, [isOpen, checkoutData]);
+
+  if (!isOpen || !checkoutData) return null;
 
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.USD;
-  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
@@ -78,7 +92,7 @@ export default function CheckoutModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain">
       {/* Backdrop */}
       <div 
         onClick={step === 'confirmed' ? onClose : undefined}
@@ -86,7 +100,7 @@ export default function CheckoutModal({
       />
 
       <div className="flex min-h-full items-center justify-center p-3 sm:p-6">
-        <div className="relative w-full max-w-2xl bg-[#FAF5EC] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-[#E8DCCB] z-10 animate-reveal-up max-h-[92vh] overflow-y-auto">
+        <div className="relative w-full max-w-2xl bg-[#FAF5EC] rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-[#E8DCCB] z-10 animate-reveal-up max-h-[92vh] overflow-y-auto overscroll-contain">
           
           {/* Header */}
           <div className="p-4 sm:p-6 bg-white border-b border-[#E8DCCB] flex items-center justify-between">

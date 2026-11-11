@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CloseIcon, HeartIcon, TrashIcon } from './Icons';
 import { CURRENCY_RATES } from '../data/products';
 
@@ -11,13 +11,27 @@ export default function WishlistModal({
   onRemoveFromWishlist,
   selectedCurrency = 'PKR'
 }) {
+  // Prevent background body scroll when wishlist modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
   const wishlistedProducts = products.filter(p => wishlistIds.includes(p.id));
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden overscroll-contain">
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -25,7 +39,7 @@ export default function WishlistModal({
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
-        <div className="w-screen max-w-md bg-[#FAF5EC] shadow-2xl flex flex-col justify-between border-l border-[#E8DCCB]">
+        <div className="w-screen max-w-md bg-[#FAF5EC] shadow-2xl flex flex-col justify-between border-l border-[#E8DCCB] overscroll-contain">
           
           {/* Header */}
           <div className="p-4 sm:p-6 border-b border-[#E8DCCB] bg-white flex items-center justify-between">

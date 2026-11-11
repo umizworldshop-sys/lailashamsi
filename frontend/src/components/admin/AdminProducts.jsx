@@ -2,7 +2,9 @@ import {
   PlusIcon, 
   SearchIcon, 
   EditIcon, 
-  TrashIcon 
+  TrashIcon,
+  GridIcon,
+  ListIcon
 } from '../Icons';
 
 export default function AdminProducts({
@@ -79,19 +81,21 @@ export default function AdminProducts({
           <div className="flex items-center bg-[#1C1722] border border-[#2F2637] rounded-xl p-0.5">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'grid' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
               }`}
             >
-              Grid
+              <GridIcon className="w-3.5 h-3.5" />
+              <span>Grid</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
                 viewMode === 'table' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
               }`}
             >
-              Table
+              <ListIcon className="w-3.5 h-3.5" />
+              <span>Table</span>
             </button>
           </div>
 

@@ -307,3 +307,57 @@ export async function updateSiteSettings(settingsData, token) {
   clientCache.delete('siteSettings');
   return handleResponse(res);
 }
+
+// ----------------------------------------------------------------------
+// CUSTOMER CONTACT MESSAGES & INQUIRIES
+// ----------------------------------------------------------------------
+
+export async function sendContactMessage({ name, email, phone, inquiryType, message }) {
+  const res = await fetchWithTimeout(`${API_BASE_URL}/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, phone, inquiryType, message })
+  });
+  return handleResponse(res);
+}
+
+export async function fetchAdminMessages(token) {
+  const res = await fetchWithTimeout(`${API_BASE_URL}/messages`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }, 8000);
+  return handleResponse(res);
+}
+
+export async function updateMessageStatus(id, status, token) {
+  const res = await fetchWithTimeout(`${API_BASE_URL}/messages/${id}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ status })
+  });
+  return handleResponse(res);
+}
+
+export async function toggleStarMessage(id, token) {
+  const res = await fetchWithTimeout(`${API_BASE_URL}/messages/${id}/star`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return handleResponse(res);
+}
+
+export async function deleteMessage(id, token) {
+  const res = await fetchWithTimeout(`${API_BASE_URL}/messages/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+  return handleResponse(res);
+}

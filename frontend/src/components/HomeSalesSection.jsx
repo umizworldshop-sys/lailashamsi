@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ProductCard from './ProductCard';
-import { ArrowRightIcon, SparklesIcon, CheckIcon } from './Icons';
+import { ArrowRightIcon, CheckIcon } from './Icons';
 
 function getSaleProducts(products) {
   const discounted = products
@@ -67,10 +67,6 @@ export default function HomeSalesSection({
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 pb-5 sm:pb-6 border-b border-[#E8DCCB] gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#641E32]/10 text-[#641E32] text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em] mb-2 sm:mb-3 border border-[#641E32]/30">
-              <SparklesIcon className="w-3.5 h-3.5 text-[#B89B62]" />
-              <span>Seasonal Archive Sale • Limited Period</span>
-            </div>
             <h2 className="font-cinzel text-2xl sm:text-4xl font-bold text-[#641E32] tracking-wide">
               Seasonal Sale & Special Offers
             </h2>

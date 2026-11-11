@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
-import { CloseIcon, CheckIcon, TrashIcon, SparklesIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from '../Icons';
+import {
+  CloseIcon,
+  CheckIcon,
+  TrashIcon,
+  SparklesIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PlusIcon,
+  UploadIcon,
+  ImageIcon,
+  LinkIcon,
+  TagIcon,
+  FlameIcon,
+  StarIcon,
+  AlertCircleIcon
+} from '../Icons';
 
 const DEFAULT_CATEGORIES = [
   { id: 'female', label: 'Female (Women Wear)', desc: 'Luxury pret, formals & festive suits' },
@@ -133,11 +148,11 @@ export default function AdminProductModal({
 
   return (
     <div 
-      className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5"
+      className="fixed inset-0 z-[60] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 overflow-hidden overscroll-contain"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-3xl bg-[#141018] text-white rounded-3xl border border-[#D4AF37]/40 shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col max-h-[92vh]"
+        className="relative w-full max-w-3xl bg-[#141018] text-white rounded-3xl border border-[#D4AF37]/40 shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden overscroll-contain flex flex-col max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
@@ -179,7 +194,7 @@ export default function AdminProductModal({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
                 step === 1 ? 'bg-[#D4AF37] text-black' : step > 1 ? 'bg-emerald-600 text-white' : 'bg-white/10 text-gray-400'
               }`}>
-                {step > 1 ? '✓' : '1'}
+                {step > 1 ? <CheckIcon className="w-3.5 h-3.5 stroke-[3]" /> : '1'}
               </span>
               <span className="hidden sm:inline">Category & Details</span>
             </button>
@@ -200,7 +215,7 @@ export default function AdminProductModal({
               <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${
                 step === 2 ? 'bg-[#D4AF37] text-black' : step > 2 ? 'bg-emerald-600 text-white' : 'bg-white/10 text-gray-400'
               }`}>
-                {step > 2 ? '✓' : '2'}
+                {step > 2 ? <CheckIcon className="w-3.5 h-3.5 stroke-[3]" /> : '2'}
               </span>
               <span className="hidden sm:inline">Pricing & Sizing</span>
             </button>
@@ -233,13 +248,13 @@ export default function AdminProductModal({
         {/* Error Alert */}
         {(stepError || productFormError) && (
           <div className="mx-6 mt-3 px-3.5 py-2 bg-rose-950/70 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-center gap-2 shrink-0 animate-reveal-up">
-            <span>⚠️</span>
+            <AlertCircleIcon className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{stepError || productFormError}</span>
           </div>
         )}
 
         {/* Step-by-Step Form Body (No vertical scrolling needed) */}
-        <form onSubmit={onSave} className="p-5 sm:p-6 flex-1 flex flex-col justify-between overflow-y-auto admin-scrollbar">
+        <form onSubmit={onSave} className="p-5 sm:p-6 flex-1 flex flex-col justify-between overflow-y-auto overscroll-contain admin-scrollbar">
           
           {/* ================= STEP 1: CATEGORY & DETAILS ================= */}
           {step === 1 && (
@@ -323,7 +338,7 @@ export default function AdminProductModal({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">✨</span>
+                      <SparklesIcon className="w-4 h-4 text-[#D4AF37] shrink-0" />
                       <div>
                         <p className="text-xs font-bold">New Arrival</p>
                         <p className="text-[9px] opacity-75">Show on New Arrivals & Home</p>
@@ -346,7 +361,7 @@ export default function AdminProductModal({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">🏷️</span>
+                      <TagIcon className="w-4 h-4 text-emerald-400 shrink-0" />
                       <div>
                         <p className="text-xs font-bold">On Sale</p>
                         <p className="text-[9px] opacity-75">Show in Grand Sale & Deals</p>
@@ -369,7 +384,7 @@ export default function AdminProductModal({
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-sm">🔥</span>
+                      <FlameIcon className="w-4 h-4 text-purple-400 shrink-0" />
                       <div>
                         <p className="text-xs font-bold">Trending</p>
                         <p className="text-[9px] opacity-75">Show on Trending Top Picks</p>
@@ -567,20 +582,22 @@ export default function AdminProductModal({
                     <button
                       type="button"
                       onClick={() => setImageTab('upload')}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
                         imageTab === 'upload' ? 'bg-[#D4AF37] text-black shadow-sm' : 'text-gray-400 hover:text-white'
                       }`}
                     >
-                      📁 Upload from Device (Cloudinary)
+                      <UploadIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span>Upload from Device (Cloudinary)</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => setImageTab('url')}
-                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
                         imageTab === 'url' ? 'bg-[#D4AF37] text-black shadow-sm' : 'text-gray-400 hover:text-white'
                       }`}
                     >
-                      🔗 Image URL Link
+                      <LinkIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span>Image URL Link</span>
                     </button>
                   </div>
 
@@ -631,8 +648,8 @@ export default function AdminProductModal({
                           id="admin-step-file-upload"
                           className="hidden"
                         />
-                        <label htmlFor="admin-step-file-upload" className="cursor-pointer block space-y-1">
-                          <span className="text-2xl block">📁</span>
+                        <label htmlFor="admin-step-file-upload" className="cursor-pointer block space-y-1.5">
+                          <UploadIcon className="w-7 h-7 text-[#D4AF37] mx-auto block" />
                           <p className="text-xs font-semibold text-white">
                             {validImages.length > 0
                               ? '+ Click to add more photos to carousel'
@@ -769,9 +786,10 @@ export default function AdminProductModal({
                             <button
                               type="button"
                               onClick={() => handleMakeCoverImage(safePreviewIdx)}
-                              className="px-2 py-1 bg-[#D4AF37] hover:bg-[#c49f2e] text-black rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                              className="px-2 py-1 bg-[#D4AF37] hover:bg-[#c49f2e] text-black rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                             >
-                              ★ Set as Cover
+                              <StarIcon className="w-3 h-3 shrink-0" />
+                              <span>Set as Cover</span>
                             </button>
                           ) : (
                             <span className="px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-md text-[9px] font-bold">
@@ -790,8 +808,8 @@ export default function AdminProductModal({
                         </div>
                       </>
                     ) : (
-                      <div className="text-center p-3 text-gray-500 space-y-1">
-                        <span className="text-xl block">🖼️</span>
+                      <div className="text-center p-3 text-gray-500 space-y-1.5">
+                        <ImageIcon className="w-7 h-7 mx-auto text-gray-500 block" />
                         <p className="text-[11px] font-medium">No photos added yet</p>
                       </div>
                     )}

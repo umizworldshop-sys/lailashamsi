@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchIcon, CloseIcon, ArrowRightIcon } from './Icons';
 import { CURRENCY_RATES } from '../data/products';
 
@@ -10,9 +10,24 @@ export default function SearchModal({
   onApplySearchQuery,
   selectedCurrency = 'PKR'
 }) {
+  const [query, setQuery] = useState('');
+
+  // Prevent background body scroll when search modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const [query, setQuery] = useState('');
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
 
   const popularTags = ['Raw Silk', 'Velvet Rose', 'Chiffon Kalidar', 'Angrakha', 'Pastel Pret', 'Co-ord'];
@@ -32,14 +47,14 @@ export default function SearchModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain">
       <div 
         onClick={onClose}
         className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
       />
 
       <div className="flex min-h-full items-start justify-center p-4 pt-16 sm:p-6">
-        <div className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden border border-[#D4AF37]/50 z-10 animate-fade-up">
+        <div className="relative w-full max-w-2xl bg-[#FAF7F2] rounded-3xl shadow-2xl overflow-hidden overscroll-contain border border-[#D4AF37]/50 z-10 animate-fade-up">
           
           {/* Search Header Input */}
           <form onSubmit={handleSearchSubmit} className="p-6 bg-white border-b border-[#E8DFC5] flex items-center gap-3">

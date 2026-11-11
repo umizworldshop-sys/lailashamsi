@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   CloseIcon, 
   StarIcon, 
@@ -32,6 +32,20 @@ export default function QuickViewModal({
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
 
+  // Prevent background body scroll when quick view is open
+  useEffect(() => {
+    if (!product) return;
+    const originalOverflow = document.body.style.overflow;
+    const originalOverscroll = document.body.style.overscrollBehavior;
+    document.body.style.overflow = 'hidden';
+    document.body.style.overscrollBehavior = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.overscrollBehavior = originalOverscroll;
+    };
+  }, [product]);
+
   if (!product) return null;
 
   const imagesList = Array.isArray(product.images) && product.images.filter(Boolean).length > 0
@@ -57,7 +71,7 @@ export default function QuickViewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto px-4 py-6 flex items-center justify-center font-sans">
+    <div className="fixed inset-0 z-50 overflow-y-auto overscroll-contain px-4 py-6 flex items-center justify-center font-sans">
       {/* Backdrop */}
       <div 
         onClick={onClose}
@@ -65,7 +79,7 @@ export default function QuickViewModal({
       />
 
       {/* Compact Main Container */}
-      <div className="relative w-full max-w-xl bg-[#FAF5EC] rounded-2xl shadow-xl overflow-hidden border border-[#E8DCCB] z-10 my-auto animate-reveal-up">
+      <div className="relative w-full max-w-xl bg-[#FAF5EC] rounded-2xl shadow-xl overflow-hidden overscroll-contain border border-[#E8DCCB] z-10 my-auto animate-reveal-up">
         
         {/* Close Button */}
         <button

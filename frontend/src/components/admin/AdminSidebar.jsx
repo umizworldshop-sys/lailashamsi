@@ -2,7 +2,8 @@ import {
   DashboardIcon, 
   PackageIcon, 
   ReceiptIcon, 
-  SparklesIcon,
+  SlidersIcon,
+  MailIcon,
   ExternalLinkIcon, 
   LogOutIcon 
 } from '../Icons';
@@ -12,6 +13,8 @@ export default function AdminSidebar({
   setActiveTab, 
   productsCount = 0, 
   ordersCount = 0, 
+  messagesCount = 0,
+  unreadMessagesCount = 0,
   adminUser, 
   onClose, 
   onLogout 
@@ -20,7 +23,14 @@ export default function AdminSidebar({
     { id: 'overview', label: 'Dashboard', icon: DashboardIcon },
     { id: 'products', label: 'Products', icon: PackageIcon, badge: productsCount },
     { id: 'orders', label: 'Orders', icon: ReceiptIcon, badge: ordersCount },
-    { id: 'settings', label: 'Banners & Slider', icon: SparklesIcon }
+    { 
+      id: 'messages', 
+      label: 'Messages', 
+      icon: MailIcon, 
+      badge: unreadMessagesCount > 0 ? unreadMessagesCount : messagesCount,
+      isUnreadBadge: unreadMessagesCount > 0 
+    },
+    { id: 'settings', label: 'Banners & Slider', icon: SlidersIcon }
   ];
 
   return (
@@ -64,7 +74,9 @@ export default function AdminSidebar({
                 </div>
                 {item.badge !== undefined && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
-                    isActive ? 'bg-[#D4AF37] text-black' : 'bg-white/10 text-gray-300'
+                    item.isUnreadBadge
+                      ? 'bg-amber-400 text-black font-bold'
+                      : isActive ? 'bg-[#D4AF37] text-black' : 'bg-white/10 text-gray-300'
                   }`}>
                     {item.badge}
                   </span>

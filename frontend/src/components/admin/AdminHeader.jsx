@@ -1,9 +1,6 @@
 import { 
   MenuIcon, 
-  SearchIcon, 
-  RefreshCwIcon, 
-  PlusIcon, 
-  CloseIcon 
+  SearchIcon 
 } from '../Icons';
 
 export default function AdminHeader({
@@ -20,6 +17,7 @@ export default function AdminHeader({
     overview: 'Dashboard Overview',
     products: 'Products',
     orders: 'Orders',
+    messages: 'Customer Messages & Inquiries',
     settings: 'Storefront Banners & Hero Slider'
   };
 
@@ -45,9 +43,8 @@ export default function AdminHeader({
         </div>
       </div>
 
-      {/* Right: Search, Refresh, Add Piece, Exit */}
+      {/* Right: Global Search */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Global Search */}
         <div className="relative hidden lg:block w-56">
           <input
             type="text"
@@ -58,34 +55,6 @@ export default function AdminHeader({
           />
           <SearchIcon className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
         </div>
-
-        {/* Refresh Data */}
-        <button
-          onClick={onRefresh}
-          disabled={dataLoading}
-          className="p-2 text-gray-300 hover:text-[#D4AF37] bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-colors cursor-pointer"
-          title="Refresh Data"
-        >
-          <RefreshCwIcon className={`w-4 h-4 ${dataLoading ? 'animate-spin text-[#D4AF37]' : ''}`} />
-        </button>
-
-        {/* Add Product Shortcut */}
-        <button
-          onClick={onOpenAddProduct}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer shrink-0"
-        >
-          <PlusIcon className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Add Product</span>
-        </button>
-
-        {/* Close Admin Console */}
-        <button
-          onClick={onClose}
-          className="p-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-xl border border-white/5 transition-colors cursor-pointer"
-          title="Exit Admin Panel"
-        >
-          <CloseIcon className="w-4 h-4" />
-        </button>
       </div>
     </header>
   );

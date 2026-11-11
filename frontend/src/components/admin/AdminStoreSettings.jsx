@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SparklesIcon, PlusIcon, TrashIcon, CheckIcon } from '../Icons';
+import { SparklesIcon, PlusIcon, TrashIcon, CheckIcon, UploadIcon } from '../Icons';
 import { uploadImageFile } from '../../services/api';
 
 const PRESET_DISCOUNTS = [10, 20, 25, 30, 40, 50, 60, 70];
@@ -436,11 +436,16 @@ export default function AdminStoreSettings({
                   />
                   <label
                     htmlFor={`hero-slide-upload-${idx}`}
-                    className="flex-1 py-2 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f2e] text-black font-bold text-xs text-center cursor-pointer transition-colors"
+                    className="flex-1 py-2 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f2e] text-black font-bold text-xs text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5"
                   >
-                    {uploadingSlideIndex === idx
-                      ? '⏳ Uploading to Cloudinary...'
-                      : '📁 Upload Picture from Device'}
+                    {uploadingSlideIndex === idx ? (
+                      <span>Uploading to Cloudinary...</span>
+                    ) : (
+                      <>
+                        <UploadIcon className="w-3.5 h-3.5 shrink-0" />
+                        <span>Upload Picture from Device</span>
+                      </>
+                    )}
                   </label>
                 </div>
               </div>

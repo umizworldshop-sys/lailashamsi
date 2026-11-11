@@ -17,6 +17,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -126,6 +127,7 @@ app.get('/', (req, res) => {
       health: '/api/health',
       products: '/api/products',
       orders: '/api/orders',
+      messages: '/api/messages',
       settings: '/api/settings',
       admin: '/api/admin'
     },
@@ -153,6 +155,7 @@ app.get('/api/health', (req, res) => {
 app.use(['/api/admin', '/admin'], adminRoutes);
 app.use(['/api/products', '/products'], productRoutes);
 app.use(['/api/orders', '/orders'], orderRoutes);
+app.use(['/api/messages', '/messages'], messageRoutes);
 app.use(['/api/upload', '/upload'], uploadRoutes);
 app.use(['/api/settings', '/settings'], settingsRoutes);
 

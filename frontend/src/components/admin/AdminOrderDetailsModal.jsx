@@ -1,4 +1,4 @@
-import { CloseIcon } from '../Icons';
+import { CloseIcon, MailIcon, PhoneIcon, MapPinIcon, WhatsAppIcon, UserIcon, PackageIcon, ReceiptIcon } from '../Icons';
 
 export default function AdminOrderDetailsModal({
   selectedOrder,
@@ -8,15 +8,16 @@ export default function AdminOrderDetailsModal({
   if (!selectedOrder) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
-      <div className="relative w-full max-w-xl bg-[#141117] text-white rounded-2xl border border-[#D4AF37]/40 shadow-2xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto admin-scrollbar space-y-5">
+    <div className="fixed inset-0 z-[60] overflow-hidden overscroll-contain bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
+      <div className="relative w-full max-w-xl bg-[#141117] text-white rounded-2xl border border-[#D4AF37]/40 shadow-2xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto overscroll-contain admin-scrollbar space-y-5">
         
         {/* Header */}
         <div className="flex justify-between items-center border-b border-[#26202C] pb-4">
           <div>
-            <span className="text-[10px] uppercase font-mono tracking-widest text-[#D4AF37]">
-              Order Details
-            </span>
+            <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest text-[#D4AF37]">
+              <ReceiptIcon className="w-3.5 h-3.5" />
+              <span>Order Details</span>
+            </div>
             <h3 className="font-mono text-xl sm:text-2xl font-bold text-white mt-0.5">
               {selectedOrder.orderNumber}
             </h3>
@@ -33,16 +34,26 @@ export default function AdminOrderDetailsModal({
         <div className="space-y-4 text-xs">
           
           {/* Customer Information Card */}
-          <div className="bg-[#19141F] p-5 rounded-2xl border border-[#2A2332] space-y-2">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-gray-400 block">
-              Customer Information
-            </span>
+          <div className="bg-[#19141F] p-5 rounded-2xl border border-[#2A2332] space-y-2.5">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-wider text-gray-400">
+              <UserIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Customer Information</span>
+            </div>
             <p className="text-base font-bold text-white">{selectedOrder.customer?.fullName || 'Guest Customer'}</p>
-            <p className="text-gray-300">📧 {selectedOrder.customer?.email || 'N/A'}</p>
-            <p className="text-gray-300">📞 {selectedOrder.customer?.phone || 'N/A'}</p>
-            <p className="text-gray-300">
-              📍 {selectedOrder.customer?.address}, {selectedOrder.customer?.city}, {selectedOrder.customer?.country || 'Pakistan'}
-            </p>
+            <div className="space-y-1.5 pt-1">
+              <p className="text-gray-300 flex items-center gap-2">
+                <MailIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                <span>{selectedOrder.customer?.email || 'N/A'}</span>
+              </p>
+              <p className="text-gray-300 flex items-center gap-2">
+                <PhoneIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                <span>{selectedOrder.customer?.phone || 'N/A'}</span>
+              </p>
+              <p className="text-gray-300 flex items-start gap-2">
+                <MapPinIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
+                <span>{selectedOrder.customer?.address}, {selectedOrder.customer?.city}, {selectedOrder.customer?.country || 'Pakistan'}</span>
+              </p>
+            </div>
             {selectedOrder.customer?.deliveryNotes && (
               <p className="text-amber-300 italic pt-2 border-t border-[#2A2332]">
                 Delivery Notes: "{selectedOrder.customer.deliveryNotes}"
@@ -52,9 +63,10 @@ export default function AdminOrderDetailsModal({
 
           {/* Ordered Items List */}
           <div className="bg-[#19141F] p-5 rounded-2xl border border-[#2A2332] space-y-3">
-            <span className="text-[10px] uppercase font-mono tracking-wider text-gray-400 block">
-              Ordered Items
-            </span>
+            <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-wider text-gray-400">
+              <PackageIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>Ordered Items</span>
+            </div>
             {selectedOrder.items?.map((item, idx) => (
               <div key={idx} className="flex items-center gap-3 py-2 border-b border-[#251E2B] last:border-0">
                 {item.image && (
@@ -102,6 +114,7 @@ export default function AdminOrderDetailsModal({
                 rel="noopener noreferrer"
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
               >
+                <WhatsAppIcon className="w-4 h-4 shrink-0" />
                 <span>Chat on WhatsApp</span>
               </a>
             )}

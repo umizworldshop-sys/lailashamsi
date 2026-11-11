@@ -9,6 +9,7 @@ import AdminOrders from './AdminOrders';
 import AdminStoreSettings from './AdminStoreSettings';
 import AdminProductModal from './AdminProductModal';
 import AdminOrderDetailsModal from './AdminOrderDetailsModal';
+import AdminMessages from './AdminMessages';
 import {
   getAdminProfile,
   fetchProducts,
@@ -19,7 +20,11 @@ import {
   fetchOrders,
   updateOrderStatus,
   fetchSiteSettings,
-  updateSiteSettings
+  updateSiteSettings,
+  fetchAdminMessages,
+  updateMessageStatus,
+  toggleStarMessage,
+  deleteMessage
 } from '../../services/api';
 
 const STOREFRONT_CATEGORIES = [
@@ -50,6 +55,7 @@ export default function AdminPanel({
   // Data states
   const [productsList, setProductsList] = useState([]);
   const [ordersList, setOrdersList] = useState([]);
+  const [messagesList, setMessagesList] = useState([]);
   const [localSettings, setLocalSettings] = useState(siteSettings || null);
   const [dataLoading, setDataLoading] = useState(false);
 
@@ -94,15 +100,17 @@ export default function AdminPanel({
     if (!activeToken) return;
     setDataLoading(true);
     try {
-      const [productsRes, ordersRes, settingsRes] = await Promise.all([
+      const [productsRes, ordersRes, settingsRes, messagesRes] = await Promise.all([
         fetchProducts().catch(() => ({ products: [] })),
         fetchOrders(activeToken).catch(() => ({ orders: [] })),
-        fetchSiteSettings().catch(() => ({ settings: null }))
+        fetchSiteSettings().catch(() => ({ settings: null })),
+        fetchAdminMessages(activeToken).catch(() => ({ messages: [] }))
       ]);
 
       if (productsRes && productsRes.products) setProductsList(productsRes.products);
       if (ordersRes && ordersRes.orders) setOrdersList(ordersRes.orders);
       if (settingsRes && settingsRes.settings) setLocalSettings(settingsRes.settings);
+      if (messagesRes && messagesRes.messages) setMessagesList(messagesRes.messages);
     } catch (err) {
       console.warn('Dashboard data loading error:', err);
     } finally {
@@ -362,6 +370,43 @@ export default function AdminPanel({
     }
   };
 
+  // Message Operations
+  const handleUpdateMessageStatus = async (id, status) => {
+    try {
+      await updateMessageStatus(id, status, token);
+      setMessagesList(prev => prev.map(m => m._id === id ? { ...m, status } : m));
+      showToast(`Inquiry marked as ${status}`);
+    } catch (err) {
+      showToast(err.message || 'Failed to update message status');
+    }
+  };
+
+  const handleToggleStarMessage = async (id) => {
+    try {
+      const res = await toggleStarMessage(id, token);
+      const isStarred = res.data?.starred;
+      setMessagesList(prev => prev.map(m => m._id === id ? { ...m, starred: isStarred } : m));
+      showToast(isStarred ? 'Message starred' : 'Message unstarred');
+    } catch (err) {
+      showToast(err.message || 'Failed to update message');
+    }
+  };
+
+  const handleDeleteMessage = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this customer inquiry?')) return;
+    try {
+      await deleteMessage(id, token);
+      setMessagesList(prev => prev.filter(m => m._id !== id));
+      showToast('Message deleted successfully.');
+    } catch (err) {
+      showToast(err.message || 'Failed to delete message');
+    }
+  };
+
+  const unreadMessagesCount = useMemo(() => {
+    return messagesList.filter(m => m.status === 'unread').length;
+  }, [messagesList]);
+
   // Revenue Calculation
   const totalRevenue = useMemo(() => {
     return ordersList.reduce((acc, order) => acc + (order.grandTotal || 0), 0);
@@ -369,8 +414,10 @@ export default function AdminPanel({
 
   if (!isOpen) return null;
 
+  const isAnySubModalOpen = isProductModalOpen || Boolean(selectedOrderDetails);
+
   return (
-    <div className="fixed inset-0 z-50 overflow-x-hidden overflow-y-auto bg-[#070607] text-[#EDE8E3] font-body w-full max-w-full">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-[#070607] text-[#EDE8E3] font-body w-full max-w-full">
       {/* Toast Feedback */}
       {panelToast && (
         <div className="fixed top-5 right-5 z-[70] bg-[#1A181C] text-white px-5 py-3 rounded-2xl border border-[#D4AF37]/80 shadow-[0_10px_40px_rgba(0,0,0,0.8)] flex items-center gap-2.5 text-xs font-semibold animate-reveal-up">
@@ -409,6 +456,8 @@ export default function AdminPanel({
               }}
               productsCount={productsList.length}
               ordersCount={ordersList.length}
+              messagesCount={messagesList.length}
+              unreadMessagesCount={unreadMessagesCount}
               adminUser={adminUser}
               onClose={handleClose}
               onLogout={handleLogout}
@@ -429,12 +478,14 @@ export default function AdminPanel({
             />
 
             {/* Scrollable Tab Canvas */}
-            <main className="flex-1 overflow-y-auto admin-scrollbar">
+            <main className={`flex-1 ${isAnySubModalOpen ? 'overflow-hidden' : 'overflow-y-auto'} admin-scrollbar`}>
               {activeTab === 'overview' && (
                 <AdminOverview
                   totalRevenue={totalRevenue}
                   ordersList={ordersList}
                   productsList={productsList}
+                  messagesList={messagesList}
+                  unreadMessagesCount={unreadMessagesCount}
                   onOpenAddProduct={handleOpenAddProduct}
                   onNavigateTab={(tab) => setActiveTab(tab)}
                   onSelectOrder={(order) => setSelectedOrderDetails(order)}
@@ -464,6 +515,17 @@ export default function AdminPanel({
                   setStatusFilter={setOrderStatusFilter}
                   onStatusChange={handleStatusChange}
                   onSelectOrder={(order) => setSelectedOrderDetails(order)}
+                />
+              )}
+
+              {activeTab === 'messages' && (
+                <AdminMessages
+                  messagesList={messagesList}
+                  onUpdateStatus={handleUpdateMessageStatus}
+                  onToggleStar={handleToggleStarMessage}
+                  onDeleteMessage={handleDeleteMessage}
+                  dataLoading={dataLoading}
+                  showToast={showToast}
                 />
               )}
 

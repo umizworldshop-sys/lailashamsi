@@ -7,6 +7,7 @@ import {
   MailIcon,
   PhoneIcon 
 } from './Icons'; // WhatsAppIcon hata diya gaya hai
+import { sendContactMessage } from '../services/api';
 
 // Strict Pakistani Mobile Number Validation (03XXXXXXXXX - 11 digits, real network prefix)
 const isValidPakistaniPhone = (phone) => {
@@ -61,6 +62,7 @@ export default function ContactPage({ onShowToast, initialCategory }) {
   });
   const [formError, setFormError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // Check if a specific Client Care category was passed or stored
@@ -89,7 +91,7 @@ export default function ContactPage({ onShowToast, initialCategory }) {
     }
   }, [initialCategory]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.name.trim() || formData.name.trim().length < 3) {
@@ -107,10 +109,31 @@ export default function ContactPage({ onShowToast, initialCategory }) {
       return;
     }
 
+    if (!formData.message.trim() || formData.message.trim().length < 3) {
+      setFormError('Please write your message or inquiry notes.');
+      return;
+    }
+
     setFormError('');
-    setSubmitted(true);
-    if (onShowToast) {
-      onShowToast('Consultation request received! A senior stylist will contact you.');
+    setIsSubmitting(true);
+
+    try {
+      await sendContactMessage({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        inquiryType: formData.inquiryType,
+        message: formData.message.trim()
+      });
+
+      setSubmitted(true);
+      if (onShowToast) {
+        onShowToast('Consultation request delivered to Atelier! A senior stylist will contact you.');
+      }
+    } catch (err) {
+      setFormError(err.message || 'Failed to submit inquiry. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -283,9 +306,10 @@ export default function ContactPage({ onShowToast, initialCategory }) {
                   <div className="pt-2">
                     <button
                       type="submit"
-                      className="group w-full sm:w-auto px-8 py-3.5 bg-[#641E32] text-white font-bold text-[10px] uppercase tracking-[0.2em] rounded hover:bg-[#4a1624] transition-colors flex items-center justify-center gap-3"
+                      disabled={isSubmitting}
+                      className="group w-full sm:w-auto px-8 py-3.5 bg-[#641E32] disabled:opacity-60 text-white font-bold text-[10px] uppercase tracking-[0.2em] rounded hover:bg-[#4a1624] transition-colors flex items-center justify-center gap-3 cursor-pointer"
                     >
-                      <span>Submit Request</span>
+                      <span>{isSubmitting ? 'Sending Request...' : 'Submit Request'}</span>
                       <ArrowRightIcon className="w-3.5 h-3.5 text-[#B89B62] group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>

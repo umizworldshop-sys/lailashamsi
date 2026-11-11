@@ -3,7 +3,8 @@ import {
   CloseIcon, 
   LockIcon, 
   EyeIcon, 
-  EyeOffIcon 
+  EyeOffIcon,
+  AlertCircleIcon
 } from '../Icons';
 import { 
   checkAdminSetup, 
@@ -11,11 +12,18 @@ import {
   loginAdmin 
 } from '../../services/api';
 
+const LOCKOUT_STORAGE_KEY = 'laila_admin_lockout_token';
+const FAILED_ATTEMPTS_KEY = 'laila_admin_failed_attempts';
+
 export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [view, setView] = useState('loading'); // 'loading' | 'register' | 'login'
   const [hasAdminExists, setHasAdminExists] = useState(false);
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Brute Force Lockout & Token State
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState(0);
 
   // Forms
   const [registerForm, setRegisterForm] = useState({
@@ -35,8 +43,61 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
   const [showLoginPassword, setShowLoginPassword] = useState(false);
 
+  // Check persistent lockout state from localStorage
+  const checkLockoutStatus = () => {
+    try {
+      const stored = localStorage.getItem(LOCKOUT_STORAGE_KEY);
+      if (!stored) {
+        setIsLocked(false);
+        setLockoutSeconds(0);
+        return false;
+      }
+      const data = JSON.parse(stored);
+      const now = Date.now();
+      if (data && data.lockedUntil && data.lockedUntil > now) {
+        const remaining = Math.max(1, Math.ceil((data.lockedUntil - now) / 1000));
+        setIsLocked(true);
+        setLockoutSeconds(remaining);
+        return true;
+      } else {
+        localStorage.removeItem(LOCKOUT_STORAGE_KEY);
+        localStorage.removeItem(FAILED_ATTEMPTS_KEY);
+        setIsLocked(false);
+        setLockoutSeconds(0);
+        return false;
+      }
+    } catch {
+      localStorage.removeItem(LOCKOUT_STORAGE_KEY);
+      setIsLocked(false);
+      setLockoutSeconds(0);
+      return false;
+    }
+  };
+
+  // Live countdown timer for active lockout
+  useEffect(() => {
+    if (!isLocked || lockoutSeconds <= 0) return;
+
+    const timer = setInterval(() => {
+      setLockoutSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          setIsLocked(false);
+          localStorage.removeItem(LOCKOUT_STORAGE_KEY);
+          localStorage.removeItem(FAILED_ATTEMPTS_KEY);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isLocked, lockoutSeconds]);
+
   useEffect(() => {
     if (!isOpen) return;
+
+    checkLockoutStatus();
 
     let isMounted = true;
     const verifyStatus = async () => {
@@ -109,8 +170,11 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLocked) return;
+
     setAuthError('');
     setAuthLoading(true);
+
     try {
       const res = await loginAdmin({
         email: loginForm.email,
@@ -118,20 +182,72 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
       });
 
       if (res && res.success && res.token) {
+        // Successful login: Clear lockout tokens and failed attempts
+        localStorage.removeItem(LOCKOUT_STORAGE_KEY);
+        localStorage.removeItem(FAILED_ATTEMPTS_KEY);
+        setIsLocked(false);
+        setLockoutSeconds(0);
         setHasAdminExists(true);
         onAuthSuccess({ token: res.token, admin: res.admin });
       } else {
-        throw new Error(res.message || 'Invalid email or password.');
+        throw new Error(res.message || 'Invalid email or password. Please verify both credentials.');
       }
     } catch (err) {
-      setAuthError(err.message || 'Invalid email or password.');
+      const errData = err.data || {};
+      const now = Date.now();
+
+      // Case 1: Backend flagged brute-force lockout (status 429)
+      if (errData.locked || err.status === 429) {
+        const retrySec = errData.retryAfter || 60;
+        const lockedUntil = now + retrySec * 1000;
+        const lockoutToken = errData.lockoutToken || `sec_lock_${now}_${Math.random().toString(36).substring(2, 9)}`;
+
+        localStorage.setItem(LOCKOUT_STORAGE_KEY, JSON.stringify({
+          token: lockoutToken,
+          lockedUntil
+        }));
+        localStorage.removeItem(FAILED_ATTEMPTS_KEY);
+
+        setIsLocked(true);
+        setLockoutSeconds(retrySec);
+        setAuthError('');
+        return;
+      }
+
+      // Case 2: Client-side tracking (syncs with 5 attempts max)
+      let attempts = 0;
+      try {
+        const storedAttempts = parseInt(localStorage.getItem(FAILED_ATTEMPTS_KEY) || '0', 10);
+        attempts = storedAttempts + 1;
+        localStorage.setItem(FAILED_ATTEMPTS_KEY, attempts.toString());
+      } catch {
+        attempts = 1;
+      }
+
+      if (attempts >= 5) {
+        const lockedUntil = now + 60 * 1000;
+        const lockoutToken = `sec_lock_${now}_${Math.random().toString(36).substring(2, 9)}`;
+        localStorage.setItem(LOCKOUT_STORAGE_KEY, JSON.stringify({
+          token: lockoutToken,
+          lockedUntil
+        }));
+        localStorage.removeItem(FAILED_ATTEMPTS_KEY);
+
+        setIsLocked(true);
+        setLockoutSeconds(60);
+        setAuthError('');
+        return;
+      }
+
+      const remaining = 5 - attempts;
+      setAuthError(`Invalid email or password. Please verify both credentials. (${remaining} attempt${remaining === 1 ? '' : 's'} remaining)`);
     } finally {
       setAuthLoading(false);
     }
   };
 
   return (
-    <div className="w-full min-h-[100dvh] flex items-center justify-center p-3 sm:p-6 py-6 sm:py-12 bg-radial from-[#1A1115] via-[#0E0B0D] to-[#050405] relative overflow-x-hidden">
+    <div className="w-full min-h-[100dvh] flex items-center justify-center p-3 sm:p-6 py-6 sm:py-12 bg-radial from-[#1A1115] via-[#0E0B0D] to-[#050405] relative overflow-x-hidden overscroll-contain">
       {/* Contained Ambient Glows (Strictly clipped to prevent horizontal scroll) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-72 sm:h-96 bg-[#B76E79]/10 rounded-full blur-3xl pointer-events-none" />
@@ -186,7 +302,7 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
 
           {authError && (
             <div className="mb-4 sm:mb-5 p-3 bg-rose-950/70 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
-              <span className="shrink-0 mt-0.5">⚠️</span>
+              <AlertCircleIcon className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
               <div className="flex-1 text-[11px] sm:text-xs">{authError}</div>
             </div>
           )}
@@ -344,12 +460,13 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
             </p>
           </div>
 
-          {authError && (
+          {/* Unified Credential Alert (Only shown before lockout) */}
+          {!isLocked && authError ? (
             <div className="mb-4 sm:mb-5 p-3 bg-rose-950/70 border border-rose-800 text-rose-300 rounded-xl text-xs flex items-start gap-2">
-              <span className="shrink-0 mt-0.5">⚠️</span>
+              <AlertCircleIcon className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
               <div className="flex-1 text-[11px] sm:text-xs">{authError}</div>
             </div>
-          )}
+          ) : null}
 
           <form onSubmit={handleLogin} className="space-y-3.5 sm:space-y-4">
             <div>
@@ -359,10 +476,15 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
               <input
                 type="email"
                 required
+                disabled={isLocked || authLoading}
                 value={loginForm.email}
                 onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                 placeholder="e.g. admin@umizworld.com"
-                className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                className={`w-full bg-[#1C1920] border rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-sm text-white transition-colors ${
+                  isLocked 
+                    ? 'border-rose-900/40 opacity-40 cursor-not-allowed select-none bg-[#141014]' 
+                    : 'border-[#332E38] focus:border-[#D4AF37] focus:outline-none'
+                }`}
               />
             </div>
 
@@ -374,15 +496,25 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
                 <input
                   type={showLoginPassword ? 'text' : 'password'}
                   required
+                  disabled={isLocked || authLoading}
                   value={loginForm.password}
                   onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                   placeholder="Enter admin password"
-                  className="w-full bg-[#1C1920] border border-[#332E38] rounded-xl pl-3.5 pr-10 py-2.5 sm:py-3 text-sm text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                  className={`w-full bg-[#1C1920] border rounded-xl pl-3.5 pr-10 py-2.5 sm:py-3 text-sm text-white transition-colors ${
+                    isLocked 
+                      ? 'border-rose-900/40 opacity-40 cursor-not-allowed select-none bg-[#141014]' 
+                      : 'border-[#332E38] focus:border-[#D4AF37] focus:outline-none'
+                  }`}
                 />
                 <button
                   type="button"
+                  disabled={isLocked}
                   onClick={() => setShowLoginPassword(!showLoginPassword)}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#D4AF37] p-1.5 transition-colors cursor-pointer"
+                  className={`absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 transition-colors ${
+                    isLocked 
+                      ? 'text-gray-600 cursor-not-allowed' 
+                      : 'text-gray-400 hover:text-[#D4AF37] cursor-pointer'
+                  }`}
                   title={showLoginPassword ? 'Hide password' : 'View password'}
                   aria-label={showLoginPassword ? 'Hide password' : 'View password'}
                 >
@@ -397,10 +529,19 @@ export default function AdminAuthModal({ isOpen, onClose, onAuthSuccess }) {
 
             <button
               type="submit"
-              disabled={authLoading}
-              className="w-full mt-3 sm:mt-4 py-3 sm:py-3.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white font-semibold text-xs uppercase tracking-[0.18em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              disabled={isLocked || authLoading}
+              className={`w-full mt-3 sm:mt-4 py-3 sm:py-3.5 font-semibold text-xs uppercase tracking-[0.18em] rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 ${
+                isLocked
+                  ? 'bg-rose-950/60 text-rose-300/60 border border-rose-900/40 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white cursor-pointer disabled:opacity-60'
+              }`}
             >
-              {authLoading ? (
+              {isLocked ? (
+                <div className="flex items-center gap-2">
+                  <LockIcon className="w-4 h-4 text-rose-300" />
+                  <span>Locked ({lockoutSeconds}s)</span>
+                </div>
+              ) : authLoading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <span>Sign In</span>

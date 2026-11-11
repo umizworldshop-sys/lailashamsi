@@ -1,16 +1,21 @@
 import { 
-  TrendingUpIcon, 
+  BanknotesIcon, 
   ReceiptIcon, 
   PackageIcon, 
+  TrendingUpIcon, 
   PlusIcon, 
-  SparklesIcon,
-  ChevronRightIcon 
+  SlidersIcon, 
+  ChevronRightIcon,
+  EyeIcon,
+  MailIcon 
 } from '../Icons';
 
 export default function AdminOverview({
   totalRevenue,
   ordersList = [],
   productsList = [],
+  messagesList = [],
+  unreadMessagesCount = 0,
   onOpenAddProduct,
   onNavigateTab,
   onSelectOrder
@@ -31,7 +36,7 @@ export default function AdminOverview({
               Total Revenue
             </span>
             <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37]">
-              <TrendingUpIcon className="w-4 h-4" />
+              <BanknotesIcon className="w-4 h-4" />
             </div>
           </div>
           <p className="font-mono text-2xl font-bold text-white tracking-tight">
@@ -92,7 +97,7 @@ export default function AdminOverview({
       </div>
 
       {/* Quick Action Tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
         <button
           onClick={onOpenAddProduct}
           className="flex items-center gap-4 p-4 bg-[#18131C] border border-[#2B2332] rounded-2xl hover:border-[#D4AF37] transition-all text-left cursor-pointer group shadow-sm"
@@ -111,7 +116,7 @@ export default function AdminOverview({
           className="flex items-center gap-4 p-4 bg-[#18131C] border border-[#2B2332] rounded-2xl hover:border-[#D4AF37] transition-all text-left cursor-pointer group shadow-sm"
         >
           <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 text-[#D4AF37] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <SparklesIcon className="w-5 h-5" />
+            <SlidersIcon className="w-5 h-5" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-white">Banners, Sale % & Slider</h4>
@@ -142,6 +147,26 @@ export default function AdminOverview({
           <div>
             <h4 className="text-xs font-bold text-white">Customer Orders</h4>
             <p className="text-[10px] text-gray-400">Update delivery statuses & order details</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => onNavigateTab('messages')}
+          className="flex items-center gap-4 p-4 bg-[#18131C] border border-[#2B2332] rounded-2xl hover:border-amber-500/50 transition-all text-left cursor-pointer group shadow-sm"
+        >
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <MailIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-xs font-bold text-white">Client Inquiries</h4>
+              {unreadMessagesCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold bg-amber-400 text-black">
+                  {unreadMessagesCount} new
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-400">View contact form messages</p>
           </div>
         </button>
       </div>
@@ -210,9 +235,10 @@ export default function AdminOverview({
                     <td className="py-3 text-right">
                       <button
                         onClick={() => onSelectOrder(order)}
-                        className="px-2.5 py-1 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[10px] font-semibold transition-colors cursor-pointer"
                       >
-                        View
+                        <EyeIcon className="w-3 h-3" />
+                        <span>View</span>
                       </button>
                     </td>
                   </tr>

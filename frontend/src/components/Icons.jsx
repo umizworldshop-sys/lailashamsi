@@ -192,9 +192,103 @@ export const DashboardIcon = ({ className = 'w-5 h-5' }) => (
 
 export const PackageIcon = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16.5 9.4 7.55 4.24a1.78 1.78 0 0 0-2.5 1.55v12.42a1.78 1.78 0 0 0 2.5 1.55l8.95-5.16a1.78 1.78 0 0 0 0-3.1Z" />
-    <path d="m21 16-9 5.25L3 16" />
-    <path d="m21 8-9-5.25L3 8" />
+    <path d="m7.5 4.27 9 5.15" />
+    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+    <path d="m3.3 7 8.7 5 8.7-5" />
+    <path d="M12 22V12" />
+  </svg>
+);
+
+export const BanknotesIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="12" x="2" y="6" rx="2" />
+    <circle cx="12" cy="12" r="2.5" />
+    <path d="M6 12h.01M18 12h.01" />
+  </svg>
+);
+
+export const SlidersIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="4" x2="4" y1="21" y2="14" />
+    <line x1="4" x2="4" y1="10" y2="3" />
+    <line x1="12" x2="12" y1="21" y2="12" />
+    <line x1="12" x2="12" y1="8" y2="3" />
+    <line x1="20" x2="20" y1="21" y2="16" />
+    <line x1="20" x2="20" y1="12" y2="3" />
+    <line x1="1" x2="7" y1="14" y2="14" />
+    <line x1="9" x2="15" y1="8" y2="8" />
+    <line x1="17" x2="23" y1="16" y2="16" />
+  </svg>
+);
+
+export const ClockIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+export const GridIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="7" height="7" x="3" y="3" rx="1" />
+    <rect width="7" height="7" x="14" y="3" rx="1" />
+    <rect width="7" height="7" x="14" y="14" rx="1" />
+    <rect width="7" height="7" x="3" y="14" rx="1" />
+  </svg>
+);
+
+export const ListIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="8" x2="21" y1="6" y2="6" />
+    <line x1="8" x2="21" y1="12" y2="12" />
+    <line x1="8" x2="21" y1="18" y2="18" />
+    <line x1="3" x2="3.01" y1="6" y2="6" />
+    <line x1="3" x2="3.01" y1="12" y2="12" />
+    <line x1="3" x2="3.01" y1="18" y2="18" />
+  </svg>
+);
+
+export const UploadIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="17 8 12 3 7 8" />
+    <line x1="12" x2="12" y1="3" y2="15" />
+  </svg>
+);
+
+export const ImageIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+  </svg>
+);
+
+export const LinkIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+export const TagIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
+    <path d="M7 7h.01" />
+  </svg>
+);
+
+export const FlameIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+  </svg>
+);
+
+export const AlertCircleIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" x2="12" y1="8" y2="12" />
+    <line x1="12" x2="12.01" y1="16" y2="16" />
   </svg>
 );
 

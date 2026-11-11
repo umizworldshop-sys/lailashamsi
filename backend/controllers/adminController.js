@@ -11,6 +11,29 @@ const generateToken = (adminId) => {
   return jwt.sign({ id: adminId }, secret, { expiresIn: '7d' });
 };
 
+// Rate limiting & Brute Force Lockout Memory Store
+const loginAttemptsMap = new Map();
+
+// Helper to cleanup stale attempts (older than 30 mins)
+const cleanupStaleAttempts = () => {
+  const now = Date.now();
+  for (const [key, value] of loginAttemptsMap.entries()) {
+    if (value.lockedUntil && now > value.lockedUntil + 1800000) {
+      loginAttemptsMap.delete(key);
+    } else if (!value.lockedUntil && now - (value.lastAttempt || value.firstAttempt) > 1800000) {
+      loginAttemptsMap.delete(key);
+    }
+  }
+};
+
+const getClientIp = (req) => {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  return req.ip || req.socket?.remoteAddress || 'unknown_ip';
+};
+
 /**
  * Check whether the master admin exists in online database
  */
@@ -118,10 +141,42 @@ exports.registerAdmin = async (req, res) => {
 };
 
 /**
- * Master Admin Login
+ * Master Admin Login (with Unified Error Alert & 5-Attempt 1-Minute Brute Force Lockout)
  */
 exports.loginAdmin = async (req, res) => {
   try {
+    cleanupStaleAttempts();
+
+    const clientIp = getClientIp(req);
+    const { email, password } = req.body;
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const rateLimitKey = `${clientIp}::${normalizedEmail || 'admin'}`;
+    const now = Date.now();
+
+    const attemptRecord = loginAttemptsMap.get(rateLimitKey) || {
+      attempts: 0,
+      firstAttempt: now,
+      lastAttempt: now,
+      lockedUntil: null
+    };
+
+    // 1. Check if currently locked out
+    if (attemptRecord.lockedUntil && now < attemptRecord.lockedUntil) {
+      const remainingSec = Math.max(1, Math.ceil((attemptRecord.lockedUntil - now) / 1000));
+      return res.status(429).json({
+        success: false,
+        locked: true,
+        retryAfter: remainingSec,
+        message: `Security Lockout: 5 failed login attempts detected. Access is temporarily locked for 1 minute. Please try again in ${remainingSec}s.`
+      });
+    }
+
+    // If lock period has expired, reset attempts
+    if (attemptRecord.lockedUntil && now >= attemptRecord.lockedUntil) {
+      attemptRecord.attempts = 0;
+      attemptRecord.lockedUntil = null;
+    }
+
     if (mongoose.connection.readyState !== 1) {
       await connectDB();
     }
@@ -133,8 +188,6 @@ exports.loginAdmin = async (req, res) => {
       });
     }
 
-    const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -142,21 +195,58 @@ exports.loginAdmin = async (req, res) => {
       });
     }
 
-    const admin = await Admin.findOne({ email: email.trim().toLowerCase() });
-    if (!admin) {
+    const admin = await Admin.findOne({ email: normalizedEmail });
+    let isMatch = false;
+
+    if (admin) {
+      isMatch = await admin.comparePassword(password);
+    }
+
+    // Security Best Practice: Never reveal whether email exists or password was wrong
+    // Both return the exact same unified alert
+    if (!admin || !isMatch) {
+      attemptRecord.attempts = (attemptRecord.attempts || 0) + 1;
+      attemptRecord.lastAttempt = now;
+
+      // Check if 5 attempts limit reached
+      if (attemptRecord.attempts >= 5) {
+        attemptRecord.lockedUntil = now + 60 * 1000; // 1 minute lockout
+        loginAttemptsMap.set(rateLimitKey, attemptRecord);
+
+        // Issue a signed security lockout token
+        const secret = process.env.JWT_SECRET || 'laila_shamsi_super_secret_jwt_key_2026_ateliere';
+        const lockoutToken = jwt.sign(
+          {
+            type: 'lockout_token',
+            ip: clientIp,
+            lockedUntil: attemptRecord.lockedUntil
+          },
+          secret,
+          { expiresIn: '1m' }
+        );
+
+        return res.status(429).json({
+          success: false,
+          locked: true,
+          retryAfter: 60,
+          lockoutToken,
+          message: 'Security Alert: 5 failed attempts reached. Form is locked for 1 minute for security.'
+        });
+      }
+
+      loginAttemptsMap.set(rateLimitKey, attemptRecord);
+      const remaining = 5 - attemptRecord.attempts;
+
       return res.status(401).json({
         success: false,
-        message: 'Invalid credentials. No admin account found with this email.'
+        locked: false,
+        remainingAttempts: remaining,
+        message: `Invalid email or password. Please verify both credentials. (${remaining} attempt${remaining === 1 ? '' : 's'} remaining)`
       });
     }
 
-    const isMatch = await admin.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials. Incorrect password.'
-      });
-    }
+    // Credentials are valid: Reset rate limit record for this client
+    loginAttemptsMap.delete(rateLimitKey);
 
     const token = generateToken(admin._id);
 
