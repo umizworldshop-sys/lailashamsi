@@ -342,7 +342,9 @@ export default function App() {
             image: primaryImg,
             images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [primaryImg],
             category: p.category || 'female',
-            categoryLabel: p.categoryLabel || 'Female (Women Wear)'
+            categoryLabel: p.categoryLabel || 'Female (Women Wear)',
+            stock: p.stock !== undefined ? Number(p.stock) : 25,
+            isOutOfStock: Boolean(p.isOutOfStock) || (p.stock !== undefined && Number(p.stock) <= 0)
           };
         });
         setProducts(backendList);
@@ -564,9 +566,17 @@ export default function App() {
             images: backendProduct.images?.length ? backendProduct.images : newItem.images,
             sizes: backendProduct.sizes?.length ? backendProduct.sizes : newItem.sizes,
             colors: backendProduct.colors?.length ? backendProduct.colors : newItem.colors,
-            stock: backendProduct.stock ?? newItem.stock
+            stock: backendProduct.stock ?? newItem.stock,
+            isOutOfStock: Boolean(backendProduct.isOutOfStock) || (backendProduct.stock !== undefined && Number(backendProduct.stock) <= 0)
           }
         : newItem;
+
+      // Prevent adding out of stock products to cart
+      const isItemOutOfStock = Boolean(enrichedNewItem.isOutOfStock) || (enrichedNewItem.stock !== undefined && Number(enrichedNewItem.stock) <= 0);
+      if (isItemOutOfStock) {
+        showToast('Sorry, this design is currently out of stock.');
+        return;
+      }
 
       setCartItems((prevItems) => {
         const existingIndex = prevItems.findIndex(

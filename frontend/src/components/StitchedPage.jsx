@@ -47,48 +47,48 @@ export default function StitchedPage({
   }, [products, selectedSubCat, sortBy]);
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#282321] pt-36 sm:pt-40 lg:pt-44 pb-24 selection:bg-[#641E32] selection:text-[#FAF5EC] font-sans">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#282321] pt-28 sm:pt-36 lg:pt-40 pb-20 selection:bg-[#641E32] selection:text-[#FAF5EC] font-sans">
       
       {/* ================= EDITORIAL STITCHED HERO BANNER ================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 mt-2 sm:mt-4">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#641E32] via-[#7d2640] to-[#501325] text-[#FAF5EC] p-8 sm:p-14 lg:p-16 border border-[#B89B62]/40 shadow-2xl">
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 mb-5 sm:mb-8 mt-1 sm:mt-3">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-[#641E32] via-[#7d2640] to-[#501325] text-[#FAF5EC] p-4 sm:p-7 lg:p-10 border border-[#B89B62]/40 shadow-xl">
           
           {/* Background Decorative Glow */}
-          <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-[#B89B62]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -right-10 -bottom-10 w-72 h-72 sm:w-96 sm:h-96 bg-[#B89B62]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-6">
             
             {/* Left Content */}
-            <div className="space-y-4 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-[#B89B62]/60 text-[#B89B62] text-[10px] uppercase tracking-[0.25em] font-bold shadow-sm">
-                <SparklesIcon className="w-3.5 h-3.5" />
+            <div className="space-y-1.5 sm:space-y-3 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 border border-[#B89B62]/60 text-[#B89B62] text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold shadow-sm">
+                <SparklesIcon className="w-3 h-3" />
                 ✦ Ready to Wear Atelier
               </div>
               
-              <h1 className="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-bold tracking-wide text-[#FAF5EC] leading-tight">
+              <h1 className="font-cinzel text-xl sm:text-3xl lg:text-4xl font-bold tracking-wide text-[#FAF5EC] leading-tight">
                 Stitched <span className="text-[#B89B62]">Pret Wear</span>
               </h1>
               
-              <p className="text-xs sm:text-sm text-[#E8DCCB] font-light leading-relaxed max-w-2xl">
-                Impeccably tailored Pakistani eastern suits, flared peshwas, and luxury party pret—finished with master artisanal handwork and ready for immediate dispatch.
+              <p className="text-[11px] sm:text-xs text-[#E8DCCB] font-light leading-relaxed max-w-2xl line-clamp-2 sm:line-clamp-none">
+                Impeccably tailored Pakistani eastern suits, flared peshwas, and party pret—finished with master artisanal handwork.
               </p>
 
-              <div className="pt-2 flex items-center gap-3">
-                <span className="text-[10px] uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-md border border-white/20 text-[#FAF5EC] font-semibold">
+              <div className="pt-0.5 hidden sm:flex items-center gap-2">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 rounded-md border border-white/15 text-[#FAF5EC] font-semibold">
                   Sizes XS to XL &middot; Express Nationwide Delivery
                 </span>
               </div>
             </div>
 
             {/* Right Counter Badge */}
-            <div className="flex lg:flex-col items-center justify-center lg:items-end text-left lg:text-right border-t lg:border-t-0 lg:border-l border-white/15 pt-6 lg:pt-0 lg:pl-10">
-              <span className="text-xs sm:text-sm uppercase tracking-[0.3em] text-[#B89B62] font-semibold block mb-1">
+            <div className="flex md:flex-col items-baseline md:items-end justify-between md:justify-center border-t md:border-t-0 md:border-l border-white/15 pt-2.5 md:pt-0 md:pl-6 shrink-0">
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#B89B62] font-semibold block mb-0.5">
                 Stitched Edit
               </span>
-              <div className="font-cinzel text-4xl sm:text-6xl font-extrabold text-white tracking-wider">
+              <div className="font-cinzel text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-wider">
                 READY <span className="text-[#B89B62]">TO WEAR</span>
               </div>
-              <span className="text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-1">
+              <span className="text-[10px] sm:text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-0.5">
                 {filteredProducts.length} {filteredProducts.length === 1 ? 'Design Available' : 'Designs Available'}
               </span>
             </div>

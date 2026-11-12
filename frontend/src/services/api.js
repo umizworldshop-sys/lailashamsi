@@ -173,6 +173,15 @@ export async function deleteProduct(id, token) {
   return handleResponse(res);
 }
 
+export async function toggleProductStock(id, token) {
+  const res = await fetch(`${API_BASE_URL}/products/${id}/toggle-stock`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  clientCache.clear();
+  return handleResponse(res);
+}
+
 export async function seedProducts(token, force = false) {
   const res = await fetch(`${API_BASE_URL}/products/seed${force ? '?force=true' : ''}`, {
     method: 'POST',

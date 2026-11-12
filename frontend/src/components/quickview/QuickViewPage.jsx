@@ -137,7 +137,10 @@ export default function QuickViewPage({
       ? Math.round(((convertedOriginalPrice - convertedPrice) / convertedOriginalPrice) * 100)
       : 0;
 
+  const isOutOfStock = Boolean(product.isOutOfStock) || (product.stock !== undefined && Number(product.stock) <= 0);
+
   const handleAddToCartClick = () => {
+    if (isOutOfStock) return;
     onAddToCart({
       ...product,
       selectedSize,
@@ -262,7 +265,14 @@ export default function QuickViewPage({
               })}
 
               {/* Single Top Left Badge (Prevents duplicate badge glitch) */}
-              {(product.tag || discountPercent > 0) && (
+              {isOutOfStock ? (
+                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2.5 py-1 rounded-full shadow-md bg-[#17131B]/95 text-rose-200 border border-rose-500/50 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    OUT OF STOCK
+                  </span>
+                </div>
+              ) : (product.tag || discountPercent > 0) && (
                 <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
                   <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2.5 py-1 rounded-full shadow-md bg-[#641E32] text-[#FAF5EC] border border-[#B89B62]/40">
                     {product.tag || `-${discountPercent}% OFF`}
@@ -356,9 +366,16 @@ export default function QuickViewPage({
                     {convertedOriginalPrice.toLocaleString()}
                   </span>
                 )}
-                <span className="text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full font-semibold">
-                  ✓ In Stock
-                </span>
+                {isOutOfStock ? (
+                  <span className="text-[10px] text-rose-700 bg-rose-100/90 border border-rose-300 px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                    ✕ Out of Stock
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full font-semibold">
+                    ✓ In Stock
+                  </span>
+                )}
               </div>
 
               {/* Description */}
@@ -499,30 +516,40 @@ export default function QuickViewPage({
                 </div>
 
                 {/* Add to Bag Button */}
-                <button
-                  type="button"
-                  onClick={handleAddToCartClick}
-                  className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-                >
-                  {addedSuccess ? (
-                    <>
-                      <CheckIcon className="w-4 h-4" />
-                      <span>Added to Bag!</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBagIcon className="w-4 h-4" />
-                      <span>
-                        Add to Bag • {curr.symbol}
-                        {(convertedPrice * quantity).toLocaleString()}
-                      </span>
-                    </>
-                  )}
-                </button>
+                {isOutOfStock ? (
+                  <button
+                    type="button"
+                    disabled
+                    className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-gray-200 text-gray-500 text-xs uppercase tracking-[0.16em] font-semibold transition-all shadow-none flex items-center justify-center gap-2 cursor-not-allowed opacity-80"
+                  >
+                    Sold Out • Out of Stock
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleAddToCartClick}
+                    className="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-semibold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  >
+                    {addedSuccess ? (
+                      <>
+                        <CheckIcon className="w-4 h-4" />
+                        <span>Added to Bag!</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBagIcon className="w-4 h-4" />
+                        <span>
+                          Add to Bag • {curr.symbol}
+                          {(convertedPrice * quantity).toLocaleString()}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Instant Buy It Now Button */}
-              {onProceedToCheckout && (
+              {onProceedToCheckout && !isOutOfStock && (
                 <button
                   type="button"
                   onClick={() => {
@@ -604,23 +631,33 @@ export default function QuickViewPage({
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={handleAddToCartClick}
-          className="flex-1 py-2.5 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-bold shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
-        >
-          {addedSuccess ? (
-            <>
-              <CheckIcon className="w-4 h-4" />
-              <span>Added!</span>
-            </>
-          ) : (
-            <>
-              <ShoppingBagIcon className="w-4 h-4" />
-              <span>Add to Bag</span>
-            </>
-          )}
-        </button>
+        {isOutOfStock ? (
+          <button
+            type="button"
+            disabled
+            className="flex-1 py-2.5 px-4 rounded-xl bg-gray-200 text-gray-500 text-xs uppercase tracking-[0.16em] font-bold shadow-none flex items-center justify-center gap-1.5 cursor-not-allowed opacity-80"
+          >
+            Out of Stock
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAddToCartClick}
+            className="flex-1 py-2.5 px-4 rounded-xl bg-[#641E32] hover:bg-[#4A1624] text-[#FAF5EC] text-xs uppercase tracking-[0.16em] font-bold shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95"
+          >
+            {addedSuccess ? (
+              <>
+                <CheckIcon className="w-4 h-4" />
+                <span>Added!</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBagIcon className="w-4 h-4" />
+                <span>Add to Bag</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
     </section>
   );

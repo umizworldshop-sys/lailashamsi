@@ -132,19 +132,30 @@ router.post('/', async (req, res) => {
       const newOrder = new Order(orderPayload);
       const savedOrder = await newOrder.save();
 
-      // Non-blocking background stock update so user gets instant response
+      // Non-blocking background stock decrement & auto out-of-stock check
       setImmediate(async () => {
         try {
-          const ops = enrichedItems
-            .filter(i => i.productId && mongoose.Types.ObjectId.isValid(i.productId))
-            .map(i => ({
-              updateOne: {
-                filter: { _id: i.productId, stock: { $gte: i.quantity } },
-                update: { $inc: { stock: -i.quantity } }
+          let productRoutes = null;
+          try { productRoutes = require('./productRoutes'); } catch {}
+
+          for (const i of enrichedItems) {
+            if (i.productId && mongoose.Types.ObjectId.isValid(i.productId)) {
+              const prod = await Product.findById(i.productId);
+              if (prod) {
+                const currentStock = Number(prod.stock) || 0;
+                const qty = Math.max(1, Number(i.quantity) || 1);
+                const nextStock = Math.max(0, currentStock - qty);
+                prod.stock = nextStock;
+                if (nextStock === 0) {
+                  prod.isOutOfStock = true;
+                }
+                await prod.save();
               }
-            }));
-          if (ops.length > 0) {
-            await Product.bulkWrite(ops, { ordered: false });
+            }
+          }
+
+          if (productRoutes && typeof productRoutes.invalidateProductsCache === 'function') {
+            productRoutes.invalidateProductsCache();
           }
         } catch (err) {
           // Non-blocking background stock sync

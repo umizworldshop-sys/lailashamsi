@@ -23,6 +23,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  toggleProductStock,
   uploadImageFile,
   fetchOrders,
   updateOrderStatus,
@@ -197,7 +198,9 @@ export default function AdminPanel({
       images: [],
       isNewArrival: true,
       isOnSale: false,
-      isTrending: false
+      isTrending: false,
+      stock: 25,
+      isOutOfStock: false
     });
     setProductFormError('');
     setIsProductModalOpen(true);
@@ -209,6 +212,8 @@ export default function AdminPanel({
     const catObj = STOREFRONT_CATEGORIES.find(c => c.id === catId);
     const realPrice = product.price < 1000 ? product.price * 100 : product.price;
     const realOrig = product.originalPrice ? (product.originalPrice < 1000 ? product.originalPrice * 100 : product.originalPrice) : '';
+    const currentStock = product.stock !== undefined ? product.stock : 25;
+    const isOut = Boolean(product.isOutOfStock) || currentStock === 0;
 
     setProductForm({
       title: product.title || '',
@@ -227,7 +232,9 @@ export default function AdminPanel({
         : (product.image ? [product.image] : []),
       isNewArrival: product.isNewArrival !== undefined ? Boolean(product.isNewArrival) : true,
       isOnSale: product.isOnSale !== undefined ? Boolean(product.isOnSale) : Boolean(product.originalPrice && Number(product.originalPrice) > Number(product.price)),
-      isTrending: product.isTrending !== undefined ? Boolean(product.isTrending) : false
+      isTrending: product.isTrending !== undefined ? Boolean(product.isTrending) : false,
+      stock: currentStock,
+      isOutOfStock: isOut
     });
     setProductFormError('');
     setIsProductModalOpen(true);
@@ -253,6 +260,11 @@ export default function AdminPanel({
         ? Math.round(((numOrig - numPrice) / numOrig) * 100)
         : (isSale && productForm.discountPercent ? Number(productForm.discountPercent) : 0);
 
+      const numStock = productForm.stock !== undefined && productForm.stock !== ''
+        ? Math.max(0, parseInt(productForm.stock, 10) || 0)
+        : 25;
+      const isOut = Boolean(productForm.isOutOfStock) || numStock === 0;
+
       const payload = {
         title: productForm.title.trim(),
         category: productForm.category,
@@ -270,7 +282,9 @@ export default function AdminPanel({
         image: validImages[0],
         isNewArrival: isSale ? false : Boolean(productForm.isNewArrival),
         isOnSale: isSale,
-        isTrending: Boolean(productForm.isTrending)
+        isTrending: Boolean(productForm.isTrending),
+        stock: isOut ? 0 : numStock,
+        isOutOfStock: isOut
       };
 
       if (editingProductId) {
@@ -288,6 +302,18 @@ export default function AdminPanel({
       setProductFormError(err.message || 'Error saving product');
     } finally {
       setProductSaving(false);
+    }
+  };
+
+  const handleToggleStock = async (product) => {
+    const pid = product._id || product.id;
+    try {
+      const res = await toggleProductStock(pid, token);
+      showToast(res.message || 'Product stock updated!');
+      loadDashboardData(token);
+      if (onProductsUpdated) onProductsUpdated();
+    } catch (err) {
+      showToast(err.message || 'Failed to update stock status');
     }
   };
 
@@ -533,6 +559,7 @@ export default function AdminPanel({
                   onOpenAddModal={handleOpenAddProduct}
                   onEditProduct={handleEditProduct}
                   onDeleteProduct={handleDeleteProduct}
+                  onToggleStock={handleToggleStock}
                 />
               )}
 

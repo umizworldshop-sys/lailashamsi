@@ -18,7 +18,8 @@ export default function AdminProducts({
   setViewMode,
   onOpenAddModal,
   onEditProduct,
-  onDeleteProduct
+  onDeleteProduct,
+  onToggleStock
 }) {
   const filteredProducts = products.filter(p => {
     let matchesCat;
@@ -122,10 +123,15 @@ export default function AdminProducts({
           {filteredProducts.map((p) => {
             const primaryImg = Array.isArray(p.images) && p.images[0] ? p.images[0] : (p.image || '/Logo.jpeg');
             const pid = p._id || p.id;
+            const isOut = Boolean(p.isOutOfStock) || (p.stock !== undefined && Number(p.stock) <= 0);
+            const stockCount = p.stock !== undefined ? p.stock : 25;
+
             return (
               <div 
                 key={pid}
-                className="bg-[#151119] border border-[#27212E] rounded-2xl overflow-hidden hover:border-[#D4AF37]/50 transition-all group flex flex-col justify-between shadow-lg"
+                className={`bg-[#151119] border rounded-2xl overflow-hidden transition-all group flex flex-col justify-between shadow-lg ${
+                  isOut ? 'border-rose-900/40 hover:border-rose-600/60' : 'border-[#27212E] hover:border-[#D4AF37]/50'
+                }`}
               >
                 <div>
                   {/* Image container */}
@@ -133,23 +139,41 @@ export default function AdminProducts({
                     <img 
                       src={primaryImg} 
                       alt={p.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isOut ? 'opacity-75' : ''}`}
                     />
-                    {p.tag && (
-                      <span className="absolute top-2 left-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] uppercase font-mono font-bold bg-black/70 text-[#D4AF37] border border-[#D4AF37]/40 backdrop-blur-sm truncate max-w-[80%]">
+                    {/* Stock Status Badge */}
+                    <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] font-mono font-bold backdrop-blur-md flex items-center gap-1 border shadow-sm ${
+                      isOut
+                        ? 'bg-rose-950/90 text-rose-300 border-rose-500/50'
+                        : 'bg-black/75 text-emerald-300 border-emerald-500/40'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${isOut ? 'bg-rose-500 animate-pulse' : 'bg-emerald-400'}`}></span>
+                      <span>{isOut ? 'OUT OF STOCK' : `${stockCount} in stock`}</span>
+                    </span>
+
+                    {p.tag && !isOut && (
+                      <span className="absolute bottom-2 left-2 px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] uppercase font-mono font-bold bg-black/80 text-[#D4AF37] border border-[#D4AF37]/40 backdrop-blur-sm truncate max-w-[70%]">
                         {p.tag}
                       </span>
                     )}
-                    <span className="absolute bottom-2 right-2 px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] font-mono bg-black/80 text-gray-300 backdrop-blur-sm truncate max-w-[80%]">
+
+                    <span className="absolute bottom-2 right-2 px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] font-mono bg-black/80 text-gray-300 backdrop-blur-sm truncate max-w-[70%]">
                       {p.categoryLabel || p.category}
                     </span>
                   </div>
 
                   {/* Info Box */}
                   <div className="p-2.5 sm:p-4 space-y-1">
-                    <h3 className="text-xs sm:text-sm font-bold text-white truncate" title={p.title}>
-                      {p.title}
-                    </h3>
+                    <div className="flex items-center justify-between gap-1">
+                      <h3 className="text-xs sm:text-sm font-bold text-white truncate flex-1" title={p.title}>
+                        {p.title}
+                      </h3>
+                      {isOut && (
+                        <span className="text-[9px] font-bold font-mono text-rose-400 uppercase tracking-tight shrink-0">
+                          Sold Out
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-gray-400 truncate">{p.fabric || 'Fabric details'}</p>
                     {/* Price display with PKR scaling */}
                     <div className="pt-1 flex flex-wrap items-baseline gap-1.5">
@@ -166,21 +190,38 @@ export default function AdminProducts({
                 </div>
 
                 {/* Card Actions */}
-                <div className="p-2 sm:p-3 bg-[#110E14] border-t border-[#231C29] flex items-center justify-between gap-1.5 sm:gap-2">
+                <div className="p-2 sm:p-2.5 bg-[#110E14] border-t border-[#231C29] flex flex-col gap-1.5">
+                  {/* 1-Click Out of Stock Toggle Button (outside on the card as requested) */}
                   <button
-                    onClick={() => onEditProduct(p)}
-                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[11px] sm:text-xs font-medium transition-colors cursor-pointer"
+                    type="button"
+                    onClick={() => onToggleStock && onToggleStock(p)}
+                    className={`w-full py-1.5 px-2 rounded-xl text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                      isOut
+                        ? 'bg-rose-950/70 hover:bg-emerald-950/80 text-rose-200 hover:text-emerald-300 border-rose-700/60 hover:border-emerald-500/60 shadow-sm'
+                        : 'bg-[#18131F] hover:bg-rose-950/60 text-gray-300 hover:text-rose-200 border-[#2E2538] hover:border-rose-700/50'
+                    }`}
+                    title={isOut ? 'Click to Restock (Mark In Stock)' : 'Click to Mark Out of Stock'}
                   >
-                    <EditIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                    <span>Edit</span>
+                    <span className={`w-1.5 h-1.5 rounded-full ${isOut ? 'bg-rose-500' : 'bg-emerald-400'}`}></span>
+                    <span>{isOut ? 'Mark In Stock' : 'Out of Stock'}</span>
                   </button>
-                  <button
-                    onClick={() => onDeleteProduct(pid)}
-                    className="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-900 rounded-lg transition-colors cursor-pointer shrink-0"
-                    title="Delete Product"
-                  >
-                    <TrashIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                  </button>
+
+                  <div className="flex items-center justify-between gap-1.5">
+                    <button
+                      onClick={() => onEditProduct(p)}
+                      className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[11px] sm:text-xs font-medium transition-colors cursor-pointer"
+                    >
+                      <EditIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      onClick={() => onDeleteProduct(pid)}
+                      className="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-900 rounded-lg transition-colors cursor-pointer shrink-0"
+                      title="Delete Product"
+                    >
+                      <TrashIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -196,6 +237,7 @@ export default function AdminProducts({
                   <th className="py-3 px-4 font-semibold">Category</th>
                   <th className="py-3 px-4 font-semibold">Fabric</th>
                   <th className="py-3 px-4 font-semibold">Price</th>
+                  <th className="py-3 px-4 font-semibold">Stock Status</th>
                   <th className="py-3 px-4 font-semibold">Badge</th>
                   <th className="py-3 px-4 text-right font-semibold">Actions</th>
                 </tr>
@@ -204,6 +246,9 @@ export default function AdminProducts({
                 {filteredProducts.map((p) => {
                   const pid = p._id || p.id;
                   const primaryImg = Array.isArray(p.images) && p.images[0] ? p.images[0] : (p.image || '/Logo.jpeg');
+                  const isOut = Boolean(p.isOutOfStock) || (p.stock !== undefined && Number(p.stock) <= 0);
+                  const stockCount = p.stock !== undefined ? p.stock : 25;
+
                   return (
                     <tr key={pid} className="hover:bg-white/[0.02] transition-colors">
                       <td className="py-3 px-4 flex items-center gap-3">
@@ -214,6 +259,21 @@ export default function AdminProducts({
                       <td className="py-3 px-4 text-gray-400 truncate max-w-[150px]">{p.fabric}</td>
                       <td className="py-3 px-4 font-mono font-bold text-[#E6B8BF]">
                         Rs. {(p.price < 1000 ? p.price * 100 : p.price)?.toLocaleString()}
+                      </td>
+                      <td className="py-3 px-4">
+                        <button
+                          type="button"
+                          onClick={() => onToggleStock && onToggleStock(p)}
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer inline-flex items-center gap-1.5 border ${
+                            isOut
+                              ? 'bg-rose-950/70 text-rose-300 border-rose-700/60 hover:bg-rose-900'
+                              : 'bg-emerald-950/50 text-emerald-300 border-emerald-700/40 hover:bg-emerald-900/60'
+                          }`}
+                          title={isOut ? 'Click to Restock (Mark In Stock)' : 'Click to Mark Out of Stock'}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${isOut ? 'bg-rose-500' : 'bg-emerald-400'}`}></span>
+                          <span>{isOut ? 'Out of Stock' : `${stockCount} in stock`}</span>
+                        </button>
                       </td>
                       <td className="py-3 px-4">
                         {p.tag ? (

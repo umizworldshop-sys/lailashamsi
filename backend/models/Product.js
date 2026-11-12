@@ -108,7 +108,12 @@ const productSchema = new mongoose.Schema({
   },
   stock: {
     type: Number,
-    default: 25
+    default: 25,
+    min: 0
+  },
+  isOutOfStock: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true,

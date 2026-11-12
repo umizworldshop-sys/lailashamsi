@@ -850,6 +850,99 @@ export default function AdminProductModal({
                 )}
               </div>
 
+              {/* Inventory & Stock Quantity */}
+              <div className="p-4 bg-[#18131F] rounded-2xl border border-[#2B2334] space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-xs font-bold text-white block">
+                      Inventory & Stock Availability
+                    </label>
+                    <p className="text-[10px] text-gray-400">
+                      Set available units. Out of Stock products remain visible on the storefront, but checkout is disabled.
+                    </p>
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${
+                    Boolean(productForm.isOutOfStock) || Number(productForm.stock) === 0
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  }`}>
+                    {Boolean(productForm.isOutOfStock) || Number(productForm.stock) === 0 ? '🔴 Out of Stock' : `🟢 In Stock (${productForm.stock !== undefined ? productForm.stock : 25})`}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  {/* Stock Quantity */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-200 block">
+                      Available Stock (Pieces) <span className="text-[#D4AF37]">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        min="0"
+                        value={productForm.stock !== undefined ? productForm.stock : 25}
+                        onChange={(e) => {
+                          const val = e.target.value === '' ? '' : Math.max(0, parseInt(e.target.value, 10) || 0);
+                          setProductForm({
+                            ...productForm,
+                            stock: val,
+                            isOutOfStock: val === 0
+                          });
+                        }}
+                        placeholder="25"
+                        className="w-full bg-[#120F16] border border-[#2F2638] rounded-xl pl-4 pr-16 py-2.5 text-xs sm:text-sm font-mono text-white focus:border-[#D4AF37] focus:outline-none"
+                      />
+                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-semibold text-gray-400">
+                        Pieces
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Quick Toggle In Stock / Out of Stock */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-200 block">
+                      Quick Availability Status
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductForm({
+                            ...productForm,
+                            isOutOfStock: false,
+                            stock: Number(productForm.stock) > 0 ? productForm.stock : 15
+                          });
+                        }}
+                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                          !(Boolean(productForm.isOutOfStock) || Number(productForm.stock) === 0)
+                            ? 'bg-emerald-600/30 text-emerald-300 border-emerald-500 shadow-sm'
+                            : 'bg-[#120F16] text-gray-400 hover:text-white border-[#2F2638]'
+                        }`}
+                      >
+                        <span>✓ In Stock</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProductForm({
+                            ...productForm,
+                            isOutOfStock: true,
+                            stock: 0
+                          });
+                        }}
+                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 border ${
+                          Boolean(productForm.isOutOfStock) || Number(productForm.stock) === 0
+                            ? 'bg-rose-950/60 text-rose-300 border-rose-600 shadow-sm'
+                            : 'bg-[#120F16] text-gray-400 hover:text-white border-[#2F2638]'
+                        }`}
+                      >
+                        <span>✕ Out of Stock</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Fabric & Pieces */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">

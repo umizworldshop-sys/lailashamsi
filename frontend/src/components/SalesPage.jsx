@@ -97,7 +97,7 @@ export default function SalesPage({
                 Discover unstitched masterpieces, luxury stitched pret, and festive attire at exclusive promotional prices.
               </p>
 
-              <div className="pt-1 flex items-center gap-2">
+              <div className="pt-0.5 hidden sm:flex items-center gap-2">
                 <span className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 rounded-md border border-white/15 text-[#FAF5EC] font-semibold">
                   Stitched &middot; Unstitched &middot; Pret
                 </span>

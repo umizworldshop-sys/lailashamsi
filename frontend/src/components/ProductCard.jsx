@@ -104,6 +104,8 @@ export default function ProductCard({
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
       : (Number(product.discountPercent) || 0);
 
+  const isOutOfStock = Boolean(product.isOutOfStock) || (product.stock !== undefined && Number(product.stock) <= 0);
+
   const handleHeartClick = (e) => {
     e.stopPropagation();
     setHeartPopping(true);
@@ -113,6 +115,7 @@ export default function ProductCard({
 
   const handleQuickAdd = (e) => {
     e.stopPropagation();
+    if (isOutOfStock) return;
     onAddToCart({
       ...product,
       selectedSize,
@@ -219,7 +222,12 @@ export default function ProductCard({
         )}
 
         {/* Minimal Luxury Sale/Status Tag */}
-        {(discount > 0 || product.tag) && (
+        {isOutOfStock ? (
+          <span className="absolute top-2.5 left-2.5 z-10 bg-[#17131B]/95 text-rose-200 text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.16em] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shadow-md border border-rose-500/40 backdrop-blur-xs flex items-center gap-1.5 pointer-events-none">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+            OUT OF STOCK
+          </span>
+        ) : (discount > 0 || product.tag) && (
           <span className="absolute top-2.5 left-2.5 z-10 bg-[#641E32] text-white text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.16em] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shadow-sm border border-[#D4AF37]/30 pointer-events-none">
             {product.tag || `-${discount}%`}
           </span>
@@ -245,7 +253,25 @@ export default function ProductCard({
           onClick={(e) => e.stopPropagation()}
           className="hidden sm:block absolute inset-x-3 bottom-3 z-20 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out"
         >
-          {showSizePicker ? (
+          {isOutOfStock ? (
+            <div className="flex h-8 bg-[#18121E]/95 backdrop-blur-sm rounded-md shadow-lg border border-white/10 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => onQuickView({ ...product, selectedColor, selectedSize })}
+                className="flex-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                Quick View
+              </button>
+              <div className="w-[1px] bg-white/10"></div>
+              <button
+                type="button"
+                disabled
+                className="flex-1 text-[9px] font-bold uppercase tracking-[0.15em] text-rose-300 bg-rose-950/70 cursor-not-allowed opacity-90"
+              >
+                Sold Out
+              </button>
+            </div>
+          ) : showSizePicker ? (
             <div className="bg-white/95 backdrop-blur-sm p-2.5 rounded-lg shadow-lg border border-white/60">
               <p className="text-[8.5px] uppercase tracking-[0.2em] text-gray-500 mb-2 text-center font-semibold">
                 Select Size
@@ -332,6 +358,12 @@ export default function ProductCard({
             {convertedOriginalPrice > convertedPrice && (
               <span className="text-[10px] text-gray-400 line-through mt-0.5">
                 {curr.symbol}{convertedOriginalPrice.toLocaleString()}
+              </span>
+            )}
+            {isOutOfStock && (
+              <span className="text-[9px] font-bold text-rose-600 uppercase tracking-wider mt-0.5 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                Out of Stock
               </span>
             )}
           </div>

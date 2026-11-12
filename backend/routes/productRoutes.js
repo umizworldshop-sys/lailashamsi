@@ -363,7 +363,8 @@ router.post('/', verifyAdmin, async (req, res) => {
       isOnSale: effectiveIsSale,
       isTrending: isTrending !== undefined ? Boolean(isTrending) : false,
       featured: featured !== undefined ? Boolean(featured) : false,
-      stock: stock ? Number(stock) : 25
+      stock: stock !== undefined ? Math.max(0, Number(stock) || 0) : 25,
+      isOutOfStock: req.body.isOutOfStock !== undefined ? Boolean(req.body.isOutOfStock) : (Number(stock) === 0)
     });
 
     const savedProduct = await newProduct.save();
@@ -412,6 +413,19 @@ router.put('/:id', verifyAdmin, async (req, res) => {
       }
     }
 
+    if (updateData.stock !== undefined) {
+      updateData.stock = Math.max(0, Number(updateData.stock) || 0);
+      if (updateData.isOutOfStock === undefined) {
+        updateData.isOutOfStock = updateData.stock === 0;
+      }
+    }
+    if (updateData.isOutOfStock !== undefined) {
+      updateData.isOutOfStock = Boolean(updateData.isOutOfStock);
+      if (updateData.isOutOfStock && (!updateData.stock || updateData.stock > 0)) {
+        updateData.stock = 0;
+      }
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
@@ -436,6 +450,47 @@ router.put('/:id', verifyAdmin, async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to update product',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * @route   PATCH /api/products/:id/toggle-stock
+ * @desc    Toggle product in-stock / out-of-stock instantly from admin product card
+ * @access  Protected (Admin only)
+ */
+router.patch('/:id/toggle-stock', verifyAdmin, async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    const currentOut = Boolean(product.isOutOfStock) || Number(product.stock) <= 0;
+    if (currentOut) {
+      product.isOutOfStock = false;
+      product.stock = 15; // standard restock quantity
+    } else {
+      product.isOutOfStock = true;
+      product.stock = 0;
+    }
+
+    await product.save();
+    invalidateProductsCache();
+
+    return res.status(200).json({
+      success: true,
+      message: product.isOutOfStock ? `"${product.title}" marked Out of Stock` : `"${product.title}" marked In Stock (15 pieces)`,
+      product
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to toggle stock status',
       error: error.message
     });
   }

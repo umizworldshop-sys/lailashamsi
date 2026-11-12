@@ -67,8 +67,10 @@ export default function QuickViewModal({
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
   const convertedPrice = Math.round(product.price * curr.rate);
   const convertedOriginalPrice = Math.round(product.originalPrice * curr.rate);
+  const isOutOfStock = Boolean(product.isOutOfStock) || (product.stock !== undefined && Number(product.stock) <= 0);
 
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
     onAddToCart({
       ...product,
       selectedSize,
@@ -151,7 +153,12 @@ export default function QuickViewModal({
                 </>
               )}
 
-              {(product.tag || (product.originalPrice > product.price)) && (
+              {isOutOfStock ? (
+                <span className="absolute top-2 left-2 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow-md bg-[#17131B]/95 text-rose-200 border border-rose-500/50 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                  OUT OF STOCK
+                </span>
+              ) : (product.tag || (product.originalPrice > product.price)) && (
                 <span className="absolute top-2 left-2 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow-2xs bg-[#641E32] text-[#FAF5EC] border border-[#B89B62]/40">
                   {product.tag || `-${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%`}
                 </span>
@@ -207,9 +214,16 @@ export default function QuickViewModal({
                   {curr.symbol}{convertedOriginalPrice.toLocaleString()}
                 </span>
               )}
-              <span className="text-[8.5px] text-[#164B3C] bg-[#164B3C]/10 px-2 py-0.5 rounded font-semibold ml-auto">
-                In Stock
-              </span>
+              {isOutOfStock ? (
+                <span className="text-[8.5px] text-rose-700 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded font-bold ml-auto flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                  Out of Stock
+                </span>
+              ) : (
+                <span className="text-[8.5px] text-[#164B3C] bg-[#164B3C]/10 px-2 py-0.5 rounded font-semibold ml-auto">
+                  In Stock
+                </span>
+              )}
             </div>
 
             {/* Compact Specs Box */}
@@ -319,22 +333,32 @@ export default function QuickViewModal({
               </div>
 
               {/* Add to Bag Button */}
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 py-1.5 px-3 rounded-md text-[9px] uppercase tracking-[0.12em] font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 bg-[#641E32] text-[#FAF5EC] hover:bg-[#4A1624]"
-              >
-                {addedSuccess ? (
-                  <>
-                    <CheckIcon className="w-3 h-3" />
-                    <span>Added!</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBagIcon className="w-3 h-3" />
-                    <span>Add • {curr.symbol}{(convertedPrice * quantity).toLocaleString()}</span>
-                  </>
-                )}
-              </button>
+              {isOutOfStock ? (
+                <button
+                  type="button"
+                  disabled
+                  className="flex-1 py-1.5 px-3 rounded-md text-[9px] uppercase tracking-[0.12em] font-bold shadow-2xs flex items-center justify-center gap-1.5 bg-gray-200 text-gray-500 cursor-not-allowed"
+                >
+                  Out of Stock
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 py-1.5 px-3 rounded-md text-[9px] uppercase tracking-[0.12em] font-bold transition-all shadow-2xs flex items-center justify-center gap-1.5 bg-[#641E32] text-[#FAF5EC] hover:bg-[#4A1624] cursor-pointer"
+                >
+                  {addedSuccess ? (
+                    <>
+                      <CheckIcon className="w-3 h-3" />
+                      <span>Added!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBagIcon className="w-3 h-3" />
+                      <span>Add • {curr.symbol}{(convertedPrice * quantity).toLocaleString()}</span>
+                    </>
+                  )}
+                </button>
+              )}
 
               {/* Wishlist Button */}
               <button
@@ -350,7 +374,7 @@ export default function QuickViewModal({
             </div>
 
             {/* Instant Checkout Button */}
-            {onProceedToCheckout && (
+            {onProceedToCheckout && !isOutOfStock && (
               <button
                 type="button"
                 onClick={() => {
