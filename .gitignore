@@ -19,6 +19,10 @@ frontend/.env
 backend/uploads/*
 !backend/uploads/.gitkeep
 
+# Backups & Temp data
+*backup*.json
+backend/data/*backup*.json
+
 # Logs
 logs/
 *.log

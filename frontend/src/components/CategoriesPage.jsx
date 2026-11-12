@@ -87,7 +87,16 @@ export default function CategoriesPage({
               <div className="absolute inset-0 bg-gradient-to-t from-[#282321]/90 via-[#282321]/35 to-transparent" />
               <div className="absolute inset-0 p-5 flex flex-col justify-end text-[#FAF5EC]">
                 <span className="text-[9px] uppercase tracking-widest text-[#B89B62] font-semibold">
-                  {cat.count} Designs
+                  {(() => {
+                    const count = (products || []).filter(p => {
+                      if (cat.id === 'female') return p.category !== 'babies' && p.category !== 'kids';
+                      if (cat.id === 'stitched') return p.category === 'stitched' || p.stitchType === 'stitched';
+                      if (cat.id === 'unstitched') return p.category === 'unstitched' || p.stitchType === 'unstitched';
+                      if (cat.id === 'babies') return p.category === 'babies' || p.category === 'kids';
+                      return p.category === cat.id;
+                    }).length;
+                    return count > 0 ? `${count} ${count === 1 ? 'Design' : 'Designs'}` : 'Artisanal Collection';
+                  })()}
                 </span>
                 <h3 className="font-cinzel text-lg font-bold tracking-wide mt-1">
                   {cat.name}

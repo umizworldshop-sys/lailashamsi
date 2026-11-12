@@ -89,7 +89,7 @@ export default function LookbookBanner({ onShopLook }) {
 
           <div className="relative aspect-[4/5] overflow-hidden group">
             <img
-              src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=1200&auto=format&fit=crop"
+              src="https://res.cloudinary.com/jpea5mb0/image/upload/v1793740272/lailashamsi_products/varnq4zuzvt1v4fqfxtz.jpg"
               alt="Pakistani Eastern Wear craftsmanship"
               className={`w-full h-full object-cover transition-transform duration-[2200ms] ease-out group-hover:scale-105 ${
                 inView ? 'scale-100' : 'scale-125'

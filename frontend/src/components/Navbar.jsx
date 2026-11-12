@@ -404,7 +404,7 @@ export default function Navbar({
                           className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#E8DCCB]/50 cursor-pointer transition-colors"
                         >
                           <img
-                            src={item.images?.[0] || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=200'}
+                            src={item.images?.[0] || item.image || '/Logo.jpeg'}
                             alt=""
                             className="w-9 h-11 sm:w-10 sm:h-12 rounded-lg object-cover border border-[#E8DCCB]"
                           />

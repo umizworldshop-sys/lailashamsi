@@ -7,8 +7,8 @@ const DEFAULT_HERO_SLIDES = [
     tag: 'Velvet Formals 2026',
     title: 'Grace in Every Thread',
     subtitle: 'Handcrafted Velvet & Zari Peshwas with Intricate Dabka Work',
-    image: 'https://jazmin.pk/cdn/shop/files/2C5A5663.png?v=1793342503&width=2000',
-    fallbackImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=85&w=2000&auto=format&fit=crop',
+    image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
+    fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
     ctaText: 'Shop Velvet Collection',
     targetRoute: '/categories'
   },
@@ -17,8 +17,8 @@ const DEFAULT_HERO_SLIDES = [
     tag: 'Festive Pret & Couture',
     title: 'Festive Pret & Couture',
     subtitle: 'Pure Chiffon, Fine Lawn & Hand-Embroidered Luxury Silks',
-    image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop',
-    fallbackImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop',
+    image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg',
+    fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg',
     ctaText: 'Shop New Arrivals',
     targetRoute: '/new-arrivals'
   },
@@ -27,8 +27,8 @@ const DEFAULT_HERO_SLIDES = [
     tag: 'Royal Heritage Formals',
     title: 'Timeless Eastern Elegance',
     subtitle: 'Flared Kalidar Silhouettes & Gilded Gotta Kinari Craft',
-    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop',
-    fallbackImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop',
+    image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg',
+    fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg',
     ctaText: 'Explore Collection',
     targetRoute: '/categories'
   }
@@ -286,12 +286,16 @@ export default function Hero({ onExploreClick, onLookbookClick, customSlides = [
 
                     <img
                       src={slide.image}
-                      alt={slide.title || 'Umi\'z World Collection'}
+                      alt={slide.title || "Umi'z World Collection"}
                       loading={idx < 3 ? 'eager' : 'lazy'}
+                      fetchPriority={idx === safeSlideIdx ? 'high' : 'auto'}
+                      decoding="async"
                       onError={(e) => {
+                        e.target.onerror = null;
                         if (slide.fallbackImage && e.target.src !== slide.fallbackImage) {
-                          e.target.onerror = null;
                           e.target.src = slide.fallbackImage;
+                        } else {
+                          e.target.src = '/Logo.jpeg';
                         }
                       }}
                       className="w-full h-full object-cover object-top transition-transform duration-1000 ease-out hover:scale-105"

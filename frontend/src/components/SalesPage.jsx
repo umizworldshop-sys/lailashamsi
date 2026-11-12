@@ -113,7 +113,7 @@ export default function SalesPage({
                 {saleDiscountType || 'FLAT'} <span className="text-[#B89B62]">{saleDiscountPercent || 30}%</span> OFF
               </div>
               <span className="text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-1">
-                On Entire Umi&apos;z World Collection
+                {saleDiscountType === 'UP TO' ? 'On Selected Sale Outfits' : "On Entire Umi'z World Collection"}
               </span>
             </div>
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { CATEGORIES } from '../data/products';
 import { ArrowRightIcon } from './Icons';
 
-export default function Categories({ onSelectCategory, activeCategory, onExploreAll }) {
+export default function Categories({ onSelectCategory, activeCategory, onExploreAll, products = [] }) {
   const displayCategories = CATEGORIES.filter(c => c.id !== 'all');
 
   return (
@@ -55,7 +55,16 @@ export default function Categories({ onSelectCategory, activeCategory, onExplore
 
                   {/* Outfit count */}
                   <span className="inline-block text-[9.5px] sm:text-[10.5px] uppercase tracking-[0.16em] sm:tracking-[0.2em] text-[#B89B62] mb-1.5 font-semibold">
-                    {cat.count} Designs
+                    {(() => {
+                      const count = (products || []).filter(p => {
+                        if (cat.id === 'female') return p.category !== 'babies' && p.category !== 'kids';
+                        if (cat.id === 'stitched') return p.category === 'stitched' || p.stitchType === 'stitched';
+                        if (cat.id === 'unstitched') return p.category === 'unstitched' || p.stitchType === 'unstitched';
+                        if (cat.id === 'babies') return p.category === 'babies' || p.category === 'kids';
+                        return p.category === cat.id;
+                      }).length;
+                      return count > 0 ? `${count} ${count === 1 ? 'Design' : 'Designs'}` : 'Artisanal Collection';
+                    })()}
                   </span>
 
                   <h3 className="font-cinzel text-base xs:text-lg sm:text-2xl font-bold tracking-wide text-[#FAF5EC] group-hover:text-[#E8DCCB] transition-colors leading-tight">

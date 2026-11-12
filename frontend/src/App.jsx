@@ -46,7 +46,12 @@ export default function App() {
       if (cached) {
         const parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          // Filter out any stale dummy Unsplash products or test products
+          const realOnly = parsed.filter(p => {
+            const firstImg = Array.isArray(p.images) && p.images[0] ? p.images[0] : (p.image || '');
+            return !firstImg.includes('unsplash.com') && p.title !== 'qwertyuiop[';
+          });
+          if (realOnly.length > 0) return realOnly;
         }
       }
     } catch {
@@ -58,19 +63,105 @@ export default function App() {
   const [loaderRendered, setLoaderRendered] = useState(true);
   const [isQuickViewLoading, setIsQuickViewLoading] = useState(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
-  const [siteSettings, setSiteSettings] = useState({
-    saleDiscountPercent: 30,
-    saleDiscountType: 'FLAT',
-    marqueeItems: [
-      '✨ Umiz World Collection ✨',
-      'Discover Timeless Pakistani Elegance',
-      'Cash on Delivery Across Pakistan',
-      '100% Authentic Handcrafted Pure Fabrics',
-      'Express Nationwide Delivery',
-      'WhatsApp Support: 03174341036'
-    ],
-    heroSlides: []
+  const [siteSettings, setSiteSettings] = useState(() => {
+    try {
+      const cached = localStorage.getItem('laila_cached_site_settings');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.heroSlides) && parsed.heroSlides.length > 0) {
+          const cleanSlides = parsed.heroSlides.filter(s => s && s.image && !s.image.includes('unsplash.com'));
+          if (cleanSlides.length > 0) {
+            return {
+              ...parsed,
+              heroSlides: cleanSlides
+            };
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return {
+      saleDiscountPercent: 30,
+      saleDiscountType: 'UP TO',
+      marqueeItems: [
+        '✨ Umiz World Collection ✨',
+        'Discover Timeless Pakistani Elegance',
+        'Cash on Delivery Across Pakistan',
+        '100% Authentic Handcrafted Pure Fabrics',
+        'Delivery 500',
+        'WhatsApp Support: 03174341036'
+      ],
+      heroSlides: [
+        {
+          id: 1,
+          tag: 'Velvet Formals 2026',
+          title: 'Grace in Every Thread',
+          subtitle: 'Handcrafted Velvet & Zari Peshwas with Intricate Dabka Work',
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
+          ctaText: 'Shop Velvet Collection',
+          targetRoute: '/categories'
+        },
+        {
+          id: 2,
+          tag: 'Festive Pret & Couture',
+          title: 'Festive Pret & Couture',
+          subtitle: 'Pure Chiffon, Fine Lawn & Hand-Embroidered Luxury Silks',
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg',
+          ctaText: 'Shop New Arrivals',
+          targetRoute: '/new-arrivals'
+        },
+        {
+          id: 3,
+          tag: 'Royal Heritage Formals',
+          title: 'Timeless Eastern Elegance',
+          subtitle: 'Flared Kalidar Silhouettes & Gilded Gotta Kinari Craft',
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg',
+          ctaText: 'Explore Collection',
+          targetRoute: '/categories'
+        }
+      ]
+    };
   });
+
+  // Dynamic Catalog: When FLAT discount is enabled in SiteSettings,
+  // all store products automatically receive the flat % discount, strikethrough original price, and tag.
+  // When UP TO is active, authentic individually configured discounts from the database are respected.
+  const displayProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
+    const isFlat = siteSettings?.saleDiscountType === 'FLAT' && (Number(siteSettings?.saleDiscountPercent) || 0) > 0;
+    const flatPct = isFlat ? Number(siteSettings.saleDiscountPercent) : 0;
+
+    return products.map((p) => {
+      if (!p) return p;
+      if (isFlat) {
+        const origNum = Number(p.originalPrice) || 0;
+        const priceNum = Number(p.price) || 0;
+        // Use true original base price if previously set, else base price
+        const baseline = origNum > priceNum ? origNum : (priceNum || origNum || 0);
+
+        if (baseline > 0) {
+          const discountedPrice = Math.max(1, Math.round(baseline * (1 - flatPct / 100)));
+          return {
+            ...p,
+            price: discountedPrice,
+            originalPrice: baseline,
+            discountPercent: flatPct,
+            tag: `${flatPct}% OFF`,
+            isOnSale: true,
+            _isFlatSale: true
+          };
+        }
+      }
+      return {
+        ...p,
+        _isFlatSale: false
+      };
+    });
+  }, [products, siteSettings?.saleDiscountType, siteSettings?.saleDiscountPercent]);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -349,6 +440,11 @@ export default function App() {
       fetchSiteSettings().then((res) => {
         if (res && res.settings && isMounted) {
           setSiteSettings(res.settings);
+          try {
+            localStorage.setItem('laila_cached_site_settings', JSON.stringify(res.settings));
+          } catch {
+            // ignore localStorage quota errors
+          }
         }
       })
     ]).finally(() => {
@@ -395,23 +491,30 @@ export default function App() {
   // Open Quick View on its own dedicated page route (/quick-view/:id) with luxury transition preloader
   const handleOpenQuickView = (product) => {
     if (!product) return;
+    const enrichedProduct = displayProducts.find(
+      (p) =>
+        (p.id !== undefined && String(p.id) === String(product.id)) ||
+        (p._id !== undefined && String(p._id) === String(product._id || product.id)) ||
+        (p.title && product.title && p.title.toLowerCase() === product.title.toLowerCase())
+    ) || product;
+
     setIsQuickViewLoading(true);
-    setQuickViewProduct(product);
+    setQuickViewProduct(enrichedProduct);
     try {
-      sessionStorage.setItem('laila_quickview_product', JSON.stringify(product));
+      sessionStorage.setItem('laila_quickview_product', JSON.stringify(enrichedProduct));
     } catch {
       // ignore
     }
     if (currentRoute !== '/quick-view') {
       setPreviousRoute(currentRoute);
     }
-    const pid = product.id || product._id || '';
+    const pid = enrichedProduct.id || enrichedProduct._id || '';
     startTransition(() => {
       setCurrentRoute('/quick-view');
     });
     window.history.pushState({}, '', pid ? `/quick-view/${pid}` : '/quick-view');
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    document.title = `${product.title} | UMI'Z WORLD Haute Couture`;
+    document.title = `${enrichedProduct.title} | UMI'Z WORLD Haute Couture`;
 
     // Smooth transition loader so data, gallery & variant details buffer seamlessly behind it
     setTimeout(() => {
@@ -429,10 +532,10 @@ export default function App() {
     }, 3200);
   }, []);
 
-  // Add to Cart handler (Always enriches from live backend products array)
+  // Add to Cart handler (Always enriches from live backend displayProducts array)
   const handleAddToCart = useCallback(
     (newItem) => {
-      const backendProduct = products.find(
+      const backendProduct = displayProducts.find(
         (p) =>
           (p.id !== undefined && String(p.id) === String(newItem.id)) ||
           (p._id !== undefined && String(p._id) === String(newItem._id || newItem.id)) ||
@@ -482,7 +585,7 @@ export default function App() {
 
       showToast(`Added "${enrichedNewItem.title}" (${enrichedNewItem.selectedSize}) to Bag!`);
     },
-    [products, showToast]
+    [displayProducts, showToast]
   );
 
   // Update quantity in Cart / Checkout
@@ -718,7 +821,7 @@ export default function App() {
         onOpenCart={() => navigateTo('/cart')}
         onOpenWishlist={() => navigateTo('/wishlist')}
         onOpenAdmin={() => setIsAdminOpen(true)}
-        products={products}
+        products={displayProducts}
         onSelectProduct={handleOpenQuickView}
         marqueeItems={siteSettings?.marqueeItems}
       />
@@ -739,6 +842,7 @@ export default function App() {
 
             {/* 2. Categories Section (Directly under Hero) */}
             <Categories
+              products={displayProducts}
               activeCategory={activeCategory}
               onSelectCategory={(catId) => {
                 setActiveCategory(catId);
@@ -753,7 +857,7 @@ export default function App() {
 
             {/* 3. New Arrivals Collection Section */}
             <ProductSection
-              products={products}
+              products={displayProducts}
               activeCategory="all"
               title="New Arrivals"
               maxProducts={5}
@@ -773,7 +877,7 @@ export default function App() {
 
             {/* 4. Sales Section with Garment Cards & Explore All Sales Button */}
             <HomeSalesSection
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -812,8 +916,14 @@ export default function App() {
           {/* DEDICATED PRODUCT QUICK VIEW PAGE (/quick-view/:id) */}
           {currentRoute === '/quick-view' && (
             <QuickViewPage
-              product={quickViewProduct}
-              products={products}
+              product={
+                displayProducts.find(
+                  (p) =>
+                    (p.id !== undefined && String(p.id) === String(quickViewProduct?.id)) ||
+                    (p._id !== undefined && String(p._id) === String(quickViewProduct?._id || quickViewProduct?.id))
+                ) || quickViewProduct
+              }
+              products={displayProducts}
               onBack={() => navigateTo(previousRoute || '/')}
               onNavigate={navigateTo}
               onSelectProduct={handleOpenQuickView}
@@ -829,7 +939,7 @@ export default function App() {
           {/* VIEW 2: DEDICATED NEW ARRIVALS */}
           {currentRoute === '/new-arrivals' && (
             <NewArrivalsPage
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -841,7 +951,7 @@ export default function App() {
           {/* VIEW 3: CATEGORIES */}
           {currentRoute === '/categories' && (
             <CategoriesPage
-              products={products}
+              products={displayProducts}
               subFilter={currentSubFilter}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
@@ -854,7 +964,7 @@ export default function App() {
           {/* VIEW 4: DEDICATED STITCHED (READY TO WEAR) */}
           {currentRoute === '/stitched' && (
             <StitchedPage
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -866,7 +976,7 @@ export default function App() {
           {/* VIEW 5: DEDICATED UNSTITCHED SUITS */}
           {currentRoute === '/unstitched' && (
             <UnstitchedPage
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -878,7 +988,7 @@ export default function App() {
           {/* VIEW 6: DEDICATED BABY & KIDS CLOTHES */}
           {currentRoute === '/baby-clothes' && (
             <BabyClothesPage
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -890,7 +1000,7 @@ export default function App() {
           {/* VIEW 7: SALES */}
           {currentRoute === '/sales' && (
             <SalesPage
-              products={products}
+              products={displayProducts}
               onQuickView={handleOpenQuickView}
               onAddToCart={handleAddToCart}
               wishlist={wishlist}
@@ -923,7 +1033,7 @@ export default function App() {
             onAddToCart={handleAddToCart}
             wishlist={wishlist}
             onToggleWishlist={handleToggleWishlist}
-            products={products}
+            products={displayProducts}
             selectedCurrency={selectedCurrency}
             onNavigate={navigateTo}
           />
@@ -933,7 +1043,7 @@ export default function App() {
         {currentRoute === '/wishlist' && (
           <WishlistPage
             wishlist={wishlist}
-            products={products}
+            products={displayProducts}
             onQuickView={handleOpenQuickView}
             onAddToCart={handleAddToCart}
             onToggleWishlist={handleToggleWishlist}
@@ -946,7 +1056,7 @@ export default function App() {
         {currentRoute === '/checkout' && (
           <CheckoutPage
             items={cartItems}
-            products={products}
+            products={displayProducts}
             initialCheckoutData={checkoutData}
             onUpdateQuantity={handleUpdateQuantity}
             onUpdateItemVariant={handleUpdateItemVariant}
@@ -992,7 +1102,7 @@ export default function App() {
         isOpen={isWishlistOpen}
         onClose={() => setIsWishlistOpen(false)}
         wishlistIds={wishlist}
-        products={products}
+        products={displayProducts}
         onAddToCart={handleAddToCart}
         onRemoveFromWishlist={handleToggleWishlist}
         selectedCurrency={selectedCurrency}
@@ -1006,7 +1116,14 @@ export default function App() {
             onClose={handleCloseAdmin}
             onProductsUpdated={() => loadProducts(true)}
             siteSettings={siteSettings}
-            onSettingsUpdated={(updated) => setSiteSettings(updated)}
+            onSettingsUpdated={(updated) => {
+              setSiteSettings(updated);
+              try {
+                localStorage.setItem('laila_cached_site_settings', JSON.stringify(updated));
+              } catch {
+                // ignore
+              }
+            }}
           />
         </Suspense>
       )}

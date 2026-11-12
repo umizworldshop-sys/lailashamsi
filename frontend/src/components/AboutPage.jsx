@@ -59,7 +59,7 @@ export default function AboutPage({ onExploreCollection }) {
           <div className="lg:col-span-5 relative">
             <div className="relative mx-auto w-full max-w-sm aspect-[4/5] rounded-2xl overflow-hidden border border-[#E8DCCB] shadow-xl">
               <img
-                src="https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=800&auto=format&fit=crop"
+                src="https://res.cloudinary.com/jpea5mb0/image/upload/v1793740272/lailashamsi_products/varnq4zuzvt1v4fqfxtz.jpg"
                 alt="Umi'z World Atelier"
                 className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-105"
               />

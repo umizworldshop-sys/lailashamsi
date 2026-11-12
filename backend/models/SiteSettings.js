@@ -49,24 +49,24 @@ const siteSettingsSchema = new mongoose.Schema(
           tag: 'Velvet Formals 2026',
           title: 'Grace in Every Thread',
           subtitle: 'Handcrafted Velvet & Zari Peshwas',
-          image: 'https://jazmin.pk/cdn/shop/files/2C5A5663.png?v=1793342503&width=2000',
-          fallbackImage: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=85&w=2000&auto=format&fit=crop'
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg'
         },
         {
           id: 2,
           tag: 'Festive Pret & Couture',
           title: 'Festive Pret & Couture',
           subtitle: 'Pure Chiffon, Fine Lawn & Embroidered Silks',
-          image: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop',
-          fallbackImage: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=85&w=2000&auto=format&fit=crop'
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790095/lailashamsi_products/dp34oped5by7svtpzj7y.jpg'
         },
         {
           id: 3,
           tag: 'Royal Heritage Formals',
           title: 'Timeless Eastern Elegance',
           subtitle: 'Flared Kalidar Silhouettes & Gotta Kinari Work',
-          image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop',
-          fallbackImage: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?q=85&w=2000&auto=format&fit=crop'
+          image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg',
+          fallbackImage: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790109/lailashamsi_hero/pyxu5ecrkjo7v2lzzchu.jpg'
         }
       ]
     }
