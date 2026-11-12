@@ -228,7 +228,7 @@ export default function AdminStoreSettings({
             type="button"
             onClick={handleAddHeroSlide} 
             className="px-4 py-2 bg-[#D4AF37]/15 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto"
-          >
+          > 
             <PlusIcon className="w-4 h-4" />
             <span>+ Add New Banner Slide</span> 
           </button>
@@ -317,6 +317,19 @@ export default function AdminStoreSettings({
 
               {/* Slide Content Fields (7 cols) - Clean & Focused */}
               <div className="lg:col-span-7 space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-gray-200 block">
+                    Picture URL (Or automatically filled when uploaded)
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.image || ''}
+                    onChange={(e) => handleSlideFieldChange(idx, 'image', e.target.value)}
+                    placeholder="https://res.cloudinary.com/..."
+                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs text-white font-mono placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+                  />
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-[11px] font-semibold text-gray-200 block">
                     Main Heading Title

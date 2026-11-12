@@ -140,8 +140,9 @@ export default function App() {
       if (isFlat) {
         const origNum = Number(p.originalPrice) || 0;
         const priceNum = Number(p.price) || 0;
-        // Use true original base price if previously set, else base price
-        const baseline = origNum > priceNum ? origNum : (priceNum || origNum || 0);
+        const baseNum = Number(p.basePrice) || 0;
+        // True baseline original price before storewide flat discount:
+        const baseline = baseNum > 0 ? baseNum : (origNum > priceNum ? origNum : (priceNum || origNum || 0));
 
         if (baseline > 0) {
           const discountedPrice = Math.max(1, Math.round(baseline * (1 - flatPct / 100)));
@@ -322,10 +323,12 @@ export default function App() {
       if (res && res.products && res.products.length > 0) {
         const backendList = res.products.map((p, idx) => {
           const rawPrice = Number(p.price) || 0;
-          // Scale price: if stored in PKR >= 1000, convert to base unit so CURRENCY_RATES.PKR.rate (100) displays exact PKR
-          const displayPrice = rawPrice >= 1000 ? Math.round(rawPrice / 100) : rawPrice;
+          // Scale price: if stored in PKR (>= 200), convert to base unit so CURRENCY_RATES.PKR.rate (100) displays exact PKR
+          const displayPrice = rawPrice >= 200 ? Math.round(rawPrice / 100) : rawPrice;
           const rawOrig = p.originalPrice ? Number(p.originalPrice) : null;
-          const displayOrig = rawOrig && rawOrig >= 1000 ? Math.round(rawOrig / 100) : rawOrig;
+          const displayOrig = (rawOrig && rawOrig >= 200) ? Math.round(rawOrig / 100) : rawOrig;
+          const rawBase = p.basePrice ? Number(p.basePrice) : null;
+          const displayBase = (rawBase && rawBase >= 200) ? Math.round(rawBase / 100) : rawBase;
           const primaryImg = Array.isArray(p.images) && p.images[0] ? p.images[0] : (p.image || '/Logo.jpeg');
 
           return {
@@ -333,7 +336,9 @@ export default function App() {
             id: p._id || p.id || idx + 1,
             price: displayPrice,
             originalPrice: displayOrig,
+            basePrice: displayBase,
             rawPkrPrice: rawPrice,
+            rawPkrOriginalPrice: rawOrig,
             image: primaryImg,
             images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [primaryImg],
             category: p.category || 'female',

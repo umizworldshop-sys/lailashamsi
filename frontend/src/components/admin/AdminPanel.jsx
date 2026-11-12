@@ -392,6 +392,9 @@ export default function AdminPanel({
         setLocalSettings(res.settings);
         if (onSettingsUpdated) onSettingsUpdated(res.settings);
       }
+      // Re-fetch dashboard products & notify parent to refresh storefront products
+      await loadDashboardData();
+      if (onProductsUpdated) await onProductsUpdated();
       showToast('Storefront Banners, Sale % & Marquee updated!');
     } catch (err) {
       showToast('Error saving settings: ' + (err.message || 'Unknown error'));

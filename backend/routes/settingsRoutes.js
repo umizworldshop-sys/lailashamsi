@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const SiteSettings = require('../models/SiteSettings');
+const Product = require('../models/Product');
 const { verifyAdmin } = require('../middleware/auth');
 const { isCloudinaryConfigured, uploadFileToCloudinary } = require('../config/cloudinary');
+
+let productRoutes = null;
+try {
+  productRoutes = require('./productRoutes');
+} catch {
+  // non-fatal if not yet loaded
+}
 
 const DEFAULT_SETTINGS = {
   key: 'main',
@@ -131,6 +139,61 @@ router.put('/', verifyAdmin, async (req, res) => {
       { $set: updatePayload },
       { new: true, upsert: true, setDefaultsOnInsert: true }
     );
+
+    // ===================================================================
+    // DYNAMIC STOREWIDE SALE LOGIC (FLAT vs UP TO)
+    // ===================================================================
+    // When FLAT is activated:
+    // 1. Every product across the store automatically receives the discount %.
+    // 2. The real base price is cut (strikethrough) and stored in originalPrice.
+    // 3. The discounted price is calculated and stored in price (e.g. 1000 cut to 900 for 10%).
+    // 4. Tag is automatically set to `${percent}% OFF` and isOnSale = true.
+    // When switched back to UP TO:
+    // Regular base prices are restored, and storewide cuts are cleared.
+    const effectiveType = updated.saleDiscountType || 'FLAT';
+    const effectivePercent = Math.min(99, Math.max(1, Number(updated.saleDiscountPercent) || 30));
+
+    if (effectiveType === 'FLAT' && effectivePercent > 0) {
+      const allProducts = await Product.find({});
+      for (const prod of allProducts) {
+        // Determine authentic original base price before flat sale
+        const baseline = (prod.basePrice && Number(prod.basePrice) > 0)
+          ? Number(prod.basePrice)
+          : Math.max(Number(prod.price) || 0, Number(prod.originalPrice) || 0);
+
+        if (baseline > 0) {
+          const discountAmount = Math.round(baseline * (effectivePercent / 100));
+          const finalPrice = Math.max(1, baseline - discountAmount);
+
+          prod.basePrice = baseline;
+          prod.originalPrice = baseline;
+          prod.price = finalPrice;
+          prod.discountPercent = effectivePercent;
+          prod.tag = `${effectivePercent}% OFF`;
+          prod.isOnSale = true;
+          await prod.save();
+        }
+      }
+    } else if (effectiveType === 'UP TO') {
+      const flatProducts = await Product.find({ basePrice: { $ne: null } });
+      for (const prod of flatProducts) {
+        if (prod.basePrice && Number(prod.basePrice) > 0) {
+          prod.price = Number(prod.basePrice);
+          prod.originalPrice = null;
+          prod.discountPercent = 0;
+          if (prod.tag && prod.tag.includes('% OFF')) {
+            prod.tag = '';
+          }
+          prod.isOnSale = false;
+          prod.basePrice = null;
+          await prod.save();
+        }
+      }
+    }
+
+    if (productRoutes && typeof productRoutes.invalidateProductsCache === 'function') {
+      productRoutes.invalidateProductsCache();
+    }
 
     return res.status(200).json({
       success: true,

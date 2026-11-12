@@ -36,6 +36,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  basePrice: {
+    type: Number,
+    default: null
+  },
   rating: {
     type: Number,
     default: 5.0,

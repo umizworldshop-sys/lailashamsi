@@ -329,7 +329,7 @@ export default function ProductCard({
             <span className="text-[13px] sm:text-[14px] font-bold text-[#641E32] tracking-wide">
               {curr.symbol}{convertedPrice.toLocaleString()}
             </span>
-            {discount > 0 && (
+            {convertedOriginalPrice > convertedPrice && (
               <span className="text-[10px] text-gray-400 line-through mt-0.5">
                 {curr.symbol}{convertedOriginalPrice.toLocaleString()}
               </span>

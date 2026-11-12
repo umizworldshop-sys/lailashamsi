@@ -316,16 +316,41 @@ router.post('/', verifyAdmin, async (req, res) => {
       ? Boolean(isOnSale) 
       : Boolean(numOrigPrice && numOrigPrice > numPrice);
 
+    let effectivePrice = numPrice;
+    let effectiveOrigPrice = numOrigPrice;
+    let effectiveDiscount = computedDiscount;
+    let effectiveTag = tag || '';
+    let effectiveIsSale = computedIsSale;
+    let effectiveBasePrice = null;
+
+    try {
+      const SiteSettings = require('../models/SiteSettings');
+      const activeSettings = await SiteSettings.findOne({ key: 'main' });
+      if (activeSettings && activeSettings.saleDiscountType === 'FLAT' && Number(activeSettings.saleDiscountPercent) > 0) {
+        const flatPct = Number(activeSettings.saleDiscountPercent);
+        const baseline = (numOrigPrice && numOrigPrice > numPrice) ? numOrigPrice : numPrice;
+        effectiveBasePrice = baseline;
+        effectiveOrigPrice = baseline;
+        effectivePrice = Math.max(1, Math.round(baseline * (1 - flatPct / 100)));
+        effectiveDiscount = flatPct;
+        effectiveTag = `${flatPct}% OFF`;
+        effectiveIsSale = true;
+      }
+    } catch {
+      // non-fatal
+    }
+
     const newProduct = new Product({
       title: title.trim(),
       category: category.trim(),
       categoryLabel: categoryLabel || undefined,
-      price: numPrice,
-      originalPrice: numOrigPrice,
-      discountPercent: computedDiscount,
+      price: effectivePrice,
+      originalPrice: effectiveOrigPrice,
+      basePrice: effectiveBasePrice,
+      discountPercent: effectiveDiscount,
       rating: rating ? Number(rating) : 5.0,
       reviewsCount: reviewsCount ? Number(reviewsCount) : 0,
-      tag: tag || '',
+      tag: effectiveTag,
       tagColor: tagColor || 'bg-[#4A0E17] text-[#FAF7F2]',
       images: processedImages,
       fabric: fabric || 'Pure Silk & Handcrafted Chiffon',
@@ -335,7 +360,7 @@ router.post('/', verifyAdmin, async (req, res) => {
       description: description || '',
       isNew: isNew !== undefined ? Boolean(isNew) : true,
       isNewArrival: isNewArrival !== undefined ? Boolean(isNewArrival) : true,
-      isOnSale: computedIsSale,
+      isOnSale: effectiveIsSale,
       isTrending: isTrending !== undefined ? Boolean(isTrending) : false,
       featured: featured !== undefined ? Boolean(featured) : false,
       stock: stock ? Number(stock) : 25

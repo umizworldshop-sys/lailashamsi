@@ -154,11 +154,11 @@ export default function AdminProducts({
                     {/* Price display with PKR scaling */}
                     <div className="pt-1 flex flex-wrap items-baseline gap-1.5">
                       <span className="font-mono text-xs sm:text-sm font-bold text-[#E6B8BF]">
-                        Rs. {(p.price < 1000 ? p.price * 100 : p.price)?.toLocaleString()}
+                        Rs. {(p.price < 200 ? p.price * 100 : p.price)?.toLocaleString()}
                       </span>
                       {p.originalPrice && p.originalPrice > p.price && (
                         <span className="font-mono text-[9px] sm:text-[10px] text-gray-500 line-through">
-                          Rs. {(p.originalPrice < 1000 ? p.originalPrice * 100 : p.originalPrice)?.toLocaleString()}
+                          Rs. {(p.originalPrice < 200 ? p.originalPrice * 100 : p.originalPrice)?.toLocaleString()}
                         </span>
                       )}
                     </div>
