@@ -9,11 +9,13 @@ export const CATEGORIES = [
   {
     id: 'all',
     name: 'All Collections',
+    label: 'All Collections',
     count: 2
   },
   {
     id: 'female',
     name: 'Female (Women Wear)',
+    label: 'Women Wear',
     subtitle: 'Luxury pret, unstitched suits & formal wear',
     image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793740272/lailashamsi_products/varnq4zuzvt1v4fqfxtz.jpg',
     count: 2
@@ -21,6 +23,7 @@ export const CATEGORIES = [
   {
     id: 'babies',
     name: 'Kids Collection',
+    label: 'Kids Collection',
     subtitle: 'Charming festive attire for girls & babies',
     image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793790101/lailashamsi_products/kfbb3t86uhm5nkg5zn9q.jpg',
     count: 0
@@ -28,6 +31,7 @@ export const CATEGORIES = [
   {
     id: 'unstitched',
     name: 'Unstitched Suits',
+    label: 'Unstitched',
     subtitle: 'Embroidered lawn suits, raw silks & chiffons',
     image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1794487431/lailashamsi_products/azmbjy6frloeuuqj9n7n.jpg',
     count: 1
@@ -35,6 +39,7 @@ export const CATEGORIES = [
   {
     id: 'stitched',
     name: 'Stitched (Ready to Wear)',
+    label: 'Ready to Wear',
     subtitle: 'Tailored shalwar kameez & luxury pret',
     image: 'https://res.cloudinary.com/jpea5mb0/image/upload/v1793740272/lailashamsi_products/varnq4zuzvt1v4fqfxtz.jpg',
     count: 1

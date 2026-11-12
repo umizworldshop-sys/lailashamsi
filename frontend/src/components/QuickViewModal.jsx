@@ -151,9 +151,9 @@ export default function QuickViewModal({
                 </>
               )}
 
-              {product.tag && (
-                <span className="absolute top-2 left-2 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow-2xs bg-[#641E32] text-[#FAF5EC]">
-                  {product.tag}
+              {(product.tag || (product.originalPrice > product.price)) && (
+                <span className="absolute top-2 left-2 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow-2xs bg-[#641E32] text-[#FAF5EC] border border-[#B89B62]/40">
+                  {product.tag || `-${Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%`}
                 </span>
               )}
             </div>

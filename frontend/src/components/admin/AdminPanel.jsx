@@ -503,10 +503,6 @@ export default function AdminPanel({
               onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
               globalSearch={globalSearch}
               setGlobalSearch={setGlobalSearch}
-              onRefresh={() => loadDashboardData()}
-              dataLoading={dataLoading}
-              onOpenAddProduct={handleOpenAddProduct}
-              onClose={handleClose}
             />
 
             {/* Scrollable Tab Canvas with safe bottom padding for mobile tab bar */}

@@ -115,21 +115,25 @@ export default function CategoriesPage({
 
       {/* Filter Tabs & Sort Controls */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8DCCB] pb-4">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
-            {CATEGORIES.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedCategory(tab.id)}
-                className={`px-4 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all whitespace-nowrap ${
-                  selectedCategory === tab.id
-                    ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
-                    : 'bg-white border border-[#E8DCCB] text-[#282321] hover:border-[#641E32] hover:text-[#641E32]'
-                }`}
-              >
-                {tab.label || tab.name}
-              </button>
-            ))}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8DCCB] pb-3 sm:pb-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            {CATEGORIES.map((tab) => {
+              const displayName = (tab.label || tab.name).replace('Female (Women Wear)', 'Women Wear');
+              const isActive = selectedCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedCategory(tab.id)}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-wider transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
+                      : 'bg-white border border-[#E8DCCB] text-[#282321] hover:border-[#641E32] hover:text-[#641E32]'
+                  }`}
+                >
+                  {displayName}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-3">

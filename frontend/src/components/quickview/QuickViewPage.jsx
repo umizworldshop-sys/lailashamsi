@@ -261,19 +261,14 @@ export default function QuickViewPage({
                 );
               })}
 
-              {/* Top Left Badges */}
-              <div className="absolute top-2.5 left-2.5 z-10 flex flex-wrap gap-1.5 pointer-events-none">
-                {discountPercent > 0 && (
-                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2 py-0.5 rounded-full shadow-sm bg-[#641E32] text-[#FAF5EC]">
-                    -{discountPercent}% OFF
+              {/* Single Top Left Badge (Prevents duplicate badge glitch) */}
+              {(product.tag || discountPercent > 0) && (
+                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2.5 py-1 rounded-full shadow-md bg-[#641E32] text-[#FAF5EC] border border-[#B89B62]/40">
+                    {product.tag || `-${discountPercent}% OFF`}
                   </span>
-                )}
-                {product.tag && (
-                  <span className="text-[9px] font-bold tracking-[0.16em] uppercase px-2 py-0.5 rounded-full shadow-sm bg-[#282321] text-[#FAF5EC] border border-[#B89B62]/40">
-                    {product.tag}
-                  </span>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Photo Indicator Pill */}
               {totalImages > 1 && (

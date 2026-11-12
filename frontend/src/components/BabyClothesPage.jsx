@@ -3,10 +3,10 @@ import ProductCard from './ProductCard';
 import { SparklesIcon } from './Icons';
 
 const SUB_CATEGORIES = [
-  { id: 'all', name: 'All Baby & Kids Clothes' },
-  { id: 'girls', name: 'Girls Angrakhas & Lehengas' },
-  { id: 'boys', name: 'Boys Kurta Sets' },
-  { id: 'eid', name: 'Eid Festive Edits' }
+  { id: 'all', name: 'All Kids' },
+  { id: 'girls', name: 'Girls Festive' },
+  { id: 'boys', name: 'Boys Kurtas' },
+  { id: 'eid', name: 'Eid Festive' }
 ];
 
 export default function BabyClothesPage({
@@ -102,17 +102,17 @@ export default function BabyClothesPage({
 
       {/* ================= FILTER & SORT CONTROL BAR ================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <div className="bg-white rounded-2xl p-3 sm:px-5 sm:py-3.5 border border-[#E8DCCB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-white rounded-2xl p-3 sm:px-5 sm:py-3.5 border border-[#E8DCCB] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
           
-          {/* Subcategory Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
+          {/* Subcategory Filter Pills (Wraps cleanly, no horizontal scrolling) */}
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 py-0.5">
             {SUB_CATEGORIES.map((tab) => {
               const isActive = selectedSubCat === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setSelectedSubCat(tab.id)}
-                  className={`px-4 py-2 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                     isActive
                       ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
                       : 'bg-[#FAF5EC]/60 border border-[#E8DCCB] text-[#282321]/80 hover:border-[#641E32] hover:text-[#641E32] hover:bg-white'

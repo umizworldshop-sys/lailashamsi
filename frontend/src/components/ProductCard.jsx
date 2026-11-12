@@ -218,9 +218,9 @@ export default function ProductCard({
           </>
         )}
 
-        {/* Minimal Tag */}
+        {/* Minimal Luxury Sale/Status Tag */}
         {(discount > 0 || product.tag) && (
-          <span className="absolute top-3 left-3 z-10 bg-[#641E32] text-white text-[8.5px] sm:text-[9px] font-medium uppercase tracking-[0.2em] px-2 py-1 rounded shadow-sm">
+          <span className="absolute top-2.5 left-2.5 z-10 bg-[#641E32] text-white text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.16em] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shadow-sm border border-[#D4AF37]/30 pointer-events-none">
             {product.tag || `-${discount}%`}
           </span>
         )}

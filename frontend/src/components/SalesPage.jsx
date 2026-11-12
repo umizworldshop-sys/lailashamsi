@@ -71,48 +71,48 @@ export default function SalesPage({
   }, [products, selectedSubCat]);
 
   return (
-    <div className="min-h-screen bg-[#FAF5EC] text-[#282321] pt-36 sm:pt-40 lg:pt-44 pb-20 selection:bg-[#B89B62] selection:text-white font-sans">
+    <div className="min-h-screen bg-[#FAF5EC] text-[#282321] pt-28 sm:pt-36 lg:pt-40 pb-16 selection:bg-[#B89B62] selection:text-white font-sans">
       
-      {/* ================= HIGH-IMPACT SALE BANNER ================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14 mt-2 sm:mt-4">
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#641E32] via-[#7d2640] to-[#501325] text-[#FAF5EC] p-8 sm:p-14 lg:p-16 border border-[#B89B62]/40 shadow-2xl">
+      {/* ================= HIGH-IMPACT SALE BANNER (MOBILE OPTIMIZED) ================= */}
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 mb-6 sm:mb-10 mt-1 sm:mt-3">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r from-[#641E32] via-[#7d2640] to-[#501325] text-[#FAF5EC] p-5 sm:p-8 lg:p-12 border border-[#B89B62]/40 shadow-xl">
           
           {/* Background Decorative Glow */}
-          <div className="absolute -right-10 -bottom-10 w-96 h-96 bg-[#B89B62]/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -right-10 -bottom-10 w-72 h-72 sm:w-96 sm:h-96 bg-[#B89B62]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6">
             
             {/* Left Content */}
-            <div className="space-y-4 max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-[#B89B62]/60 text-[#B89B62] text-[10px] uppercase tracking-[0.25em] font-bold shadow-sm">
-                <SparklesIcon className="w-3.5 h-3.5" />
+            <div className="space-y-2 sm:space-y-3 max-w-xl">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/10 border border-[#B89B62]/60 text-[#B89B62] text-[9px] sm:text-[10px] uppercase tracking-[0.2em] font-bold shadow-sm">
+                <SparklesIcon className="w-3 h-3" />
                 Limited Time Offer
               </div>
 
-              <h1 className="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-bold tracking-wide text-[#FAF5EC] leading-tight">
+              <h1 className="font-cinzel text-2xl sm:text-4xl lg:text-5xl font-bold tracking-wide text-[#FAF5EC] leading-tight">
                 Grand Seasonal <span className="text-[#B89B62]">Sale</span>
               </h1>
 
-              <p className="text-xs sm:text-sm text-[#E8DCCB] font-light leading-relaxed">
-                Discover unstitched masterpieces, luxury stitched pret, and adorable traditional wear for little ones at exclusive festive prices.
+              <p className="text-[11px] sm:text-xs text-[#E8DCCB] font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+                Discover unstitched masterpieces, luxury stitched pret, and festive attire at exclusive promotional prices.
               </p>
 
-              <div className="pt-2 flex items-center gap-3">
-                <span className="text-[10px] uppercase tracking-widest bg-white/10 px-3 py-1.5 rounded-md border border-white/20 text-[#FAF5EC] font-semibold">
-                  Stitched &middot; Unstitched &middot; Baby Wear
+              <div className="pt-1 flex items-center gap-2">
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-white/10 px-2.5 py-1 rounded-md border border-white/15 text-[#FAF5EC] font-semibold">
+                  Stitched &middot; Unstitched &middot; Pret
                 </span>
               </div>
             </div>
 
             {/* Right Badge (FLAT OFF Style) */}
-            <div className="flex lg:flex-col items-center justify-center lg:items-end text-left lg:text-right border-t lg:border-t-0 lg:border-l border-white/15 pt-6 lg:pt-0 lg:pl-10">
-              <span className="text-xs sm:text-sm uppercase tracking-[0.3em] text-[#B89B62] font-semibold block mb-1">
+            <div className="flex md:flex-col items-baseline md:items-end justify-between md:justify-center border-t md:border-t-0 md:border-l border-white/15 pt-3 md:pt-0 md:pl-8 shrink-0">
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#B89B62] font-semibold block mb-0.5">
                 Special Discount
               </span>
-              <div className="font-cinzel text-4xl sm:text-6xl font-extrabold text-white tracking-wider">
+              <div className="font-cinzel text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-wider">
                 {saleDiscountType || 'FLAT'} <span className="text-[#B89B62]">{saleDiscountPercent || 30}%</span> OFF
               </div>
-              <span className="text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-1">
+              <span className="text-[10px] sm:text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-0.5 hidden sm:block">
                 {saleDiscountType === 'UP TO' ? 'On Selected Sale Outfits' : "On Entire Umi'z World Collection"}
               </span>
             </div>
@@ -121,40 +121,44 @@ export default function SalesPage({
         </div>
       </section>
 
-      {/* ================= CATEGORY FILTER PILLS ================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <div className="flex items-center justify-between border-b border-[#E8DCCB] pb-4">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
-            {CATEGORIES.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setSelectedSubCat(tab.id)}
-                className={`px-4 py-2 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-widest transition-all whitespace-nowrap ${
-                  selectedSubCat === tab.id
-                    ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
-                    : 'bg-white border border-[#E8DCCB] text-[#282321]/80 hover:border-[#641E32] hover:text-[#641E32]'
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
+      {/* ================= CATEGORY FILTER PILLS (NO SCROLL, WRAPS CLEANLY) ================= */}
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#E8DCCB] pb-3 sm:pb-4">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            {CATEGORIES.map((tab) => {
+              const displayName = tab.label || tab.name;
+              const isActive = selectedSubCat === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSelectedSubCat(tab.id)}
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-full uppercase tracking-wider transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-[#641E32] text-[#FAF5EC] shadow-md border border-[#B89B62]/40'
+                      : 'bg-white border border-[#E8DCCB] text-[#282321]/80 hover:border-[#641E32] hover:text-[#641E32]'
+                  }`}
+                >
+                  {displayName}
+                </button>
+              );
+            })}
           </div>
 
-          <span className="text-xs text-[#282321]/60 font-light hidden sm:inline shrink-0 pl-4">
-            {saleProducts.length} Pieces Available
+          <span className="text-[11px] sm:text-xs text-[#282321]/60 font-medium shrink-0">
+            {saleProducts.length} Outfits Available
           </span>
         </div>
       </section>
 
-      {/* ================= PRODUCT GRID ================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ================= PRODUCT GRID (2-COLUMN RESPONSIVE ON MOBILE) ================= */}
+      <section className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
         {saleProducts.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-[#E8DCCB]">
+          <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-[#E8DCCB]">
             <p className="text-sm font-cinzel text-[#641E32] font-semibold">No pieces found in this category.</p>
             <p className="text-xs text-[#282321]/60 mt-1">Please explore other collections or check back soon.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {saleProducts.map((product) => (
               <ProductCard
                 key={product._id || product.id}
