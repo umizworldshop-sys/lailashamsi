@@ -26,11 +26,21 @@ export default function QuickViewModal({
   selectedCurrency = 'PKR'
 }) {
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product?.colors?.[0] || { name: 'Standard', hex: '#641E32' });
+  const [selectedSize, setSelectedSize] = useState(product?.selectedSize || product?.sizes?.[0] || 'M');
+  const [selectedColor, setSelectedColor] = useState(product?.selectedColor || product?.colors?.[0] || { name: 'Standard', hex: '#641E32' });
   const [quantity, setQuantity] = useState(1);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
   const [addedSuccess, setAddedSuccess] = useState(false);
+
+  // Sync state whenever product prop updates
+  useEffect(() => {
+    if (product) {
+      setSelectedSize(product.selectedSize || product.sizes?.[0] || 'M');
+      setSelectedColor(product.selectedColor || product.colors?.[0] || { name: 'Standard', hex: '#641E32' });
+      setActiveImage(0);
+      setQuantity(1);
+    }
+  }, [product]);
 
   // Prevent background body scroll when quick view is open
   useEffect(() => {
@@ -209,27 +219,30 @@ export default function QuickViewModal({
             </div>
 
             {/* Colour Selection */}
-            <div>
-              <label className="text-[9.5px] font-bold text-[#282321] uppercase tracking-wider block mb-1">
-                Colour: <span className="font-normal text-[#641E32] capitalize">{selectedColor.name}</span>
-              </label>
-              <div className="flex items-center gap-1.5">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.name}
-                    onClick={() => setSelectedColor(color)}
-                    style={{ backgroundColor: color.hex }}
-                    className={`w-4 h-4 rounded-full border transition-all ${
-                      selectedColor.name === color.name 
-                        ? 'border-[#641E32] scale-110 ring-1 ring-[#641E32]/40' 
-                        : 'border-white hover:scale-105'
-                    }`}
-                    title={color.name}
-                    aria-label={color.name}
-                  />
-                ))}
+            {Array.isArray(product.colors) && product.colors.length > 0 && (
+              <div>
+                <label className="text-[9.5px] font-bold text-[#282321] uppercase tracking-wider block mb-1">
+                  Colour: <span className="font-normal text-[#641E32] capitalize">{selectedColor?.name || 'Standard'}</span>
+                </label>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color.name}
+                      type="button"
+                      onClick={() => setSelectedColor(color)}
+                      style={{ backgroundColor: color.hex }}
+                      className={`w-4 h-4 rounded-full border transition-all cursor-pointer ${
+                        selectedColor?.name === color.name 
+                          ? 'border-[#641E32] scale-110 ring-1 ring-[#641E32]/40 shadow-xs' 
+                          : 'border-white hover:scale-105'
+                      }`}
+                      title={color.name}
+                      aria-label={color.name}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Size Selection */}
             <div>

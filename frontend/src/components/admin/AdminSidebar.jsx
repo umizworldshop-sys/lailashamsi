@@ -5,7 +5,8 @@ import {
   SlidersIcon,
   MailIcon,
   ExternalLinkIcon, 
-  LogOutIcon 
+  LogOutIcon,
+  CloseIcon 
 } from '../Icons';
 
 export default function AdminSidebar({ 
@@ -14,10 +15,11 @@ export default function AdminSidebar({
   productsCount = 0, 
   ordersCount = 0, 
   messagesCount = 0,
-  unreadMessagesCount = 0,
+  unreadMessagesCount = 0, 
   adminUser, 
   onClose, 
-  onLogout 
+  onLogout,
+  onCloseDrawer 
 }) {
   const navItems = [
     { id: 'overview', label: 'Dashboard', icon: DashboardIcon },
@@ -34,23 +36,37 @@ export default function AdminSidebar({
   ];
 
   return (
-    <aside className="w-64 bg-[#110E14] border-r border-[#26202C] flex flex-col justify-between shrink-0 h-full">
+    <aside className="w-64 max-w-[85vw] bg-[#110E14] border-r border-[#26202C] flex flex-col justify-between shrink-0 h-full shadow-2xl">
       {/* Top Header */}
       <div>
-        <div className="p-5 border-b border-[#26202C] flex items-center gap-3">
-          <img 
-            src="/Logo.jpeg" 
-            alt="Laila Shamsi" 
-            className="w-10 h-10 rounded-xl object-contain border border-[#D4AF37]/40 shadow-md"
-          />
-          <div className="min-w-0">
-            <h2 className="font-cinzel text-sm font-bold text-white tracking-widest uppercase truncate">
-              Laila Shamsi
-            </h2>
-            <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold truncate">
-              Admin Panel
-            </p>
+        <div className="p-4 sm:p-5 border-b border-[#26202C] flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <img 
+              src="/Logo.jpeg" 
+              alt="Laila Shamsi" 
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain border border-[#D4AF37]/40 shadow-md shrink-0"
+            />
+            <div className="min-w-0">
+              <h2 className="font-cinzel text-xs sm:text-sm font-bold text-white tracking-widest uppercase truncate">
+                Laila Shamsi
+              </h2>
+              <p className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold truncate">
+                Admin Panel
+              </p>
+            </div>
           </div>
+
+          {/* Mobile Drawer Close Button */}
+          {onCloseDrawer && (
+            <button
+              onClick={onCloseDrawer}
+              className="md:hidden p-1.5 text-gray-400 hover:text-white rounded-lg bg-white/5 cursor-pointer shrink-0 transition-colors"
+              title="Close Menu"
+              aria-label="Close Menu"
+            >
+              <CloseIcon className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Navigation Tabs */}

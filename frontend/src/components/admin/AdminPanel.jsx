@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { SparklesIcon } from '../Icons';
+import { 
+  SparklesIcon, 
+  DashboardIcon, 
+  PackageIcon, 
+  ReceiptIcon, 
+  MailIcon, 
+  SlidersIcon 
+} from '../Icons';
 import AdminAuthModal from './AdminAuthModal';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
@@ -234,27 +241,35 @@ export default function AdminPanel({
     try {
       const validImages = (productForm.images || []).map(img => (img || '').trim()).filter(Boolean);
       if (validImages.length === 0) {
-        setProductFormError('Please upload a product photo from your device or paste an Image URL before saving.');
+        setProductFormError('Please upload at least one product photo from your device before saving.');
         setProductSaving(false);
         return;
       }
+
+      const numOrig = productForm.originalPrice ? Number(productForm.originalPrice) : null;
+      const numPrice = Number(productForm.price);
+      const isSale = Boolean((numOrig && numOrig > numPrice) || productForm.isOnSale);
+      const computedDiscount = (numOrig && numOrig > numPrice)
+        ? Math.round(((numOrig - numPrice) / numOrig) * 100)
+        : (isSale && productForm.discountPercent ? Number(productForm.discountPercent) : 0);
 
       const payload = {
         title: productForm.title.trim(),
         category: productForm.category,
         categoryLabel: productForm.categoryLabel,
-        price: Number(productForm.price),
-        originalPrice: productForm.originalPrice ? Number(productForm.originalPrice) : undefined,
+        price: numPrice,
+        originalPrice: numOrig || undefined,
+        discountPercent: computedDiscount,
         fabric: productForm.fabric.trim(),
         pieces: productForm.pieces.trim(),
-        tag: productForm.tag.trim(),
+        tag: productForm.tag.trim() || (isSale ? `${computedDiscount}% OFF` : 'New Arrival'),
         description: productForm.description.trim(),
         sizes: productForm.sizes,
         colors: productForm.colors,
         images: validImages,
         image: validImages[0],
-        isNewArrival: Boolean(productForm.isNewArrival),
-        isOnSale: Boolean(productForm.isOnSale || (productForm.originalPrice && Number(productForm.originalPrice) > Number(productForm.price))),
+        isNewArrival: isSale ? false : Boolean(productForm.isNewArrival),
+        isOnSale: isSale,
         isTrending: Boolean(productForm.isTrending)
       };
 
@@ -291,6 +306,19 @@ export default function AdminPanel({
   const handleImageFileUpload = async (e) => {
     const fileList = Array.from(e.target.files || []);
     if (fileList.length === 0) return;
+
+    // Strict 1 MB per image limit
+    const MAX_SIZE_BYTES = 1 * 1024 * 1024; // 1 MB
+    const oversizedFiles = fileList.filter(f => f.size > MAX_SIZE_BYTES);
+
+    if (oversizedFiles.length > 0) {
+      const details = oversizedFiles
+        .map(f => `"${f.name}" (${(f.size / (1024 * 1024)).toFixed(2)} MB)`)
+        .join(', ');
+      setProductFormError(`Image size limit is 1 MB. The following photo(s) exceed 1 MB: ${details}. Please select or compress images under 1 MB.`);
+      if (e.target) e.target.value = '';
+      return;
+    }
 
     setProductFormError('');
     setUploadingImage(true);
@@ -461,11 +489,12 @@ export default function AdminPanel({
               adminUser={adminUser}
               onClose={handleClose}
               onLogout={handleLogout}
+              onCloseDrawer={() => setMobileSidebarOpen(false)}
             />
           </div>
 
           {/* Main Dashboard Canvas */}
-          <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0A080D]">
+          <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#0A080D] relative">
             <AdminHeader
               activeTab={activeTab}
               onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
@@ -477,8 +506,8 @@ export default function AdminPanel({
               onClose={handleClose}
             />
 
-            {/* Scrollable Tab Canvas */}
-            <main className={`flex-1 ${isAnySubModalOpen ? 'overflow-hidden' : 'overflow-y-auto'} admin-scrollbar`}>
+            {/* Scrollable Tab Canvas with safe bottom padding for mobile tab bar */}
+            <main className={`flex-1 ${isAnySubModalOpen ? 'overflow-hidden' : 'overflow-y-auto'} admin-scrollbar pb-24 md:pb-8`}>
               {activeTab === 'overview' && (
                 <AdminOverview
                   totalRevenue={totalRevenue}
@@ -538,6 +567,53 @@ export default function AdminPanel({
                 />
               )}
             </main>
+
+            {/* Mobile Bottom Navigation Bar (Instant Thumb Tab Switching) */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#110E14]/95 backdrop-blur-lg border-t border-[#26202C] px-2 py-1.5 flex items-center justify-around shadow-[0_-5px_25px_rgba(0,0,0,0.8)]">
+              {[
+                { id: 'overview', label: 'Dashboard', icon: DashboardIcon },
+                { id: 'products', label: 'Products', icon: PackageIcon, badge: productsList.length },
+                { id: 'orders', label: 'Orders', icon: ReceiptIcon, badge: ordersList.length },
+                { 
+                  id: 'messages', 
+                  label: 'Messages', 
+                  icon: MailIcon, 
+                  badge: unreadMessagesCount > 0 ? unreadMessagesCount : null,
+                  isUnread: unreadMessagesCount > 0 
+                },
+                { id: 'settings', label: 'Banners', icon: SlidersIcon }
+              ].map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(item.id);
+                      setMobileSidebarOpen(false);
+                    }}
+                    className={`flex flex-col items-center justify-center py-1 px-1.5 rounded-xl transition-all cursor-pointer relative min-w-[54px] ${
+                      isActive ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-gray-200'
+                    }`}
+                  >
+                    <div className="relative">
+                      <Icon className={`w-4 h-4 transition-transform ${isActive ? 'text-[#D4AF37] scale-110' : 'text-gray-400'}`} />
+                      {item.badge !== null && item.badge !== undefined && item.badge > 0 && (
+                        <span className={`absolute -top-1.5 -right-2.5 px-1 min-w-[14px] h-3.5 rounded-full text-[8px] font-mono font-bold flex items-center justify-center ${
+                          item.isUnread ? 'bg-amber-400 text-black animate-pulse' : 'bg-[#D4AF37] text-black'
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                    <span className={`text-[10px] mt-0.5 tracking-tight ${isActive ? 'font-bold text-[#D4AF37]' : 'text-gray-400'}`}>
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
         </div>
       )}

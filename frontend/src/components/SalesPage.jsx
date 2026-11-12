@@ -3,6 +3,20 @@ import { CATEGORIES } from '../data/products';
 import ProductCard from './ProductCard';
 import { SparklesIcon } from './Icons';
 
+// Helper to calculate exact discount percentage
+function getDiscountPercent(p) {
+  if (!p) return 0;
+  const price = Number(p.price) || 0;
+  const orig = Number(p.originalPrice) || 0;
+  if (orig > price && price > 0) {
+    return Math.round(((orig - price) / orig) * 100);
+  }
+  if (p.discountPercent && Number(p.discountPercent) > 0) {
+    return Number(p.discountPercent);
+  }
+  return 0;
+}
+
 export default function SalesPage({
   products,
   onQuickView,
@@ -15,11 +29,15 @@ export default function SalesPage({
   const [selectedSubCat, setSelectedSubCat] = useState('all');
 
   const saleProducts = useMemo(() => {
-    return products
+    return (products || [])
       .filter((p) => {
-        // Must be on sale or have a discounted originalPrice
-        const isSaleItem = p.isOnSale === true || (p.originalPrice && Number(p.originalPrice) > Number(p.price)) || p.tag?.toLowerCase().includes('sale') || p.tag?.toLowerCase().includes('off');
-        if (!isSaleItem) return false;
+        const discPct = getDiscountPercent(p);
+        // STRICT: Must have a genuine discount (> 0%) or originalPrice > price
+        const hasRealDiscount = discPct > 0 || (p.isOnSale === true && p.originalPrice && Number(p.originalPrice) > Number(p.price));
+        if (!hasRealDiscount) return false;
+
+        // If it's a pure non-sale item (discount 0%), do not display on Sales page
+        if (p.isOnSale === false && discPct <= 0) return false;
 
         if (selectedSubCat === 'all') return true;
         if (selectedSubCat === 'female' || selectedSubCat === 'women') {
@@ -37,10 +55,17 @@ export default function SalesPage({
         return p.category === selectedSubCat || p.stitchType === selectedSubCat;
       })
       .sort((a, b) => {
-        // Higher discount items appear first
-        const discA = a.originalPrice && a.originalPrice > a.price ? (a.originalPrice - a.price) : 0;
-        const discB = b.originalPrice && b.originalPrice > b.price ? (b.originalPrice - b.price) : 0;
-        return discB - discA;
+        // High discount on top, then lower, then lowest (e.g. 50% -> 40% -> 30% -> 20% -> 10%)
+        const discA = getDiscountPercent(a);
+        const discB = getDiscountPercent(b);
+        if (discB !== discA) {
+          return discB - discA;
+        }
+
+        // Secondary sort: highest cash savings in PKR
+        const saveA = (Number(a.originalPrice) || Number(a.price)) - Number(a.price);
+        const saveB = (Number(b.originalPrice) || Number(b.price)) - Number(b.price);
+        return saveB - saveA;
       });
   }, [products, selectedSubCat]);
 
@@ -133,7 +158,7 @@ export default function SalesPage({
               <ProductCard
                 key={product._id || product.id}
                 product={product}
-                onQuickView={() => onQuickView(product)}
+                onQuickView={onQuickView}
                 onAddToCart={onAddToCart}
                 isWishlisted={wishlist.includes(product.id)}
                 onToggleWishlist={onToggleWishlist}

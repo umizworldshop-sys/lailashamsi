@@ -37,10 +37,13 @@ export default function ProductSection({
         matchesCategory = p.category === activeCategory || p.stitchType === activeCategory;
       }
 
-      const matchesSearch = !searchQuery ||
-        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.fabric.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const q = searchQuery ? searchQuery.trim().toLowerCase() : '';
+      const matchesSearch = !q ||
+        (p.title && p.title.toLowerCase().includes(q)) ||
+        (p.fabric && p.fabric.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.categoryLabel && p.categoryLabel.toLowerCase().includes(q)) ||
+        (Array.isArray(p.colors) && p.colors.some(c => (c?.name || '').toLowerCase().includes(q)));
 
       return matchesCategory && matchesSearch;
     }).sort((a, b) => {
@@ -92,6 +95,7 @@ export default function ProductSection({
                 <ProductCard
                   key={product.id}
                   product={product}
+                  searchQuery={searchQuery}
                   onQuickView={onQuickView}
                   onAddToCart={onAddToCart}
                   isWishlisted={wishlist.includes(product.id)}

@@ -30,9 +30,9 @@ export default function QuickViewPage({
   selectedCurrency = 'PKR'
 }) {
   const [activeImage, setActiveImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0] || 'M');
+  const [selectedSize, setSelectedSize] = useState(product?.selectedSize || product?.sizes?.[0] || 'M');
   const [selectedColor, setSelectedColor] = useState(
-    product?.colors?.[0] || { name: 'Standard', hex: '#641E32' }
+    product?.selectedColor || product?.colors?.[0] || { name: 'Standard', hex: '#641E32' }
   );
   const [quantity, setQuantity] = useState(1);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
@@ -47,8 +47,8 @@ export default function QuickViewPage({
     if (!product) return;
     const timer = setTimeout(() => {
       setActiveImage(0);
-      setSelectedSize(product.sizes?.[0] || 'M');
-      setSelectedColor(product.colors?.[0] || { name: 'Standard', hex: '#641E32' });
+      setSelectedSize(product.selectedSize || product.sizes?.[0] || 'M');
+      setSelectedColor(product.selectedColor || product.colors?.[0] || { name: 'Standard', hex: '#641E32' });
       setQuantity(1);
       setShowSizeGuide(false);
     }, 0);

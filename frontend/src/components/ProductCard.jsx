@@ -4,6 +4,7 @@ import { CURRENCY_RATES } from '../data/products';
 
 export default function ProductCard({
   product,
+  searchQuery = '',
   onQuickView,
   onAddToCart,
   isWishlisted,
@@ -11,8 +12,38 @@ export default function ProductCard({
   selectedCurrency = 'PKR',
   staggerClass = 'stagger-1'
 }) {
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || { name: 'Standard', hex: '#641E32' });
+  const productColors = Array.isArray(product.colors) && product.colors.length > 0
+    ? product.colors
+    : [{ name: 'Standard', hex: '#641E32' }];
+
+  const [selectedSize, setSelectedSize] = useState(
+    Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes[0] : 'M'
+  );
+  
+  const [selectedColor, setSelectedColor] = useState(() => {
+    if (product.selectedColor) return product.selectedColor;
+    if (searchQuery && typeof searchQuery === 'string') {
+      const q = searchQuery.trim().toLowerCase();
+      const matched = productColors.find((c) => (c?.name || '').toLowerCase().includes(q));
+      if (matched) return matched;
+    }
+    return productColors[0];
+  });
+
+  // When searchQuery or product changes, update selectedColor if matching
+  useEffect(() => {
+    if (searchQuery && typeof searchQuery === 'string') {
+      const q = searchQuery.trim().toLowerCase();
+      const matched = productColors.find((c) => (c?.name || '').toLowerCase().includes(q));
+      if (matched) {
+        setSelectedColor(matched);
+        return;
+      }
+    }
+    if (product.selectedColor) {
+      setSelectedColor(product.selectedColor);
+    }
+  }, [searchQuery, product.id, product.selectedColor]);
   const [showSizePicker, setShowSizePicker] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
   const [heartPopping, setHeartPopping] = useState(false);
@@ -71,7 +102,7 @@ export default function ProductCard({
   const discount =
     product.originalPrice > product.price
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
-      : 0;
+      : (Number(product.discountPercent) || 0);
 
   const handleHeartClick = (e) => {
     e.stopPropagation();
@@ -105,7 +136,7 @@ export default function ProductCard({
       {/* ================= IMAGE & FLOATING ACTIONS ================= */}
       <div
         className="relative w-full aspect-[4/5] overflow-hidden bg-[#F7F3EB] cursor-pointer rounded-xl transition-shadow hover:shadow-lg"
-        onClick={() => onQuickView(product)}
+        onClick={() => onQuickView({ ...product, selectedColor, selectedSize })}
       >
         {/* Base Cover Image (Always visible underneath so the frame is NEVER blank) */}
         <img
@@ -190,7 +221,7 @@ export default function ProductCard({
         {/* Minimal Tag */}
         {(discount > 0 || product.tag) && (
           <span className="absolute top-3 left-3 z-10 bg-[#641E32] text-white text-[8.5px] sm:text-[9px] font-medium uppercase tracking-[0.2em] px-2 py-1 rounded shadow-sm">
-            {discount > 0 ? `-${discount}%` : product.tag}
+            {product.tag || `-${discount}%`}
           </span>
         )}
 
@@ -256,7 +287,8 @@ export default function ProductCard({
             /* 🔥 SLEEK SPLIT BUTTON (Perfect for small cards) 🔥 */
             <div className="flex h-8 bg-white/95 backdrop-blur-sm rounded-md shadow-lg border border-white/60 overflow-hidden">
               <button
-                onClick={() => onQuickView(product)}
+                type="button"
+                onClick={() => onQuickView({ ...product, selectedColor, selectedSize })}
                 className="flex-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#282321] hover:bg-gray-50 transition-colors"
               >
                 Quick View
@@ -266,6 +298,7 @@ export default function ProductCard({
               <div className="w-[1px] bg-gray-200"></div>
               
               <button
+                type="button"
                 onClick={() => setShowSizePicker(true)}
                 className="flex-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#641E32] hover:bg-[#641E32] hover:text-white transition-colors"
               >
@@ -284,7 +317,7 @@ export default function ProductCard({
               {product.categoryLabel}
             </p>
             <h3
-              onClick={() => onQuickView(product)}
+              onClick={() => onQuickView({ ...product, selectedColor, selectedSize })}
               className="font-cinzel text-[13px] sm:text-[14px] font-bold leading-snug text-[#282321] cursor-pointer hover:text-[#641E32] transition-colors line-clamp-2"
               title={product.title}
             >
@@ -305,25 +338,38 @@ export default function ProductCard({
         </div>
 
         <div className="mt-auto pt-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            {product.colors.slice(0, 4).map((color) => (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {productColors.slice(0, 4).map((color) => (
               <button
                 key={color.name}
-                onClick={() => setSelectedColor(color)}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedColor(color);
+                }}
                 style={{ backgroundColor: color.hex }}
                 title={color.name}
                 aria-label={color.name}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  selectedColor.name === color.name
-                    ? 'ring-2 ring-offset-2 ring-[#641E32]'
-                    : 'ring-1 ring-gray-200'
+                className={`w-3 h-3 rounded-full transition-all cursor-pointer ${
+                  selectedColor?.name === color.name
+                    ? 'ring-2 ring-offset-1 ring-[#641E32] scale-110 shadow-xs'
+                    : 'ring-1 ring-gray-300 hover:scale-105'
                 }`}
               />
             ))}
+            {selectedColor?.name && selectedColor.name !== 'Standard' && (
+              <span className="text-[9px] text-[#641E32] font-semibold tracking-wide ml-0.5 truncate max-w-[80px]">
+                {selectedColor.name}
+              </span>
+            )}
           </div>
 
           <button
-            onClick={() => onQuickView(product)}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onQuickView({ ...product, selectedColor, selectedSize });
+            }}
             className="sm:hidden text-[9px] font-bold uppercase tracking-widest text-[#641E32] hover:text-[#4A1624] transition-colors underline underline-offset-2"
           >
             Quick View

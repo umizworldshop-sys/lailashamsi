@@ -79,91 +79,91 @@ export default function AdminMessages({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       
-      {/* Top Header & Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      {/* Top Header & Stats Cards (2x2 on Mobile, 4 cols on Desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         
         {/* Total Inquiries */}
-        <div className="bg-[#141018] p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 block">
+        <div className="bg-[#141018] p-3 sm:p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
+          <div className="min-w-0">
+            <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-gray-400 block truncate">
               Total Messages
             </span>
-            <span className="text-xl sm:text-2xl font-bold font-mono text-white mt-0.5 block">
+            <span className="text-lg sm:text-2xl font-bold font-mono text-white mt-0.5 block">
               {totalCount}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-            <MailIcon className="w-5 h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+            <MailIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
         {/* Unread Inquiries */}
-        <div className="bg-[#141018] p-4 rounded-2xl border border-[#D4AF37]/40 flex items-center justify-between shadow-lg shadow-amber-500/5">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#D4AF37] font-semibold block">
-                Unread Messages
+        <div className="bg-[#141018] p-3 sm:p-4 rounded-2xl border border-[#D4AF37]/40 flex items-center justify-between shadow-lg shadow-amber-500/5">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-[#D4AF37] font-semibold block truncate">
+                Unread
               </span>
               {unreadCount > 0 && (
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping inline-block" />
               )}
             </div>
-            <span className="text-xl sm:text-2xl font-bold font-mono text-amber-300 mt-0.5 block">
+            <span className="text-lg sm:text-2xl font-bold font-mono text-amber-300 mt-0.5 block">
               {unreadCount}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400">
-            <SparklesIcon className="w-5 h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+            <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
         {/* Today's Inquiries */}
-        <div className="bg-[#141018] p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 block">
-              Received Today
+        <div className="bg-[#141018] p-3 sm:p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
+          <div className="min-w-0">
+            <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-gray-400 block truncate">
+              Today
             </span>
-            <span className="text-xl sm:text-2xl font-bold font-mono text-white mt-0.5 block">
+            <span className="text-lg sm:text-2xl font-bold font-mono text-white mt-0.5 block">
               {todayCount}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <ClockIcon className="w-5 h-5" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
         </div>
 
         {/* Starred Inquiries */}
-        <div className="bg-[#141018] p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 block">
-              Starred / Important
+        <div className="bg-[#141018] p-3 sm:p-4 rounded-2xl border border-[#2B2332] flex items-center justify-between">
+          <div className="min-w-0">
+            <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-wider text-gray-400 block truncate">
+              Starred
             </span>
-            <span className="text-xl sm:text-2xl font-bold font-mono text-white mt-0.5 block">
+            <span className="text-lg sm:text-2xl font-bold font-mono text-white mt-0.5 block">
               {starredCount}
             </span>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400">
-            <StarIcon className="w-5 h-5 fill-amber-400/20" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-amber-400/10 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+            <StarIcon className="w-4 h-4 sm:w-5 sm:h-5 fill-amber-400/20" />
           </div>
         </div>
 
       </div>
 
       {/* Controls & Filter Bar */}
-      <div className="bg-[#141018] p-4 rounded-2xl border border-[#2B2332] space-y-3">
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-[#141018] p-3 sm:p-4 rounded-2xl border border-[#2B2332] space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           
           {/* Search Box */}
           <div className="relative flex-1">
-            <SearchIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <SearchIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by customer name, email, phone, or keyword..."
-              className="w-full pl-9 pr-4 py-2 bg-[#1A1521] border border-[#2F2638] rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+              className="w-full pl-9 pr-3 py-2 bg-[#1A1521] border border-[#2F2638] rounded-xl text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
             />
           </div>
 
@@ -172,23 +172,23 @@ export default function AdminMessages({
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 bg-[#1A1521] border border-[#2F2638] rounded-xl text-xs text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
+              className="w-full sm:w-auto px-3 py-2 bg-[#1A1521] border border-[#2F2638] rounded-xl text-xs text-white focus:outline-none focus:border-[#D4AF37] cursor-pointer"
             >
-              <option value="all">All Inquiry Categories</option>
+              <option value="all">All Categories</option>
               <option value="Track Order">Track Order</option>
               <option value="Size Guide">Size Guide</option>
               <option value="Cash on Delivery">Cash on Delivery</option>
               <option value="14-Day Exchanges">14-Day Exchanges</option>
               <option value="Styling Assistance">Styling Assistance</option>
-              <option value="General Enquiry">General Enquiry & Support</option>
+              <option value="General Enquiry">General Enquiry</option>
             </select>
           </div>
 
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#231B29]">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 mr-1">
+        {/* Status Filter Tabs (Horizontal swipe on mobile) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none pt-1 border-t border-[#231B29]">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-gray-400 mr-1 shrink-0">
             Status:
           </span>
           {[
@@ -201,7 +201,7 @@ export default function AdminMessages({
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 ${
                 statusFilter === tab.id
                   ? 'bg-[#D4AF37] text-black shadow-sm'
                   : 'bg-[#1A1521] text-gray-400 hover:text-white border border-[#2B2332]'
@@ -395,7 +395,7 @@ export default function AdminMessages({
                   </div>
 
                   {/* External Communication Buttons */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
                     {cleanPhone && (
                       <a
                         href={`https://wa.me/${cleanPhone.startsWith('92') ? cleanPhone : '92' + cleanPhone.replace(/^0/, '')}?text=Hello%20${encodeURIComponent(msg.name || 'Customer')},%20this%20is%20Laila%20Shamsi%20Atelier%20regarding%20your%20inquiry%20about%20${encodeURIComponent(msg.inquiryType || 'our collection')}.`}
@@ -406,10 +406,10 @@ export default function AdminMessages({
                             onUpdateStatus(msg._id, 'replied');
                           }
                         }}
-                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+                        className="flex-1 sm:flex-none px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
                       >
                         <WhatsAppIcon className="w-3.5 h-3.5 shrink-0" />
-                        <span>Reply on WhatsApp</span>
+                        <span>WhatsApp</span>
                       </a>
                     )}
 
@@ -420,7 +420,7 @@ export default function AdminMessages({
                           onUpdateStatus(msg._id, 'replied');
                         }
                       }}
-                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-white/10"
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-200 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border border-white/10 cursor-pointer"
                     >
                       <ExternalLinkIcon className="w-3 h-3" />
                       <span>Email</span>

@@ -135,9 +135,9 @@ router.get('/', async (req, res) => {
         ];
       } else if (collection === 'sale') {
         query.$or = [
-          { isOnSale: true },
-          { originalPrice: { $gt: 0 } },
-          { tag: { $regex: /sale|off/i } }
+          { isOnSale: true, discountPercent: { $gt: 0 } },
+          { discountPercent: { $gt: 0 } },
+          { $expr: { $gt: ['$originalPrice', '$price'] } }
         ];
       } else if (collection === 'trending') {
         query.$or = [
@@ -148,19 +148,30 @@ router.get('/', async (req, res) => {
 
       if (search && search.trim() !== '') {
         const regex = new RegExp(search.trim(), 'i');
-        query.$or = [
+        const searchConditions = [
           { title: regex },
           { description: regex },
           { fabric: regex },
-          { categoryLabel: regex }
+          { categoryLabel: regex },
+          { 'colors.name': regex }
         ];
+
+        if (query.$or) {
+          query.$and = [
+            { $or: query.$or },
+            { $or: searchConditions }
+          ];
+          delete query.$or;
+        } else {
+          query.$or = searchConditions;
+        }
       }
 
       let sortOption = { createdAt: -1 };
       if (sort === 'price_asc') sortOption = { price: 1 };
       else if (sort === 'price_desc') sortOption = { price: -1 };
       else if (sort === 'rating') sortOption = { rating: -1 };
-      else if (sort === 'discount_desc') sortOption = { discountPercent: -1, createdAt: -1 };
+      else if (sort === 'discount_desc' || collection === 'sale') sortOption = { discountPercent: -1, createdAt: -1 };
 
       const rawProducts = await Product.find(query).sort(sortOption).lean();
       const products = rawProducts.map((p, i) => formatLeanProduct(p, i));

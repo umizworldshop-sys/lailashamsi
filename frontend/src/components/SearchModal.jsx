@@ -30,12 +30,16 @@ export default function SearchModal({
 
   const curr = CURRENCY_RATES[selectedCurrency] || CURRENCY_RATES.PKR;
 
-  const popularTags = ['Raw Silk', 'Velvet Rose', 'Chiffon Kalidar', 'Angrakha', 'Pastel Pret', 'Co-ord'];
+  const popularTags = ['Black', 'Emerald', 'Burgundy', 'Raw Silk', 'Velvet Rose', 'Chiffon Kalidar', 'Angrakha', 'Pastel Pret'];
 
-  const matchedProducts = query.trim() ? products.filter((p) => {
-    return p.title.toLowerCase().includes(query.toLowerCase()) ||
-           p.fabric.toLowerCase().includes(query.toLowerCase()) ||
-           p.categoryLabel.toLowerCase().includes(query.toLowerCase());
+  const cleanQuery = query.trim().toLowerCase();
+  const matchedProducts = cleanQuery ? products.filter((p) => {
+    const titleMatch = (p.title || '').toLowerCase().includes(cleanQuery);
+    const fabricMatch = (p.fabric || '').toLowerCase().includes(cleanQuery);
+    const catMatch = (p.categoryLabel || '').toLowerCase().includes(cleanQuery);
+    const descMatch = (p.description || '').toLowerCase().includes(cleanQuery);
+    const colorMatch = Array.isArray(p.colors) && p.colors.some(c => (c?.name || '').toLowerCase().includes(cleanQuery));
+    return titleMatch || fabricMatch || catMatch || descMatch || colorMatch;
   }) : [];
 
   const handleSearchSubmit = (e) => {
@@ -64,7 +68,7 @@ export default function SearchModal({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by outfit name, fabric (e.g. Silk, Chiffon), or style..."
+              placeholder="Search by outfit name, color (e.g. Black, Emerald), fabric..."
               className="w-full text-sm sm:text-base bg-transparent text-[#24171A] focus:outline-none placeholder:text-gray-400"
             />
             {query && (
@@ -118,23 +122,54 @@ export default function SearchModal({
                 </p>
                 {matchedProducts.map((p) => {
                   const price = Math.round(p.price * curr.rate);
+                  const matchedColor = Array.isArray(p.colors)
+                    ? p.colors.find(c => (c?.name || '').toLowerCase().includes(cleanQuery))
+                    : null;
+                  const activeColor = matchedColor || (Array.isArray(p.colors) && p.colors[0]) || null;
 
                   return (
                     <div 
                       key={p.id}
                       onClick={() => {
-                        onSelectProduct(p);
+                        onSelectProduct({ ...p, selectedColor: activeColor });
                         onClose();
                       }}
                       className="flex items-center gap-4 p-2.5 rounded-xl bg-white border border-[#EBE3D5] hover:border-[#4A0E17] hover:shadow-md transition-all cursor-pointer group"
                     >
                       <img src={p.images[0]} alt="" className="w-14 h-16 object-cover rounded-lg" />
-                      <div className="flex-1">
-                        <span className="text-[10px] text-[#C59B27] uppercase tracking-wider font-semibold">{p.categoryLabel}</span>
-                        <h4 className="font-serif text-sm font-bold text-[#24171A] group-hover:text-[#4A0E17] transition-colors">{p.title}</h4>
-                        <p className="text-[11px] text-gray-500 italic">{p.fabric}</p>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-[10px] text-[#C59B27] uppercase tracking-wider font-semibold block">{p.categoryLabel}</span>
+                        <h4 className="font-serif text-sm font-bold text-[#24171A] group-hover:text-[#4A0E17] transition-colors truncate">{p.title}</h4>
+                        <p className="text-[11px] text-gray-500 italic truncate">{p.fabric}</p>
+                        
+                        {/* Matched Color Display */}
+                        {matchedColor ? (
+                          <div className="mt-1 flex items-center gap-1.5">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#FAF3EB] border border-[#641E32]/30 text-[10px] font-semibold text-[#641E32]">
+                              <span 
+                                className="w-2.5 h-2.5 rounded-full border border-black/20 shadow-xs inline-block" 
+                                style={{ backgroundColor: matchedColor.hex }} 
+                              />
+                              <span>Color: {matchedColor.name}</span>
+                            </span>
+                          </div>
+                        ) : Array.isArray(p.colors) && p.colors.length > 0 ? (
+                          <div className="mt-1 flex items-center gap-1">
+                            {p.colors.slice(0, 4).map((c) => (
+                              <span
+                                key={c.name}
+                                title={c.name}
+                                className="w-2.5 h-2.5 rounded-full border border-black/15 shadow-xs inline-block"
+                                style={{ backgroundColor: c.hex }}
+                              />
+                            ))}
+                            <span className="text-[10px] text-gray-400 ml-1">
+                              {p.colors[0]?.name}
+                            </span>
+                          </div>
+                        ) : null}
                       </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                         <span className="font-serif font-bold text-[#4A0E17] text-sm">
                           {curr.symbol}{price.toLocaleString()}
                         </span>

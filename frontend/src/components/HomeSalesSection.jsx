@@ -2,37 +2,34 @@ import { useState } from 'react';
 import ProductCard from './ProductCard';
 import { ArrowRightIcon, CheckIcon } from './Icons';
 
-function getSaleProducts(products) {
-  const discounted = products
-    .filter(
-      (p) =>
-        p.isOnSale === true ||
-        (p.originalPrice && p.originalPrice > p.price) ||
-        (p.tag &&
-          (p.tag.toLowerCase().includes('sale') ||
-            p.tag.toLowerCase().includes('favourite') ||
-            p.tag.toLowerCase().includes('special')))
-    )
-    .sort((a, b) => {
-      const discA = a.originalPrice && a.originalPrice > a.price ? a.originalPrice - a.price : 0;
-      const discB = b.originalPrice && b.originalPrice > b.price ? b.originalPrice - b.price : 0;
-      return discB - discA;
-    });
-
-  if (discounted.length >= 4) {
-    return discounted.slice(0, 4);
+function getDiscountPercent(p) {
+  if (!p) return 0;
+  const price = Number(p.price) || 0;
+  const orig = Number(p.originalPrice) || 0;
+  if (orig > price && price > 0) {
+    return Math.round(((orig - price) / orig) * 100);
   }
+  if (p.discountPercent && Number(p.discountPercent) > 0) {
+    return Number(p.discountPercent);
+  }
+  return 0;
+}
 
-  const fallbackList = products.map((p, idx) => {
-    if (p.originalPrice && p.originalPrice > p.price) return p;
-    return {
-      ...p,
-      originalPrice: p.originalPrice || Math.round(p.price * 1.25),
-      tag: idx % 2 === 0 ? '-25% Off' : 'Seasonal Sale'
-    };
-  });
-
-  return fallbackList.slice(0, 4);
+function getSaleProducts(products) {
+  return (products || [])
+    .filter((p) => {
+      const disc = getDiscountPercent(p);
+      return disc > 0 || (p.isOnSale === true && p.originalPrice && Number(p.originalPrice) > Number(p.price));
+    })
+    .sort((a, b) => {
+      const discA = getDiscountPercent(a);
+      const discB = getDiscountPercent(b);
+      if (discB !== discA) return discB - discA;
+      const saveA = (Number(a.originalPrice) || Number(a.price)) - Number(a.price);
+      const saveB = (Number(b.originalPrice) || Number(b.price)) - Number(b.price);
+      return saveB - saveA;
+    })
+    .slice(0, 4);
 }
 
 export default function HomeSalesSection({

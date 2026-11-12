@@ -44,11 +44,11 @@ export default function AdminProducts({
   });
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       {/* Top Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#141117] p-4 rounded-2xl border border-[#27212E]">
-        {/* Category Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto">
+      <div className="bg-[#141117] p-3 sm:p-4 rounded-2xl border border-[#27212E] space-y-3">
+        {/* Category Pills (Horizontal swipe on mobile) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -65,57 +65,60 @@ export default function AdminProducts({
         </div>
 
         {/* Search, View Mode & Add */}
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex-1 sm:w-48">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          {/* Search Box */}
+          <div className="relative flex-1">
             <input
               type="text"
               value={catalogSearch}
               onChange={(e) => setCatalogSearch(e.target.value)}
-              placeholder="Search products..."
-              className="w-full bg-[#1C1722] border border-[#2F2637] rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]"
+              placeholder="Search by title, fabric or tag..."
+              className="w-full bg-[#1C1722] border border-[#2F2637] rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37]"
             />
             <SearchIcon className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
           </div>
 
-          {/* Grid vs Table toggle */}
-          <div className="flex items-center bg-[#1C1722] border border-[#2F2637] rounded-xl p-0.5">
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+            {/* Grid vs Table toggle */}
+            <div className="flex items-center bg-[#1C1722] border border-[#2F2637] rounded-xl p-0.5">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg transition-colors cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <GridIcon className="w-3.5 h-3.5" />
+                <span>Grid</span>
+              </button>
+              <button
+                onClick={() => setViewMode('table')}
+                className={`flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg transition-colors cursor-pointer ${
+                  viewMode === 'table' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                <ListIcon className="w-3.5 h-3.5" />
+                <span>Table</span>
+              </button>
+            </div>
+
             <button
-              onClick={() => setViewMode('grid')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'grid' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
-              }`}
+              onClick={onOpenAddModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer shrink-0"
             >
-              <GridIcon className="w-3.5 h-3.5" />
-              <span>Grid</span>
-            </button>
-            <button
-              onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'table' ? 'bg-[#D4AF37] text-black font-bold' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <ListIcon className="w-3.5 h-3.5" />
-              <span>Table</span>
+              <PlusIcon className="w-3.5 h-3.5" />
+              <span>Add Product</span>
             </button>
           </div>
-
-          <button
-            onClick={onOpenAddModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#B76E79] to-[#8E4453] hover:from-[#c27c87] hover:to-[#9f4f5f] text-white rounded-xl text-xs font-semibold shadow-md transition-all cursor-pointer shrink-0"
-          >
-            <PlusIcon className="w-3.5 h-3.5" />
-            <span>Add Product</span>
-          </button>
         </div>
       </div>
 
       {/* Product Content: Grid or Table */}
       {filteredProducts.length === 0 ? (
-        <div className="bg-[#141117] border border-[#27212E] rounded-2xl p-12 text-center text-gray-500 text-xs">
+        <div className="bg-[#141117] border border-[#27212E] rounded-2xl p-8 sm:p-12 text-center text-gray-500 text-xs">
           No products found matching this filter or search.
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
           {filteredProducts.map((p) => {
             const primaryImg = Array.isArray(p.images) && p.images[0] ? p.images[0] : (p.image || '/Logo.jpeg');
             const pid = p._id || p.id;
@@ -133,28 +136,28 @@ export default function AdminProducts({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {p.tag && (
-                      <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[9px] uppercase font-mono font-bold bg-black/70 text-[#D4AF37] border border-[#D4AF37]/40 backdrop-blur-sm">
+                      <span className="absolute top-2 left-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[9px] uppercase font-mono font-bold bg-black/70 text-[#D4AF37] border border-[#D4AF37]/40 backdrop-blur-sm truncate max-w-[80%]">
                         {p.tag}
                       </span>
                     )}
-                    <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded-md text-[9px] font-mono bg-black/80 text-gray-300 backdrop-blur-sm">
+                    <span className="absolute bottom-2 right-2 px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[9px] font-mono bg-black/80 text-gray-300 backdrop-blur-sm truncate max-w-[80%]">
                       {p.categoryLabel || p.category}
                     </span>
                   </div>
 
                   {/* Info Box */}
-                  <div className="p-4 space-y-1.5">
-                    <h3 className="text-xs font-bold text-white truncate" title={p.title}>
+                  <div className="p-2.5 sm:p-4 space-y-1">
+                    <h3 className="text-xs sm:text-sm font-bold text-white truncate" title={p.title}>
                       {p.title}
                     </h3>
                     <p className="text-[10px] text-gray-400 truncate">{p.fabric || 'Fabric details'}</p>
                     {/* Price display with PKR scaling */}
-                    <div className="pt-2 flex items-baseline gap-2">
-                      <span className="font-mono text-sm font-bold text-[#E6B8BF]">
+                    <div className="pt-1 flex flex-wrap items-baseline gap-1.5">
+                      <span className="font-mono text-xs sm:text-sm font-bold text-[#E6B8BF]">
                         Rs. {(p.price < 1000 ? p.price * 100 : p.price)?.toLocaleString()}
                       </span>
                       {p.originalPrice && p.originalPrice > p.price && (
-                        <span className="font-mono text-[10px] text-gray-500 line-through">
+                        <span className="font-mono text-[9px] sm:text-[10px] text-gray-500 line-through">
                           Rs. {(p.originalPrice < 1000 ? p.originalPrice * 100 : p.originalPrice)?.toLocaleString()}
                         </span>
                       )}
@@ -163,20 +166,20 @@ export default function AdminProducts({
                 </div>
 
                 {/* Card Actions */}
-                <div className="p-3 bg-[#110E14] border-t border-[#231C29] flex items-center justify-between gap-2">
+                <div className="p-2 sm:p-3 bg-[#110E14] border-t border-[#231C29] flex items-center justify-between gap-1.5 sm:gap-2">
                   <button
                     onClick={() => onEditProduct(p)}
-                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-white/5 hover:bg-[#D4AF37] hover:text-black text-gray-300 rounded-lg text-[11px] sm:text-xs font-medium transition-colors cursor-pointer"
                   >
-                    <EditIcon className="w-3.5 h-3.5" />
+                    <EditIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                     <span>Edit</span>
                   </button>
                   <button
                     onClick={() => onDeleteProduct(pid)}
-                    className="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-900 rounded-lg transition-colors cursor-pointer"
+                    className="p-1.5 text-rose-400 hover:text-white bg-rose-950/40 hover:bg-rose-900 rounded-lg transition-colors cursor-pointer shrink-0"
                     title="Delete Product"
                   >
-                    <TrashIcon className="w-3.5 h-3.5" />
+                    <TrashIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                   </button>
                 </div>
               </div>

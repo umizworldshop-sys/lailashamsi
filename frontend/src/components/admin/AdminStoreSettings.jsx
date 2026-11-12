@@ -126,6 +126,15 @@ export default function AdminStoreSettings({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Strict 1 MB per image limit
+    if (file.size > 1 * 1024 * 1024) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+      if (showToast) showToast(`Image exceeds 1 MB limit (${sizeMB} MB). Please select an image under 1 MB.`);
+      alert(`Image "${file.name}" exceeds the 1 MB limit (${sizeMB} MB). Please select or compress your photo under 1 MB.`);
+      if (e.target) e.target.value = '';
+      return;
+    }
+
     setUploadingSlideIndex(idx);
 
     const readFileAsDataUrl = (f) =>
@@ -170,43 +179,211 @@ export default function AdminStoreSettings({
   };
 
   return (
-    <form onSubmit={handleSaveAll} className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
+    <form onSubmit={handleSaveAll} className="p-3 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto pb-24 md:pb-8">
       {/* Top Sticky Save Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#141018] p-5 rounded-2xl border border-[#D4AF37]/40 shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-[#141018] p-3.5 sm:p-5 rounded-2xl border border-[#D4AF37]/40 shadow-lg">
         <div>
-          <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-            <SparklesIcon className="w-5 h-5 text-[#D4AF37]" />
-            <span>Storefront Banners, Hero Slider & Top Marquee</span>
+          <h2 className="text-sm sm:text-lg font-bold text-white flex items-center gap-2">
+            <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4AF37]" />
+            <span>Homepage Banners & Storefront Settings</span>
           </h2>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Customize your Sales Banner discount %, Hero Slider photos, and Navbar scrolling announcement bar.
+          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">
+            Manage your Homepage Hero Slider banner photos, titles, and Grand Seasonal Sale discount percentage.
           </p>
         </div>
 
         <button
           type="submit"
           disabled={saving || uploadingSlideIndex !== null}
-          className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#b59024] hover:from-[#e0bc42] hover:to-[#c9a129] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
+          className="w-full sm:w-auto px-5 py-2.5 sm:px-6 sm:py-3 bg-gradient-to-r from-[#D4AF37] to-[#b59024] hover:from-[#e0bc42] hover:to-[#c9a129] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-lg transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0"
         >
           <CheckIcon className="w-4 h-4 stroke-[3]" />
-          <span>{saving ? 'Saving Changes...' : 'Save All Storefront Changes'}</span>
+          <span>{saving ? 'Saving Changes...' : 'Save Banner Settings'}</span>
         </button>
       </div>
 
       {/* =================================================================== */}
-      {/* SECTION 1: SALES BANNER FLAT % DISCOUNT                             */}
+      {/* SECTION 1: HOMEPAGE HERO BANNER SLIDER (PRIMARY)                     */}
+      {/* =================================================================== */}
+      <div className="bg-[#141018] rounded-3xl border border-[#26202C] p-5 sm:p-7 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#26202C] pb-4">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
+              1. HOMEPAGE HERO BANNER SLIDER
+            </span>
+            <h3 className="text-base font-bold text-white mt-0.5">
+              Hero Banner Slides ({heroSlides.length} Active Slides)
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Upload photos directly from your device (Max 1 MB) and set banner headings.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddHeroSlide}
+            className="px-4 py-2 bg-[#D4AF37]/15 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto"
+          >
+            <PlusIcon className="w-4 h-4" />
+            <span>+ Add New Banner Slide</span>
+          </button>
+        </div>
+
+        {/* Slides List */}
+        <div className="space-y-5">
+          {heroSlides.map((slide, idx) => ( 
+            <div
+              key={slide.id || idx}
+              className="p-4 sm:p-5 rounded-2xl bg-[#1A1521] border border-[#2E2536] grid grid-cols-1 lg:grid-cols-12 gap-5 items-start"
+            >
+              {/* Slide Image Preview & Device Upload (5 cols) */}
+              <div className="lg:col-span-5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#D4AF37] flex items-center gap-1.5">
+                    <span className="w-5 h-5 rounded-md bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-[10px] flex items-center justify-center font-mono font-bold">
+                      {idx + 1}
+                    </span>
+                    <span>Banner Picture</span>
+                  </span>
+                  {heroSlides.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveHeroSlide(idx)}
+                      className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <TrashIcon className="w-3.5 h-3.5" />
+                      <span>Remove Slide</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Banner Live Preview Box */}
+                <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#110E14] border border-[#382E42] group shadow-inner">
+                  <img
+                    src={slide.image || '/Logo.jpeg'}
+                    alt={slide.title || `Slide ${idx + 1}`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/Logo.jpeg';
+                    }}
+                    className="w-full h-full object-cover object-top"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex flex-col justify-end p-3">
+                    {slide.tag && (
+                      <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold">
+                        {slide.tag}
+                      </span>
+                    )}
+                    <p className="text-xs font-bold text-white truncate">{slide.title || 'Untitled Banner'}</p>
+                    {slide.subtitle && (
+                      <p className="text-[10px] text-gray-300 truncate">{slide.subtitle}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Upload from Device Button (Max 1 MB) */}
+                <div className="space-y-1.5">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id={`hero-slide-upload-${idx}`}
+                    onChange={(e) => handleSlideImageUpload(idx, e)}
+                    disabled={uploadingSlideIndex === idx}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor={`hero-slide-upload-${idx}`}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f2e] text-black font-bold text-xs text-center cursor-pointer transition-colors flex items-center justify-center gap-2 shadow-md"
+                  >
+                    {uploadingSlideIndex === idx ? (
+                      <span className="animate-pulse">Uploading to Cloudinary...</span>
+                    ) : (
+                      <>
+                        <UploadIcon className="w-4 h-4 shrink-0" />
+                        <span>Upload Picture from Device</span>
+                      </>
+                    )}
+                  </label>
+                  <p className="text-[10px] text-gray-400 text-center">
+                    JPG, PNG or WEBP (Strictly under 1 MB limit)
+                  </p>
+                </div>
+              </div>
+
+              {/* Slide Content Fields (7 cols) - Clean & Focused */}
+              <div className="lg:col-span-7 space-y-3.5">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-gray-200 block">
+                    Main Heading Title
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.title || ''}
+                    onChange={(e) => handleSlideFieldChange(idx, 'title', e.target.value)}
+                    placeholder="e.g. Grace in Every Thread"
+                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-gray-200 block">
+                    Subtitle Description
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.subtitle || ''}
+                    onChange={(e) => handleSlideFieldChange(idx, 'subtitle', e.target.value)}
+                    placeholder="e.g. Handcrafted Velvet & Zari Peshwas"
+                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-gray-200 block">
+                    Top Badge / Tag
+                  </label>
+                  <input
+                    type="text"
+                    value={slide.tag || ''}
+                    onChange={(e) => handleSlideFieldChange(idx, 'tag', e.target.value)}
+                    placeholder="e.g. Velvet Formals 2026"
+                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+                  />
+                </div>
+
+                {/* Status indicator */}
+                <div className="pt-1 flex items-center justify-between text-[11px] text-gray-400 border-t border-[#26202C]">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>Banner Ready</span>
+                  </span>
+                  <span className="text-[#D4AF37] text-[10px] font-mono">
+                    Slide #{idx + 1}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* =================================================================== */}
+      {/* SECTION 2: GRAND SEASONAL SALE BANNER                               */}
       {/* =================================================================== */}
       <div className="bg-[#141018] rounded-3xl border border-[#26202C] p-5 sm:p-7 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#26202C] pb-4">
           <div>
             <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
-              1. GRAND SEASONAL SALE BANNER
+              2. GRAND SEASONAL SALE BANNER
             </span>
             <h3 className="text-base font-bold text-white mt-0.5">
               Sale Banner Discount Percentage (FLAT % OFF)
             </h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Configures the flat discount percentage shown across the promotional sale banner.
+            </p>
           </div>
-          <span className="px-3 py-1 rounded-full bg-[#641E32]/40 border border-[#B76E79]/40 text-xs font-bold text-[#D4AF37]">
+          <span className="px-3.5 py-1.5 rounded-full bg-[#641E32]/40 border border-[#B76E79]/40 text-xs font-bold text-[#D4AF37] self-start sm:self-auto">
             Currently: FLAT {salePercent}% OFF
           </span>
         </div>
@@ -287,239 +464,88 @@ export default function AdminStoreSettings({
       </div>
 
       {/* =================================================================== */}
-      {/* SECTION 2: NAVBAR TOP MARQUEE ANNOUNCEMENT TEXTS                    */}
+      {/* SECTION 3: OPTIONAL TOP MARQUEE TICKER (COLLAPSIBLE)                 */}
       {/* =================================================================== */}
-      <div className="bg-[#141018] rounded-3xl border border-[#26202C] p-5 sm:p-7 space-y-5">
-        <div className="border-b border-[#26202C] pb-4">
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
-            2. TOP NAVBAR MARQUEE BAR
-          </span>
-          <h3 className="text-base font-bold text-white mt-0.5">
-            Scrolling Announcement Bar Messages ({marqueeList.length})
-          </h3>
-          <p className="text-xs text-gray-400 mt-0.5">
-            Edit, remove, or add new promotional lines that scroll at the very top of your website navbar.
-          </p>
-        </div>
-
-        {/* Existing Marquee Lines */}
-        <div className="space-y-2.5">
-          {marqueeList.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-2.5">
-              <span className="w-7 h-7 rounded-lg bg-[#1A1521] border border-[#2F2638] text-[#D4AF37] text-xs font-mono font-bold flex items-center justify-center shrink-0">
-                {idx + 1}
-              </span>
-              <input
-                type="text"
-                value={item}
-                onChange={(e) => handleUpdateMarqueeItem(idx, e.target.value)}
-                placeholder="Enter announcement text..."
-                className="flex-1 bg-[#1A1521] border border-[#2F2638] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:border-[#D4AF37] focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveMarqueeItem(idx)}
-                className="p-2 bg-rose-950/50 hover:bg-rose-900 text-rose-300 rounded-xl border border-rose-800/40 transition-colors cursor-pointer shrink-0"
-                title="Remove line"
-              >
-                <TrashIcon className="w-4 h-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Add New Marquee Line */}
-        <div className="flex items-center gap-2.5 pt-2">
-          <input
-            type="text"
-            value={newMarqueeText}
-            onChange={(e) => setNewMarqueeText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                handleAddMarqueeItem();
-              }
-            }}
-            placeholder="Add new marquee message (e.g. Flat 50% Sale Live Now!)..."
-            className="flex-1 bg-[#1A1521] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
-          />
-          <button
-            type="button"
-            onClick={handleAddMarqueeItem}
-            className="px-4 py-2.5 bg-[#D4AF37] hover:bg-[#c49f2e] text-black rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
-          >
-            <PlusIcon className="w-4 h-4" />
-            <span>Add Line</span>
-          </button>
-        </div>
-      </div>
-
-      {/* =================================================================== */}
-      {/* SECTION 3: HERO SLIDER PICTURES & HEADINGS                          */}
-      {/* =================================================================== */}
-      <div className="bg-[#141018] rounded-3xl border border-[#26202C] p-5 sm:p-7 space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#26202C] pb-4">
-          <div>
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#D4AF37] font-semibold">
-              3. HOMEPAGE HERO SLIDER
+      <details className="bg-[#141018] rounded-2xl border border-[#26202C] p-4 sm:p-5 group transition-all">
+        <summary className="cursor-pointer text-xs font-semibold text-gray-400 hover:text-[#D4AF37] flex items-center justify-between select-none">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#D4AF37]">
+              Optional
             </span>
-            <h3 className="text-base font-bold text-white mt-0.5">
-              Hero Banner Slides ({heroSlides.length} Slides)
-            </h3>
-            <p className="text-xs text-gray-400 mt-0.5">
-              Upload new banner pictures from your device (Cloudinary) or paste image URLs, and customize slide titles.
-            </p>
+            <span>Top Navbar Announcement Bar Ticker ({marqueeList.length} Messages)</span>
+          </div>
+          <span className="text-[10px] text-gray-500 group-open:rotate-180 transition-transform">
+            ▼
+          </span>
+        </summary>
+
+        <div className="mt-4 pt-4 border-t border-[#26202C] space-y-4">
+          <p className="text-xs text-gray-400">
+            Edit or add promotional announcements that scroll at the very top of your website navbar.
+          </p>
+
+          {/* Existing Marquee Lines */}
+          <div className="space-y-2.5">
+            {marqueeList.map((item, idx) => (
+              <div key={idx} className="flex items-center gap-2.5">
+                <span className="w-7 h-7 rounded-lg bg-[#1A1521] border border-[#2F2638] text-[#D4AF37] text-xs font-mono font-bold flex items-center justify-center shrink-0">
+                  {idx + 1}
+                </span>
+                <input
+                  type="text"
+                  value={item}
+                  onChange={(e) => handleUpdateMarqueeItem(idx, e.target.value)}
+                  placeholder="Enter announcement text..."
+                  className="flex-1 bg-[#1A1521] border border-[#2F2638] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-white focus:border-[#D4AF37] focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveMarqueeItem(idx)}
+                  className="p-2 bg-rose-950/50 hover:bg-rose-900 text-rose-300 rounded-xl border border-rose-800/40 transition-colors cursor-pointer shrink-0"
+                  title="Remove line"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
           </div>
 
-          <button
-            type="button"
-            onClick={handleAddHeroSlide}
-            className="px-4 py-2 bg-[#D4AF37]/15 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto"
-          >
-            <PlusIcon className="w-4 h-4" />
-            <span>+ Add New Hero Slide</span>
-          </button>
-        </div>
-
-        {/* Slides List */}
-        <div className="space-y-5">
-          {heroSlides.map((slide, idx) => (
-            <div
-              key={slide.id || idx}
-              className="p-4 sm:p-5 rounded-2xl bg-[#1A1521] border border-[#2E2536] grid grid-cols-1 lg:grid-cols-12 gap-5 items-center"
+          {/* Add New Marquee Line */}
+          <div className="flex items-center gap-2.5 pt-1">
+            <input
+              type="text"
+              value={newMarqueeText}
+              onChange={(e) => setNewMarqueeText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddMarqueeItem();
+                }
+              }}
+              placeholder="Add new marquee message..."
+              className="flex-1 bg-[#1A1521] border border-[#2F2638] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-gray-500 focus:border-[#D4AF37] focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleAddMarqueeItem}
+              className="px-4 py-2.5 bg-[#D4AF37] hover:bg-[#c49f2e] text-black rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
             >
-              {/* Slide Image Preview & Upload (5 cols) */}
-              <div className="lg:col-span-5 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#D4AF37]">
-                    Slide #{idx + 1} Banner Picture
-                  </span>
-                  {heroSlides.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveHeroSlide(idx)}
-                      className="text-[11px] text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer"
-                    >
-                      <TrashIcon className="w-3.5 h-3.5" />
-                      <span>Remove Slide</span>
-                    </button>
-                  )}
-                </div>
-
-                <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[#110E14] border border-[#382E42] group">
-                  <img
-                    src={slide.image || '/Logo.jpeg'}
-                    alt={slide.title || `Slide ${idx + 1}`}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/Logo.jpeg';
-                    }}
-                    className="w-full h-full object-cover object-top"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-3">
-                    <span className="text-[9px] uppercase tracking-widest text-[#D4AF37] font-bold">
-                      {slide.tag}
-                    </span>
-                    <p className="text-xs font-bold text-white truncate">{slide.title}</p>
-                  </div>
-                </div>
-
-                {/* Upload from Device Button */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    id={`hero-slide-upload-${idx}`}
-                    onChange={(e) => handleSlideImageUpload(idx, e)}
-                    disabled={uploadingSlideIndex === idx}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor={`hero-slide-upload-${idx}`}
-                    className="flex-1 py-2 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#c49f2e] text-black font-bold text-xs text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    {uploadingSlideIndex === idx ? (
-                      <span>Uploading to Cloudinary...</span>
-                    ) : (
-                      <>
-                        <UploadIcon className="w-3.5 h-3.5 shrink-0" />
-                        <span>Upload Picture from Device</span>
-                      </>
-                    )}
-                  </label>
-                </div>
-              </div>
-
-              {/* Slide Text & URL Fields (7 cols) */}
-              <div className="lg:col-span-7 space-y-3">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-gray-300 block">
-                    Picture URL (Or automatically filled when uploaded)
-                  </label>
-                  <input
-                    type="text"
-                    value={slide.image || ''}
-                    onChange={(e) => handleSlideFieldChange(idx, 'image', e.target.value)}
-                    placeholder="https://res.cloudinary.com/..."
-                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3 py-2 text-xs text-white font-mono focus:border-[#D4AF37] focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-gray-300 block">
-                      Top Badge / Tag
-                    </label>
-                    <input
-                      type="text"
-                      value={slide.tag || ''}
-                      onChange={(e) => handleSlideFieldChange(idx, 'tag', e.target.value)}
-                      placeholder="e.g. Velvet Formals 2026"
-                      className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3 py-2 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-gray-300 block">
-                      Main Heading Title
-                    </label>
-                    <input
-                      type="text"
-                      value={slide.title || ''}
-                      onChange={(e) => handleSlideFieldChange(idx, 'title', e.target.value)}
-                      placeholder="e.g. Grace in Every Thread"
-                      className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3 py-2 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[11px] font-semibold text-gray-300 block">
-                    Subtitle Description
-                  </label>
-                  <input
-                    type="text"
-                    value={slide.subtitle || ''}
-                    onChange={(e) => handleSlideFieldChange(idx, 'subtitle', e.target.value)}
-                    placeholder="e.g. Handcrafted Velvet & Zari Peshwas"
-                    className="w-full bg-[#130F18] border border-[#2F2638] rounded-xl px-3 py-2 text-xs text-white focus:border-[#D4AF37] focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+              <PlusIcon className="w-4 h-4" />
+              <span>Add</span>
+            </button>
+          </div>
         </div>
-      </div>
+      </details>
 
       {/* Bottom Save Button */}
       <div className="flex justify-end pt-2">
         <button
           type="submit"
           disabled={saving || uploadingSlideIndex !== null}
-          className="px-8 py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#b59024] hover:from-[#e0bc42] hover:to-[#c9a129] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xl transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+          className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[#D4AF37] to-[#b59024] hover:from-[#e0bc42] hover:to-[#c9a129] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
         >
           <CheckIcon className="w-4 h-4 stroke-[3]" />
-          <span>{saving ? 'Saving Storefront Settings...' : 'Save All Storefront Changes'}</span>
+          <span>{saving ? 'Saving Settings...' : 'Save Banner Settings'}</span>
         </button>
       </div>
     </form>

@@ -8,46 +8,50 @@ export default function AdminOrderDetailsModal({
   if (!selectedOrder) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] overflow-hidden overscroll-contain bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
-      <div className="relative w-full max-w-xl bg-[#141117] text-white rounded-2xl border border-[#D4AF37]/40 shadow-2xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto overscroll-contain admin-scrollbar space-y-5">
+    <div className="fixed inset-0 z-[60] overflow-hidden overscroll-contain bg-black/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-5">
+      <div className="relative w-full max-w-xl bg-[#141117] text-white rounded-2xl border border-[#D4AF37]/40 shadow-2xl p-4 sm:p-6 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto overscroll-contain admin-scrollbar space-y-4 sm:space-y-5">
         
         {/* Header */}
-        <div className="flex justify-between items-center border-b border-[#26202C] pb-4">
+        <div className="flex justify-between items-center border-b border-[#26202C] pb-3 sm:pb-4">
           <div>
             <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-widest text-[#D4AF37]">
               <ReceiptIcon className="w-3.5 h-3.5" />
               <span>Order Details</span>
             </div>
-            <h3 className="font-mono text-xl sm:text-2xl font-bold text-white mt-0.5">
+            <h3 className="font-mono text-lg sm:text-2xl font-bold text-white mt-0.5">
               {selectedOrder.orderNumber}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white rounded-full bg-[#1F1924] hover:bg-[#2B2332] transition-colors cursor-pointer"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-white rounded-full bg-[#1F1924] hover:bg-[#2B2332] transition-colors cursor-pointer"
             title="Close"
           >
-            <CloseIcon className="w-5 h-5" />
+            <CloseIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
-        <div className="space-y-4 text-xs">
+        <div className="space-y-3.5 sm:space-y-4 text-xs">
           
           {/* Customer Information Card */}
-          <div className="bg-[#19141F] p-5 rounded-2xl border border-[#2A2332] space-y-2.5">
+          <div className="bg-[#19141F] p-4 sm:p-5 rounded-2xl border border-[#2A2332] space-y-2.5">
             <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono tracking-wider text-gray-400">
               <UserIcon className="w-3.5 h-3.5 text-[#D4AF37]" />
               <span>Customer Information</span>
             </div>
-            <p className="text-base font-bold text-white">{selectedOrder.customer?.fullName || 'Guest Customer'}</p>
+            <p className="text-sm sm:text-base font-bold text-white">{selectedOrder.customer?.fullName || 'Guest Customer'}</p>
             <div className="space-y-1.5 pt-1">
               <p className="text-gray-300 flex items-center gap-2">
                 <MailIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                <span>{selectedOrder.customer?.email || 'N/A'}</span>
+                <a href={`mailto:${selectedOrder.customer?.email}`} className="hover:text-white hover:underline truncate">
+                  {selectedOrder.customer?.email || 'N/A'}
+                </a>
               </p>
               <p className="text-gray-300 flex items-center gap-2">
                 <PhoneIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                <span>{selectedOrder.customer?.phone || 'N/A'}</span>
+                <a href={`tel:${selectedOrder.customer?.phone}`} className="font-mono text-[#D4AF37] hover:underline">
+                  {selectedOrder.customer?.phone || 'N/A'}
+                </a>
               </p>
               <p className="text-gray-300 flex items-start gap-2">
                 <MapPinIcon className="w-3.5 h-3.5 text-[#D4AF37] shrink-0 mt-0.5" />
