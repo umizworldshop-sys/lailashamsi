@@ -11,6 +11,7 @@ export default function AdminStoreSettings({
   showToast
 }) {
   const [salePercent, setSalePercent] = useState(siteSettings?.saleDiscountPercent || 30);
+  const [saleType, setSaleType] = useState(siteSettings?.saleDiscountType || 'FLAT');
   const [marqueeList, setMarqueeList] = useState(
     Array.isArray(siteSettings?.marqueeItems) && siteSettings.marqueeItems.length > 0
       ? siteSettings.marqueeItems
@@ -61,6 +62,9 @@ export default function AdminStoreSettings({
     const timer = setTimeout(() => {
       if (siteSettings.saleDiscountPercent) {
         setSalePercent(siteSettings.saleDiscountPercent);
+      }
+      if (siteSettings.saleDiscountType) {
+        setSaleType(siteSettings.saleDiscountType);
       }
       if (Array.isArray(siteSettings.marqueeItems) && siteSettings.marqueeItems.length > 0) {
         setMarqueeList(siteSettings.marqueeItems);
@@ -170,6 +174,7 @@ export default function AdminStoreSettings({
     try {
       await onSaveSettings({
         saleDiscountPercent: Number(salePercent) || 30,
+        saleDiscountType: saleType,
         marqueeItems: marqueeList.map((m) => m.trim()).filter(Boolean),
         heroSlides: heroSlides.filter((s) => s && s.image)
       });
@@ -221,11 +226,11 @@ export default function AdminStoreSettings({
 
           <button
             type="button"
-            onClick={handleAddHeroSlide}
+            onClick={handleAddHeroSlide} 
             className="px-4 py-2 bg-[#D4AF37]/15 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-black border border-[#D4AF37]/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto"
           >
             <PlusIcon className="w-4 h-4" />
-            <span>+ Add New Banner Slide</span>
+            <span>+ Add New Banner Slide</span> 
           </button>
         </div>
 
@@ -377,20 +382,46 @@ export default function AdminStoreSettings({
               2. GRAND SEASONAL SALE BANNER
             </span>
             <h3 className="text-base font-bold text-white mt-0.5">
-              Sale Banner Discount Percentage (FLAT % OFF)
+              Sale Banner Discount ({saleType} % OFF)
             </h3>
             <p className="text-xs text-gray-400 mt-0.5">
-              Configures the flat discount percentage shown across the promotional sale banner.
+              Choose FLAT or UP TO discount offer and configure the percentage shown across the promotional sale banner.
             </p>
           </div>
           <span className="px-3.5 py-1.5 rounded-full bg-[#641E32]/40 border border-[#B76E79]/40 text-xs font-bold text-[#D4AF37] self-start sm:self-auto">
-            Currently: FLAT {salePercent}% OFF
+            Currently: {saleType} {salePercent}% OFF
           </span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
           {/* Controls */}
           <div className="space-y-4">
+            {/* Discount Prefix Type: FLAT vs UP TO */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-200 block">
+                Discount Offer Type (FLAT or UP TO)
+              </label>
+              <div className="flex items-center gap-2">
+                {[
+                  { id: 'FLAT', label: 'FLAT (e.g. FLAT 30% OFF)' },
+                  { id: 'UP TO', label: 'UP TO (e.g. UP TO 50% OFF)' }
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setSaleType(item.id)}
+                    className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                      saleType === item.id
+                        ? 'bg-[#D4AF37] text-black shadow-md scale-105'
+                        : 'bg-[#1A1521] text-gray-400 hover:text-white border border-[#2F2638]'
+                    }`}
+                  >
+                    <span>{item.id}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-200 block">
                 Enter Discount Percentage (%)
@@ -410,7 +441,7 @@ export default function AdminStoreSettings({
                   </span>
                 </div>
                 <span className="text-xs text-gray-400">
-                  Changes &ldquo;FLAT {salePercent}% OFF&rdquo; on Sales Banner
+                  Changes &ldquo;{saleType} {salePercent}% OFF&rdquo; on Sales Banner
                 </span>
               </div>
             </div>
@@ -430,7 +461,7 @@ export default function AdminStoreSettings({
                         : 'bg-[#1A1521] text-gray-300 hover:text-white border border-[#2F2638]'
                     }`}
                   >
-                    FLAT {pct}%
+                    {saleType} {pct}%
                   </button>
                 ))}
               </div>
@@ -453,7 +484,7 @@ export default function AdminStoreSettings({
                 SPECIAL DISCOUNT
               </span>
               <div className="font-cinzel text-xl sm:text-2xl font-extrabold text-white">
-                FLAT <span className="text-[#B89B62]">{salePercent || 30}%</span> OFF
+                {saleType} <span className="text-[#B89B62]">{salePercent || 30}%</span> OFF
               </div>
               <span className="text-[8px] text-[#E8DCCB]/80 uppercase tracking-widest block">
                 ON ENTIRE COLLECTION

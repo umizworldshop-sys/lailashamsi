@@ -60,6 +60,7 @@ export default function App() {
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [siteSettings, setSiteSettings] = useState({
     saleDiscountPercent: 30,
+    saleDiscountType: 'FLAT',
     marqueeItems: [
       '✨ Umiz World Collection ✨',
       'Discover Timeless Pakistani Elegance',
@@ -780,6 +781,7 @@ export default function App() {
               selectedCurrency={selectedCurrency}
               onExploreAll={() => navigateTo('/sales')}
               saleDiscountPercent={siteSettings?.saleDiscountPercent}
+              saleDiscountType={siteSettings?.saleDiscountType}
             />
 
             {/* 5. Brand Heritage Value Props */}
@@ -895,6 +897,7 @@ export default function App() {
               onToggleWishlist={handleToggleWishlist}
               selectedCurrency={selectedCurrency}
               saleDiscountPercent={siteSettings?.saleDiscountPercent}
+              saleDiscountType={siteSettings?.saleDiscountType}
             />
           )}
 

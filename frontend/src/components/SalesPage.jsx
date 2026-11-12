@@ -24,7 +24,8 @@ export default function SalesPage({
   wishlist,
   onToggleWishlist,
   selectedCurrency = 'PKR',
-  saleDiscountPercent = 30
+  saleDiscountPercent = 30,
+  saleDiscountType = 'FLAT'
 }) {
   const [selectedSubCat, setSelectedSubCat] = useState('all');
 
@@ -109,7 +110,7 @@ export default function SalesPage({
                 Special Discount
               </span>
               <div className="font-cinzel text-4xl sm:text-6xl font-extrabold text-white tracking-wider">
-                FLAT <span className="text-[#B89B62]">{saleDiscountPercent || 30}%</span> OFF
+                {saleDiscountType || 'FLAT'} <span className="text-[#B89B62]">{saleDiscountPercent || 30}%</span> OFF
               </div>
               <span className="text-[11px] text-[#E8DCCB]/80 uppercase tracking-widest mt-1">
                 On Entire Umi&apos;z World Collection

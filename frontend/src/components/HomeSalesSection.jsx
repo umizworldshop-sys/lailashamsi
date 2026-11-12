@@ -40,7 +40,8 @@ export default function HomeSalesSection({
   onToggleWishlist,
   selectedCurrency = 'PKR',
   onExploreAll,
-  saleDiscountPercent = 30
+  saleDiscountPercent = 30,
+  saleDiscountType = 'FLAT'
 }) {
   const [copiedCode, setCopiedCode] = useState(false);
   const saleProducts = getSaleProducts(products);
@@ -68,7 +69,7 @@ export default function HomeSalesSection({
               Seasonal Sale & Special Offers
             </h2>
             <p className="text-xs sm:text-sm text-[#282321]/80 font-normal mt-1.5 sm:mt-2 max-w-xl leading-relaxed">
-              Enjoy flat {saleDiscountPercent || 30}% off on handcrafted Pakistani Eastern Wear, embroidered lawn suits, luxury pret, and festive attire.
+              Enjoy {saleDiscountType ? saleDiscountType.toLowerCase() : 'flat'} {saleDiscountPercent || 30}% off on handcrafted Pakistani Eastern Wear, embroidered lawn suits, luxury pret, and festive attire.
             </p>
           </div>
         </div>

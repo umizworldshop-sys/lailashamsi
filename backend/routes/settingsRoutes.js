@@ -7,6 +7,7 @@ const { isCloudinaryConfigured, uploadFileToCloudinary } = require('../config/cl
 const DEFAULT_SETTINGS = {
   key: 'main',
   saleDiscountPercent: 30,
+  saleDiscountType: 'FLAT',
   marqueeItems: [
     'Discover Timeless Pakistani Elegance',
     'Cash on Delivery Across Pakistan',
@@ -77,12 +78,17 @@ router.get('/', async (req, res) => {
  */
 router.put('/', verifyAdmin, async (req, res) => {
   try {
-    const { saleDiscountPercent, marqueeItems, heroSlides } = req.body;
+    const { saleDiscountPercent, saleDiscountType, marqueeItems, heroSlides } = req.body;
     const updatePayload = {};
 
     if (saleDiscountPercent !== undefined) {
       const parsedPercent = Math.min(99, Math.max(1, Number(saleDiscountPercent) || 30));
       updatePayload.saleDiscountPercent = parsedPercent;
+    }
+
+    if (saleDiscountType !== undefined) {
+      const normalizedType = String(saleDiscountType).trim().toUpperCase();
+      updatePayload.saleDiscountType = normalizedType === 'UP TO' || normalizedType === 'UPTO' ? 'UP TO' : 'FLAT';
     }
 
     if (Array.isArray(marqueeItems)) {

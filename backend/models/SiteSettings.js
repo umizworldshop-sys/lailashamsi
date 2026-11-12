@@ -26,6 +26,11 @@ const siteSettingsSchema = new mongoose.Schema(
       min: 1,
       max: 99
     },
+    saleDiscountType: {
+      type: String,
+      default: 'FLAT',
+      trim: true
+    },
     marqueeItems: {
       type: [String],
       default: [
